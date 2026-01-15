@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET() {
 
-  await new Promise(res => setTimeout(res, 2000));
+  // todo Update database if necessary
 
   const response = NextResponse.json({ success: true, message: "success" });
   response.cookies.set("refresh", "", {
@@ -12,7 +12,5 @@ export async function GET(request: Request) {
     path: "/",
     maxAge: 0,
   });
-
-
   return response;
 }
