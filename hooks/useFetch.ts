@@ -1,26 +1,25 @@
-import { NextResponse } from "next/server";
 import { useState } from "react";
 
-interface FetchData {
+export interface FetchData {
   success: boolean,
   message?: string,
   error?: string,
 }
 
-export const useFetch = (
-  fetchFn: () => Promise<Response>, 
-  initData: Partial<FetchData>
+export const useFetch = <Args extends any[], Data extends FetchData>(
+  fetchFn: (...args: Args) => Promise<Response>, 
+  initData: Partial<Data>
 ) => {
   const [ loading, setLoading ] = useState<boolean>(false);
   const [ error, setError ] = useState<string>("");
-  const [ data, setData ] = useState<Partial<FetchData>>(initData);
+  const [ data, setData ] = useState<Partial<Data>>(initData);
 
-  const fetch = async () => {
+  const fetch = async (...args: Args) => {
     setLoading(true);
     setError("");
     try {
-      const response = await fetchFn();
-      const result = await response.json();
+      const response = await fetchFn(...args);
+      const result: Partial<Data> = await response.json();
       if (!response.ok) throw new Error(result.message ?? "There was a problem logging in");
       setData(result);      
     } catch (err) {

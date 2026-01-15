@@ -1,48 +1,39 @@
 "use client"
 
-import { redirect } from "next/navigation";
-import React, { ChangeEvent, useState } from "react"
+import { LoginData } from "@/app/api/login/route";
+import { useFetch } from "@/hooks/useFetch";
+import { useRouter } from "next/navigation";
+import React, { ChangeEvent, useEffect, useState } from "react"
 
-export default function LoginForm() {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [ error, setError ] = useState<string>("");
+const login = async (email: string, password: string): Promise<Response> => {
+  return fetch("/api/login", {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  });
+}
+
+export default function LoginForm(): React.ReactElement {
+  const { data, error, loading, refetch } = useFetch<[string, string], LoginData>(login, {});
+  const router = useRouter();
   const [input, setInput] = useState<Record<string, string>>({
     email: "",
     password: "",
   });
 
+  useEffect(() => {
+    if (data?.success && data.token) {
+      localStorage.setItem("token", data.token);
+      console.log(data.token);    
+      router.push("/auth/dashboard");  
+    }
+  }, [data, router]);
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(input.email, input.password);
-  }
-
-  const login = async (e: string, p: string) => {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await fetch("/api/login", {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ email: e, password: p })
-      });
-      
-      // Get message from response body
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message ?? "There was a problem logging in");
-
-      // Get token
-      const { token } = result;
-      localStorage.setItem("token", token);
-      console.log(token);      
-    } catch (err) {
-      if (err instanceof Error) setError(err.message);
-      else setError("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-    return redirect("/auth/dashboard");
+    await refetch(input.email, input.password);
   }
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
