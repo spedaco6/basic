@@ -1,7 +1,7 @@
 import type { FetchResponseData } from "@/hooks/useFetch";
 import { NextResponse } from "next/server";
 
-export interface LoginData extends FetchResponseData {
+export interface LoginResponseData extends FetchResponseData {
   token: string
 }
 
