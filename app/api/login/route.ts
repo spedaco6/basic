@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   const accessToken = "token123";
   const refreshToken = "TOKEN_ABC";
 
-  const response = NextResponse.json({ token: accessToken, message: "Success" });
+  const response = NextResponse.json({ success: true, token: accessToken, message: "Success" });
   response.cookies.set("refresh", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

@@ -4,7 +4,7 @@ export async function GET(request: Request) {
 
   await new Promise(res => setTimeout(res, 2000));
 
-  const response = NextResponse.json({ message: "success" });
+  const response = NextResponse.json({ success: true, message: "success" });
   response.cookies.set("refresh", "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
