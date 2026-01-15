@@ -2,8 +2,9 @@ import type { FetchData } from "@/hooks/useFetch";
 import { NextResponse } from "next/server";
 
 export interface LoginData extends FetchData {
-  token?: string
+  token: string
 }
+
 export async function POST(request: Request): Promise<Response> {
   const { email, password } = await request.json();
 
