@@ -17,7 +17,7 @@ const login = (email: string, password: string): Promise<Response> => {
   });
 }
 
-export default function LoginForm(): React.ReactElement {
+export default function LoginForm({ className="" }): React.ReactElement {
   const { data, error, loading, refetch } = useFetch<[string, string], LoginResponseData>(login, {});
   const router = useRouter();
   const email = useInput("email", "");
@@ -36,13 +36,14 @@ export default function LoginForm(): React.ReactElement {
     await refetch(email.value, password.value);
   }
 
-  return <main>
-    <form className="flex flex-col m-4 p-6 gap-4 bg-gray-200 rounded-lg max-w-[25rem]" onSubmit={onSubmit}>
-      <h1 className="text-center text-xl">LOGIN</h1>
-      { error && <p className="text-red-500">{ error }</p> }
-      <Input hook={email} className="bg-white" type="email" placeholder="Email" />
+  return <form className={`${className} flex flex-col m-4 p-6 bg-gray-200 justify-between rounded-lg h-[15rem] w-[25rem]`} onSubmit={onSubmit}>
+    <h1 className="text-center text-xl">LOGIN</h1>
+    { error && <p className="text-red-500">{ error }</p> }
+    <div className="flex flex-col gap-4">
+      <Input hook={email} className="bg-white" type="email" placeholder="Email" autoFocus />
       <Input hook={password} className="bg-white" type="password" placeholder="Password" />
       <button className="border-1 bg-gray-700 hover:bg-gray-500 text-white cursor-pointer p-1 rounded-sm">{ loading ? "Submitting..." : "Login"}</button>
-    </form>
-  </main>
+    </div>
+  </form>
+
 }

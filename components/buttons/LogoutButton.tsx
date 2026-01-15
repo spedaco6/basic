@@ -19,7 +19,7 @@ export function LogoutButton(): React.ReactElement {
 
   return <div>
    {error && <p className="text-red-500">{error}</p>}
-    <button onClick={refetch}>
+    <button onClick={refetch} className="py-1 px-2 bg-gray-700 hover:bg-gray-500 text-white rounded-lg cursor-pointer ">
       { loading ? "Logging out" : "Logout" }
     </button>
   </div>

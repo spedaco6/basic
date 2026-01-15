@@ -10,9 +10,8 @@ export default function Dashboard() {
   const { data, refetch } = useFetch(refresh, {});
   console.log(data);
 
-  return <main>
-    <h1>DASHBOARD</h1>
-    <LogoutButton />
-    <button onClick={refetch}>Refresh Token</button>
+  return <main className="p-4">
+    <h1 className="text-2xl">DASHBOARD</h1>
+    <button onClick={refetch}>Refresh Token</button>    
   </main>
 }
