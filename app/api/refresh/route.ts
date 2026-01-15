@@ -17,5 +17,5 @@ export async function GET() {
   // todo Get new access token
   const newToken = "newToken";
 
-  return NextResponse.json({ token: newToken, message: "cookie refreshed" });
+  return NextResponse.json({ success: true, token: newToken, message: "cookie refreshed" });
 }

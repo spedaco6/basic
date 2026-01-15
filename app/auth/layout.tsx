@@ -2,7 +2,7 @@ import { LogoutButton } from "@/components/buttons/LogoutButton";
 import React from "react";
 
 export default function AuthLayout({ children }: React.PropsWithChildren ): React.ReactElement {
-
+  
   return <div className="flex flex-col h-[100dvh]">
     <div className="p-2 border-b-2 bg-gray-100 border-gray-200 flex justify-end">
       <LogoutButton />
