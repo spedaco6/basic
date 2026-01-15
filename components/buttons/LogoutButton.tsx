@@ -4,7 +4,7 @@ import { useFetch } from "@/hooks/useFetch";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
-const logout: () => Promise<Response> = async () => fetch("/api/logout");
+const logout: () => Promise<Response> = () => fetch("/api/logout");
 
 export function LogoutButton(): React.ReactElement {
   const { data, error, loading, refetch } = useFetch(logout, {});

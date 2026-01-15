@@ -1,12 +1,12 @@
 import { useState } from "react";
 
-export interface FetchData {
+export interface FetchResponseData {
   success: boolean,
   message?: string,
   error?: string,
 }
 
-export const useFetch = <Args extends any[], Data extends FetchData>(
+export const useFetch = <Args extends any[], Data extends FetchResponseData>(
   fetchFn: (...args: Args) => Promise<Response>, 
   initData: Partial<Data>
 ) => {

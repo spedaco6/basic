@@ -1,11 +1,11 @@
 "use client"
 
-import { LoginData } from "@/app/api/login/route";
+import type { LoginResponseData } from "@/app/api/login/route";
 import { useFetch } from "@/hooks/useFetch";
 import { useRouter } from "next/navigation";
 import React, { ChangeEvent, useEffect, useState } from "react"
 
-const login = async (email: string, password: string): Promise<Response> => {
+const login = (email: string, password: string): Promise<Response> => {
   return fetch("/api/login", {
     method: "post",
     headers: {
@@ -16,7 +16,7 @@ const login = async (email: string, password: string): Promise<Response> => {
 }
 
 export default function LoginForm(): React.ReactElement {
-  const { data, error, loading, refetch } = useFetch<[string, string], LoginData>(login, {});
+  const { data, error, loading, refetch } = useFetch<[string, string], LoginResponseData>(login, {});
   const router = useRouter();
   const [input, setInput] = useState<Record<string, string>>({
     email: "",
