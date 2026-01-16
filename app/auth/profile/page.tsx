@@ -1,3 +1,4 @@
+import { LoadingProfileCard } from "@/components/cards/LoadingProfileCard";
 import { ProfileCard } from "@/components/cards/ProfileCard";
 import { Metadata } from "next";
 import React from "react";
@@ -10,6 +11,7 @@ export default function ProfilePage(): React.ReactElement {
 
   return <main className="p-4">
     <h1 className="text-2xl mb-4 uppercase">Profile</h1>
+    <h2 className="mt-12 mb-6 text-xl uppercase shadow-lg">Account Details</h2>
     <ProfileCard />
   </main>
 }

@@ -19,11 +19,9 @@ export const ProfileCard = (): React.ReactElement => {
   const { data, error, loading } = useFetch<ProfileResponseData>(getProfile);
 
   return <div>
-    <h3>Profile Card</h3>
     { data && !error && !loading && <div>
       <p>{ data.firstName } {data.lastName }</p>
     </div> }
     { error && <p className="text-red-500">{ error }</p> }
-    { loading && <LoadingProfileCard /> }
   </div>
 }
