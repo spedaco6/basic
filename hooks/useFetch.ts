@@ -6,7 +6,7 @@ export interface FetchResponseData {
   error?: string,
 }
 
-export const useFetch = <Args extends any[], Data extends FetchResponseData>(
+export const useFetch = <Data extends FetchResponseData, Args extends any[] = any>(
   fetchFn: (...args: Args) => Promise<Response>, 
   initData: Partial<Data>
 ) => {

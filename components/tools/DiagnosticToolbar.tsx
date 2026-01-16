@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react"
 const refresh: () => Promise<Response> = () => fetch("/api/refresh");
 
 export const DiagnosticToolbar = (): React.ReactElement => {
-  const { data, refetch } = useFetch<any, RefreshResponseData>(refresh, {});
+  const { data, refetch } = useFetch<RefreshResponseData>(refresh, {});
   const [ show, setShow ] = useState(false);
   
   useEffect(() => {
