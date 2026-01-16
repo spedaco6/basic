@@ -18,7 +18,7 @@ const login = (email: string, password: string): Promise<Response> => {
 }
 
 export default function LoginForm({ className="" }): React.ReactElement {
-  const { data, error, loading, refetch } = useFetch<LoginResponseData, [string, string]>(login, {});
+  const { data, error, loading, refetch } = useFetch<LoginResponseData, [string, string]>(login, {}, { immediate: false });
   const router = useRouter();
   const email = useInput("email", "");
   const password = useInput("password", "");

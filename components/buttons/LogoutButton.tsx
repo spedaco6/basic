@@ -7,7 +7,7 @@ import React, { useEffect } from "react";
 const logout: () => Promise<Response> = () => fetch("/api/logout");
 
 export function LogoutButton(): React.ReactElement {
-  const { data, error, loading, refetch } = useFetch(logout, {});
+  const { data, error, loading, refetch } = useFetch(logout, {}, { immediate: false });
   const router = useRouter();
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface FetchResponseData {
   success: boolean,
@@ -6,19 +6,29 @@ export interface FetchResponseData {
   error?: string,
 }
 
-export const useFetch = <Data extends FetchResponseData, Args extends any[] = any>(
+interface FetchOptions {
+  immediate: boolean,
+}
+
+export const useFetch = <
+  Data extends FetchResponseData, 
+  Args extends any[] = [],
+>(
   fetchFn: (...args: Args) => Promise<Response>, 
-  initData: Partial<Data>
+  initData?: Partial<Data>,
+  options?: Partial<FetchOptions>,
 ) => {
   const [ loading, setLoading ] = useState<boolean>(false);
   const [ error, setError ] = useState<string>("");
-  const [ data, setData ] = useState<Partial<Data>>(initData);
+  const [ data, setData ] = useState<Partial<Data>>(initData ?? {});
 
-  const fetch = async (...args: Args) => {
+  const immediate: boolean = options?.immediate ?? true;
+
+  const fetch = useCallback(async (...args: Args | []) => {
     setLoading(true);
     setError("");
     try {
-      const response = await fetchFn(...args);
+      const response = await fetchFn(...(args as Args));
       const result: Partial<Data> = await response.json();
       if (!response.ok) throw new Error(result.message ?? "There was a problem logging in");
       setData(result);      
@@ -28,7 +38,13 @@ export const useFetch = <Data extends FetchResponseData, Args extends any[] = an
     } finally {
       setLoading(false);
     }
-  }
+  }, [fetchFn]);
+
+  useEffect(() => {
+    if (immediate) {
+      fetch();
+    }
+  }, [immediate, fetch]);
 
   return {
     error,

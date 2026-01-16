@@ -3,7 +3,7 @@
 import { ProfileResponseData } from "@/app/api/profile/route";
 import { useFetch } from "@/hooks/useFetch"
 import { getToken } from "@/lib/tokens";
-import React, { useEffect } from "react"
+import React from "react"
 import { LoadingProfileCard } from "./LoadingProfileCard";
 
 const getProfile = async (): Promise<Response> => {
@@ -16,15 +16,7 @@ const getProfile = async (): Promise<Response> => {
 }
 
 export const ProfileCard = (): React.ReactElement => {
-  const { data, error, loading, refetch } = useFetch<ProfileResponseData>(getProfile, {});
-  
-  console.log("Data: ", data);
-
-  useEffect(() => {
-    if (Object.keys(data).length === 0 && !error && !loading) {
-      refetch();
-    }
-  }, [refetch, data]);
+  const { data, error, loading } = useFetch<ProfileResponseData>(getProfile);
 
   return <div>
     <h3>Profile Card</h3>
