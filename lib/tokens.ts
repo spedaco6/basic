@@ -1,3 +1,10 @@
+import { JWTPayload, jwtVerify, SignJWT } from "jose";
+
+interface TokenPayload extends JWTPayload {
+  userId: number,
+  userRole: number,
+}
+
 export const getToken = async (): Promise<string> => {
   // Try to get existing token
   const token = localStorage.getItem("token");
@@ -15,4 +22,38 @@ export const refreshToken = async (): Promise<string> => {
   const result = await response.json();
   if (!response.ok) throw new Error(result?.message ?? "Could not refresh token");
   return result.token;
+}
+
+// Create access token
+export async function createAccessToken<T extends TokenPayload>(payload: T): Promise<string> {
+  const accessTokenSecret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET);
+  const accessToken = await new SignJWT(payload)
+  .setProtectedHeader({ alg: "HS256" })
+  .setExpirationTime("15m")
+  .sign(accessTokenSecret);
+  return accessToken;
+}
+
+// Verify access token
+export async function verifyAccessToken(accessToken: string): Promise<TokenPayload | null> {
+  const accessTokenSecret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET);
+  const verified = await jwtVerify<TokenPayload>(accessToken, accessTokenSecret);
+  return verified.payload ?? null;
+}
+
+// Create refresh token
+export async function createRefreshToken<T extends TokenPayload>(payload: T): Promise<string> {
+  const refreshTokenSecret = new TextEncoder().encode(process.env.REFRESH_TOKEN_SECRET);
+  const refreshToken = await new SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("7d")
+    .sign(refreshTokenSecret);
+  return refreshToken;
+}
+
+// Verify refresh token
+export async function verifyRefreshToken(refreshToken: string): Promise<TokenPayload | null> {
+  const refreshTokenSecret = new TextEncoder().encode(process.env.REFRESH_TOKEN_SECRET);
+  const verified = await jwtVerify<TokenPayload>(refreshToken, refreshTokenSecret);
+  return verified.payload ?? null;
 }

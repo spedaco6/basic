@@ -1,4 +1,6 @@
 import type { FetchResponseData } from "@/hooks/useFetch";
+import { createAccessToken, createRefreshToken } from "@/lib/tokens";
+import { SignJWT } from "jose";
 import { NextResponse } from "next/server";
 
 export interface LoginResponseData extends FetchResponseData {
@@ -11,11 +13,13 @@ export async function POST(request: Request): Promise<Response> {
 
   // todo Authenticate user
   
-  // todo Create new access and refresh tokens
-  await new Promise(res => setTimeout(res, 2000));
-  const accessToken = "token123";
-  const refreshToken = "TOKEN_ABC";
-
+  await new Promise(res => setTimeout(res, 2000)); // todo
+  
+  // Create access and refresh tokens
+  const payload = { userId: 1, userRole: 50 };
+  const accessToken = await createAccessToken(payload);
+  const refreshToken = await createRefreshToken(payload);
+    
   // Return response with token and cookie
   const response = NextResponse.json({ success: true, token: accessToken, message: "Success" });
   response.cookies.set("refresh", refreshToken, {

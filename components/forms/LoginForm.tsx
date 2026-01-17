@@ -42,7 +42,11 @@ export default function LoginForm({ className="" }): React.ReactElement {
     <div className="flex flex-col gap-4">
       <Input hook={email} className="bg-white" type="email" placeholder="Email" autoFocus />
       <Input hook={password} className="bg-white" type="password" placeholder="Password" />
-      <button className="border-1 bg-gray-700 hover:bg-gray-500 text-white cursor-pointer p-1 rounded-sm">{ loading ? "Submitting..." : "Login"}</button>
+      <button className="border-1 bg-gray-700 hover:bg-gray-500 text-white cursor-pointer py-2 rounded-sm">{ !loading ? "Login" : 
+        <div className="animate-spin">
+          <i className="bi bi-arrow-clockwise text-2xl" />
+        </div> }
+      </button>
     </div>
   </form>
 

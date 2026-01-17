@@ -1,6 +1,8 @@
 import { FetchResponseData } from "@/hooks/useFetch";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { jwtVerify, SignJWT } from "jose";
+import { createAccessToken, verifyRefreshToken } from "@/lib/tokens";
 
 export interface RefreshResponseData extends FetchResponseData {
   token: string
@@ -8,14 +10,16 @@ export interface RefreshResponseData extends FetchResponseData {
 
 export async function GET() {
   const cookieStore = await cookies();
-  const refresh = cookieStore.get("refresh");
-
-  if (!refresh) return NextResponse.redirect("/login");
+    const refreshToken = cookieStore.get("refresh");
+  if (!refreshToken) return NextResponse.redirect("/login");
   
-  // todo Validate refresh token
-  
-  // todo Get new access token
-  const newToken = "newToken";
+  // Validate refresh token
+  const verified = await verifyRefreshToken(refreshToken.value);
+  if (!verified) return NextResponse.json({ success: false, message: "invalid token" });
 
-  return NextResponse.json({ success: true, token: newToken, message: "cookie refreshed" });
+  // Get new access token
+  const payload = { userId: 1, userRole: 50 }; // todo
+  const accessToken = await createAccessToken(payload);
+
+  return NextResponse.json({ success: true, token: accessToken, message: "cookie refreshed" });
 }

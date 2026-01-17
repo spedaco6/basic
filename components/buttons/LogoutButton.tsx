@@ -23,7 +23,11 @@ export function LogoutButton(): React.ReactElement {
       onClick={refetch} className="py-1 px-2 text-black flex justify-center rounded-lg cursor-pointer"
       title="Logout"
     >
-      { loading ? "Logging out" : <i className="bi bi-box-arrow-right text-2xl" /> }
+      { loading ? 
+        <div className="animate-spin">
+          <i className="bi bi-arrow-clockwise text-2xl" />
+        </div> : 
+        <i className="bi bi-box-arrow-right text-2xl" /> }
     </button>
   </div>
 }

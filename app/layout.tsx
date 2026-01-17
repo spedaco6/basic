@@ -1,7 +1,9 @@
+import { config } from "dotenv";
 import type { Metadata } from "next";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./globals.css";
 
+config();
 
 export const metadata: Metadata = {
   title: "Basic App",
