@@ -96,7 +96,7 @@ export abstract class Model {
   public delete(): void {
     const db = getDb();
     if (!this.id) throw new Error("No id provided for deletion");
-    db.deleteOne(this.tableName, this.id);
+    db.deleteOne(this.tableName, this);
   }
 
   // Return an array of all property names todo

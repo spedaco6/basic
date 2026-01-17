@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
+import { Model } from "../models/Model";
 // import "server-only";
 // todo REMOVE PROMISES
-interface Model {};
 
 export interface QueryOptions {
   sort: "asc" | "desc",
@@ -137,8 +137,9 @@ export class SQLite {
   }
 
   // delete one record
-  public deleteOne<T extends Model>(tableName: string, id: number): boolean {
+  public deleteOne<T extends Model>(tableName: string, data: T): boolean {
     try {
+      const id = data.id;
       if (!id) throw new Error("No id provided");
       const existingRecord = this.find(tableName, { id });
       if (!existingRecord) throw new Error(`Could not find a record to delete with id ${id}`);
