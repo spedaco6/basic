@@ -1,9 +1,9 @@
-import Database from "better-sqlite3";
+import { SQLite } from "./SQLite";
 import "server-only";
 
-let db: Database.Database;
+let db: SQLite;
 
-export function getDb(): Database.Database {
-  if (!db) db = new Database('./lib/database/sqlite.db');
+export function getDb(): SQLite {
+  if (!db) db = new SQLite('./lib/database/sqlite.db');
   return db;
 }

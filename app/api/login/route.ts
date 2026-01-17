@@ -1,5 +1,7 @@
 import type { FetchResponseData } from "@/hooks/useFetch";
 import { getDb } from "@/lib/database/db";
+import { SQLite } from "@/lib/database/SQLite";
+import { User } from "@/lib/models/User";
 import { createAccessToken, createRefreshToken } from "@/lib/tokens";
 import { NextResponse } from "next/server";
 
@@ -18,10 +20,28 @@ export async function POST(request: Request): Promise<Response> {
   const { email, password } = await request.json();
   // todo Sanitize and validate data
 
+  const db = getDb();
+  db.deleteTable("users");
+  User.init();
+
   // todo Authenticate user
-  const db = getDb(); // todo set proper db
-  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email) as Partial<IUser>;
-  if (!user) return NextResponse.json({ 
+  const newUser = new User({
+    email: "test@save.com",
+    password: "password",
+    userRole: 30,
+  });
+  newUser.save();
+
+  newUser.email = "update@test.com";
+  newUser.save();
+
+  const updatedUser = User.findById(newUser.id);
+  updatedUser?.delete();
+
+
+  // const db = getDb(); // todo set proper db
+  // const temp = db.prepare("SELECT * FROM users WHERE email = ?").get(email) as Partial<IUser>;
+  /* if (!user) return NextResponse.json({ 
     success: false, 
     message: "Incorrect email or password" 
   }, { status: 403 });
@@ -30,7 +50,7 @@ export async function POST(request: Request): Promise<Response> {
   if (user.password !== password) return NextResponse.json({ 
     success: false, 
     message: "Incorrect email or password" 
-  }, { status: 403 });
+  }, { status: 403 }); */
   
   await new Promise(res => setTimeout(res, 2000)); // todo remove
   

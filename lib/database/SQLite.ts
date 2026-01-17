@@ -20,7 +20,6 @@ export interface ColumnSchema {
   type: string,
   primaryKey?: boolean,
   required?: boolean,
-  autoIncrement?: boolean,
   unique?: boolean,
   default?: any,
 };
@@ -77,14 +76,14 @@ export class SQLite {
     return values;
   }
 
-  public async find<T extends Model>(
+  public find<T extends Model>( // todo
     tableName: string,
     filters: Record<string, any> = {},
     options: Partial<QueryOptions> = {},
     ...returnFields: string[]
-  ): Promise<T[]> {
+  ): T[] {
 
-    let models: T[] = [];
+    let results: T[] = [];
     // Compile query options
     const queryOptions: Required<QueryOptions> = {
       ...defaultQueryOptions,
@@ -129,44 +128,37 @@ export class SQLite {
       `;
 
       // Run query
-      const [ results ] = await this.pool.query(sql, values) as any; // todo change query to sqlite
-
-      models = [...results];
+      results = this.db.prepare(sql).all(values) as any; // todo change query to sqlite
     } catch (err) {
       console.error(err);
     } finally {
-      return models;
+      return results;
     }
   }
 
   // delete one record
-  public async deleteOne<T extends Model>(tableName: string, data: T): Promise<boolean> {
+  public deleteOne<T extends Model>(tableName: string, id: number): boolean {
     try {
-      const id = data.id;
       if (!id) throw new Error("No id provided");
       const existingRecord = this.find(tableName, { id });
       if (!existingRecord) throw new Error(`Could not find a record to delete with id ${id}`);
 
       // todo confirm table name is safe
       const sql = `DELETE FROM ${tableName}
-        WHERE id = ?;
-      `;
-
-      const [{ affectedRows }] = await this.pool.query(sql, [id]) as any;
-      if (affectedRows !== 1) return false;
+        WHERE id = ?;`;
+      const result = this.db.prepare(sql).run(id) as any;
+      if (result.changes === 0) return false;
       return true;
     } catch (err) {
       console.error(err);
       return false;
     } 
-    
   }
 
   // create one record 
-  public async createOne<T extends Model>(tableName: string, data: T): Promise<T | null> {
+  public createOne<T extends Model>(tableName: string, data: T): T | null {
     let dataModel: T | null = null;
     try {
-
       // Create sql string for field names   
       const fieldNames = Object.keys(data)
         .filter(field => field !== "id")
@@ -181,14 +173,11 @@ export class SQLite {
       // Create SQL for insert statement todo check that tableName is safe
       let sql = `INSERT INTO ${tableName} (
         ${ fieldNames }
-      ) VALUES (${fieldData.map(d => "?").join(", ")});`;
+      ) VALUES (${fieldData.map(d => "?").join(", ")})
+      RETURNING *;`;
 
-      // Query database to insert the new record
-      const [{ insertId }] = await this.pool.query<ResultSetHeader>(sql, fieldData); // todo conver to sqlite
-
-      // Fetch the new record based on record id
-      const result = await this.find(tableName, { id: insertId }) as any;
-      if (result.length) dataModel = result[0];
+      // Query database to insert and retrieve the new record
+      dataModel = this.db.prepare(sql).get(fieldData) as any;
     } catch (err) {
       console.error(err);
     } finally {
@@ -197,16 +186,16 @@ export class SQLite {
   } 
 
   // Updates one record in the database
-  public async updateOne<T extends Model>(tableName: string, data: T): Promise<T | null> {
+  public updateOne<T extends Model>(tableName: string, data: T): T | null {
     let updated: T | null = null;
     try {
       const id = data.id;
       if (!id) throw new Error("No id provided in the object");
-      const originalRecord = await this.find(tableName, { id });
+      const originalRecord = this.find(tableName, { id });
       if (!originalRecord) throw new Error(`Could not find a record with id ${id}`);
 
       // Filter out fields that cannot be edited
-      const editableFields = Object.entries(data).filter(([key]) => key !== "id");
+      const editableFields = Object.entries(data).filter(([key]) => key !== "id" && key !== "secureKey");
       const editableData = editableFields.map(([key, val]) => val);
 
       // Create strings that set updated values
@@ -215,13 +204,10 @@ export class SQLite {
       //todo be sure tableName is safe
       const sql = `UPDATE ${tableName}
         SET ${fieldStr}
-        WHERE id = ?;
-      `
-      const [{ changedRows }] = await this.pool.query(sql, [...editableData, id]) as any; // todo conver to sqlite
-      if (changedRows === 0) throw new Error("Could not update record");
-
-      const result = await this.find(tableName, { id }) as any;
-      if (result.length) updated = result[0];
+        WHERE id = ?
+        RETURNING *;
+      `;
+      updated = this.db.prepare(sql).get([...editableData, id]) as any;
     } catch (err) {
       console.error(err);
     } finally {
@@ -230,7 +216,7 @@ export class SQLite {
   }
 
   // Create table in the database
-  public async createTable(tableName: string, tableSchema: TableSchema): Promise<void> {
+  public createTable(tableName: string, tableSchema: TableSchema): void {
     try {
       // confirm args and establish this.pool
       if (!tableName) throw new Error("No table name provided");
@@ -242,8 +228,8 @@ export class SQLite {
       // Get SQL string for table columns
       const sql = this._createTableSchemaSQL(tableSchema);
       
-      // Interpolate column names to prevent sql injection // todo convert to sqlite
-      await this.pool.query(`CREATE TABLE IF NOT EXISTS ${name} (
+      // Interpolate column names to prevent sql injection
+     this.db.exec(`CREATE TABLE IF NOT EXISTS ${name} (
         ${ sql }
       );`);
         
@@ -253,7 +239,7 @@ export class SQLite {
   };
 
   // Delete a table from the database
-  public async deleteTable(tableName: string): Promise<void> {
+  public deleteTable(tableName: string): void {
     try {
       // confirm args and establish this.pool
       if (!tableName) throw new Error("No table name provided");
@@ -262,7 +248,7 @@ export class SQLite {
       const name = tableName; // todo be sure tableName is safe
   
       // Drop table from the database
-      await this.pool.query(`DROP TABLE IF EXISTS ${name};`); // todo conver to sqlite
+      this.db.exec(`DROP TABLE IF EXISTS ${name};`);
     } catch (err) {
       console.error("Error in deleting table", err);
     } finally {
@@ -278,7 +264,6 @@ export class SQLite {
       const sql = this._createColumnSchemaSQL(col);
       tableSQL.push(sql);
     }
-  
     return tableSQL.join(",\n");
   }
 
@@ -296,7 +281,6 @@ export class SQLite {
     let sql: string = `${colSchema.name} ${colType}`; // todo trust column schema name?
     if (!colType.includes("TIMESTAMP")) {
       sql += `${colSchema.primaryKey ? " PRIMARY KEY" : ""}`;
-      sql += `${colSchema.autoIncrement ? " AUTO_INCREMENT" : ""}`; // todo Change to AUTOINCREMENT
       sql += `${colSchema.required ? " NOT NULL" : ""}`;
       sql += `${colSchema.unique ? " UNIQUE" : ""}`;
       // sql += `${colSchema.default ? `DEFAULT ${colSchema.default}` : ""}`
@@ -306,7 +290,7 @@ export class SQLite {
   }
 
   // Map common column types to MySQL types
-  private _mapColumnType = (type: string): string => { // todo map columns to SQLite like INTEGER
+  private _mapColumnType = (type: string): string => {
     let columnType: string = "";
     switch (type.toLowerCase()) {
       case "text":
@@ -315,17 +299,17 @@ export class SQLite {
         break;
       case "int":
       case "number":
-        columnType = "INT";
+        columnType = "INTEGER";
         break;
       case "bool":
       case "boolean":
-        columnType = "BOOLEAN";
+        columnType = "BOOLEAN"; // todo make INTEGER NOT NULL CHECK (col IN (0,1))???
         break;
       case "timestamp_create":
         columnType = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
         break;
       case "timestamp_update":
-        columnType = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
+        columnType = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"; // todo make a trigger or other logic to update on update
         break;
     }
     if (!columnType) throw new Error("Invalid column type");
