@@ -1,10 +1,17 @@
 import type { FetchResponseData } from "@/hooks/useFetch";
+import { getDb } from "@/lib/database/db";
 import { createAccessToken, createRefreshToken } from "@/lib/tokens";
-import { SignJWT } from "jose";
 import { NextResponse } from "next/server";
 
 export interface LoginResponseData extends FetchResponseData {
   token: string
+}
+
+interface IUser {
+  id: number,
+  email: string,
+  password: string,
+  userRole: number,
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -12,8 +19,20 @@ export async function POST(request: Request): Promise<Response> {
   // todo Sanitize and validate data
 
   // todo Authenticate user
+  const db = getDb(); // todo set proper db
+  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email) as Partial<IUser>;
+  if (!user) return NextResponse.json({ 
+    success: false, 
+    message: "Incorrect email or password" 
+  }, { status: 403 });
+
+  // validate password todo hash password
+  if (user.password !== password) return NextResponse.json({ 
+    success: false, 
+    message: "Incorrect email or password" 
+  }, { status: 403 });
   
-  await new Promise(res => setTimeout(res, 2000)); // todo
+  await new Promise(res => setTimeout(res, 2000)); // todo remove
   
   // Create access and refresh tokens
   const payload = { userId: 1, userRole: 50 };

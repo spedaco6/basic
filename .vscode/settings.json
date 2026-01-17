@@ -9,5 +9,6 @@
     "**/*.css",
     "**/*.scss"
   ],
-  "todohighlight.defaultStyle": {}
+  "todohighlight.defaultStyle": {},
+  "editor.tabSize": 2
 }
