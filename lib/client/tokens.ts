@@ -1,4 +1,4 @@
-import { JWTPayload, jwtVerify, SignJWT } from "jose";
+import { decodeJwt, JWTPayload, jwtVerify, SignJWT } from "jose";
 
 interface TokenPayload extends JWTPayload {
   userId: number,
@@ -8,13 +8,28 @@ interface TokenPayload extends JWTPayload {
 export const getToken = async (): Promise<string> => {
   // Try to get existing token
   const token = localStorage.getItem("token");
-  // todo add check for token expiration and call refresh if within a certain threshhold
-  if (token) return token;
+
+  // check for token expiration and call refresh if within a certain threshhold
+  const isFresh = checkExpiration(token);
+  if (token && isFresh) return token;
 
   // Try to refresh token;
   const newToken = await refreshToken();
   localStorage.setItem("token", newToken);
   return newToken;
+}
+
+export const checkExpiration = (token?: string | null): boolean => {
+  if (!token) return false;
+  try {
+    const payload = decodeJwt(token);
+    const exp = (payload.exp ? payload.exp - 30 : 0) * 1000; // 30 second buffer included
+    const now = Date.now();
+    if (now <= exp) return true;
+    return false;
+  } catch (err) {
+    return false;
+  }
 }
 
 export const refreshToken = async (): Promise<string> => {
