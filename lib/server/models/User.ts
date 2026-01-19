@@ -30,7 +30,7 @@ export class User extends Model implements IUser {
       name: "role",
       type: "INT",
       required: true,
-      default: 30,
+      default: 50,
     }, {
       name: "firstName",
       type: "TEXT",
@@ -59,19 +59,49 @@ const db = getDb();
 await User.init(db);
 
 // todo delete this setup
-const users = await User.findOne({ or: { email: ["email@email.com", "admin@email.com"]} });
-if (!users) {
+const users = await User.find({ or: { email: [
+  "user@email.com",
+  "customer@email.com",
+  "employee@email.com", 
+  "manager@email.com", 
+  "admin@email.com"
+]} });
+if (users && !users.length) {
   console.log("Setting up sample users...");
   const user = new User({
-    firstName: "Purely",
-    lastName: "Ficticious",
-    email: "email@email.com",
-    password: "$2b$10$wjJfTLNsZqnGEh29SpuL8OWUhghSUDwINncj0wnzbp5f9KCbZhfP6"
+    firstName: "Lone",
+    lastName: "User",
+    email: "user@email.com",
+    password: "$2b$10$wjJfTLNsZqnGEh29SpuL8OWUhghSUDwINncj0wnzbp5f9KCbZhfP6",
   });
   await user.save();
+  const customer = new User({
+    firstName: "Committed",
+    lastName: "Customer",
+    email: "customer@email.com",
+    password: "$2b$10$wjJfTLNsZqnGEh29SpuL8OWUhghSUDwINncj0wnzbp5f9KCbZhfP6",
+    role: 40,
+  });
+  await customer.save();
+  const employee = new User({
+    firstName: "Purely",
+    lastName: "Ficticious",
+    email: "employee@email.com",
+    password: "$2b$10$wjJfTLNsZqnGEh29SpuL8OWUhghSUDwINncj0wnzbp5f9KCbZhfP6",
+    role: 30,
+  });
+  await employee.save();
+  const manager = new User({
+    firstName: "Manager",
+    lastName: "Man",
+    email: "manager@email.com",
+    password: "$2b$10$wjJfTLNsZqnGEh29SpuL8OWUhghSUDwINncj0wnzbp5f9KCbZhfP6",
+    role: 20
+  });
+  await manager.save();
   const admin = new User({
     firstName: "Admin",
-    lastName: "User",
+    lastName: "Access",
     email: "admin@email.com",
     password: "$2b$10$wjJfTLNsZqnGEh29SpuL8OWUhghSUDwINncj0wnzbp5f9KCbZhfP6",
     role: 10

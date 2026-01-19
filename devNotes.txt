@@ -3,4 +3,9 @@ TODO
 - JTI should be added to an array and removed from the array on login/logout.
 That way multiple devices can be logged in
 
-- 
+User Permissions
+10 - Admin (full access)
+20 - Management
+30 - Employee
+40 - Customer
+50 - Blank account

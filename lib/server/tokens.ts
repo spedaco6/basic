@@ -1,10 +1,6 @@
 import { JWTPayload, jwtVerify, SignJWT } from "jose";
 import "server-only";
-
-interface TokenPayload extends JWTPayload {
-  userId: number,
-  userRole: number,
-}
+import { TokenPayload } from "../client/tokens";
 
 export interface RefreshTokenPayload extends TokenPayload {
   jti: string,

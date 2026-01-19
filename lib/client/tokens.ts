@@ -1,4 +1,9 @@
-import { decodeJwt } from "jose";
+import { decodeJwt, JWTPayload } from "jose";
+
+export interface TokenPayload extends JWTPayload {
+  userId: number,
+  userRole: number,
+}
 
 export const getToken = async (): Promise<string> => {
   // Try to get existing token

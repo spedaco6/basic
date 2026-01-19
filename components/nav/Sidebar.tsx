@@ -1,6 +1,7 @@
 import React from "react";
 import { SidebarHeading } from "./SidebarHeading";
 import { SidebarLink } from "./SidebarLink";
+import { SidebarAdmin } from "./SidebarAdmin";
 
 export const Sidebar = (): React.ReactElement => {
 
@@ -16,17 +17,7 @@ export const Sidebar = (): React.ReactElement => {
         <span className="ml-2">Profile</span>
       </SidebarLink>
       
-      <SidebarHeading>Admin</SidebarHeading>
-      <SidebarLink href="/auth/users">
-        <i className="bi bi-person-fill text-2xl" />
-        <span className="ml-2">Users</span>
-      </SidebarLink>
-
-      <SidebarHeading>Maintenance</SidebarHeading>
-      <SidebarLink href="/auth/diagnostics">
-        <i className="bi bi-gear text-2xl" />
-        <span className="ml-2">Diagnostics</span>
-      </SidebarLink>
+      <SidebarAdmin />
       
     </ul>
   </div>
