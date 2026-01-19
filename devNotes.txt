@@ -1,0 +1,6 @@
+TODO 
+
+- JTI should be added to an array and removed from the array on login/logout.
+That way multiple devices can be logged in
+
+- 
