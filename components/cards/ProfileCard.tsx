@@ -23,6 +23,10 @@ export const ProfileCard = (): React.ReactElement => {
       <p>{ data.firstName } {data.lastName }</p>
     </div> }
     { error && <p className="text-red-500">{ error }</p> }
-    { loading && <LoadingProfileCard /> }
+    { loading && <div className="space-y-4">
+      <LoadingProfileCard /> 
+      <LoadingProfileCard /> 
+      <LoadingProfileCard /> 
+    </div> }
   </div>
 }
