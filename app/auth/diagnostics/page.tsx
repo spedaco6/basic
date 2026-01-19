@@ -1,7 +1,6 @@
 import React from "react";
 import { Metadata } from "next";
 import { DiagnosticToolbar } from "@/components/tools/DiagnosticToolbar";
-import { Alert } from "@/components/alert/Alert";
 
 export const metadata: Metadata = {
   title: "Diagnostics",

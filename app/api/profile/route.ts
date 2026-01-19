@@ -1,5 +1,5 @@
 import { FetchResponseData } from "@/hooks/useFetch";
-import { verifyAccessToken } from "@/lib/client/tokens";
+import { verifyAccessToken } from "@/lib/server/tokens";
 import { User } from "@/lib/server/models/User";
 import { NextResponse } from "next/server";
 

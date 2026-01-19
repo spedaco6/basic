@@ -1,7 +1,7 @@
 import { FetchResponseData } from "@/hooks/useFetch";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { createAccessToken, createRefreshToken, verifyRefreshToken } from "@/lib/client/tokens";
+import { createAccessToken, createRefreshToken, verifyRefreshToken } from "@/lib/server/tokens";
 import { User } from "@/lib/server/models/User";
 import { v4 } from "uuid";
 

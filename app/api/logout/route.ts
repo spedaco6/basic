@@ -1,4 +1,4 @@
-import { RefreshTokenPayload } from "@/lib/client/tokens";
+import { RefreshTokenPayload } from "@/lib/server/tokens";
 import { User } from "@/lib/server/models/User";
 import { decodeJwt } from "jose";
 import { cookies } from "next/headers";
