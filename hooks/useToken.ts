@@ -5,7 +5,7 @@ import { decodeJwt } from "jose";
 import { useEffect, useState } from "react"
 
 export const useToken = () => {
-  const [ payload, setPayload ] = useState<TokenPayload>({ userRole: 50, userId: 0 });
+  const [ payload, setPayload ] = useState<TokenPayload>({ userRole: 50, userId: 0 }); // todo is there a better option than setting this 0?
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
