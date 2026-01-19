@@ -1,36 +1,20 @@
-import Database from "better-sqlite3";
+import SQLiteDatabase from "better-sqlite3";
+import { Database } from "./Database";
 import { Model } from "../models/Model";
+import { defaultQueryOptions } from "./Database";
+import type { TableSchema, ColumnSchema, QueryOptions, IDatabaseConfig } from "./Database";
 // import "server-only";
-// todo REMOVE PROMISES
 
-export interface QueryOptions {
-  sort: "asc" | "desc",
-  order: string,
-  limit: number,
-  skip: number,
-}
-export const defaultQueryOptions: QueryOptions = {
-  order: "id",
-  sort: "asc",
-  limit: 0,
-  skip: 0,
-}
-export interface ColumnSchema {
-  name: string,
-  type: string,
-  primaryKey?: boolean,
-  required?: boolean,
-  unique?: boolean,
-  default?: any,
-};
+export interface ISQLiteConfig extends IDatabaseConfig {
+  path: string;
+} 
 
-export type TableSchema = ColumnSchema[];
-
-export class SQLite {
-  public db: Database.Database;
+export class SQLite extends Database {
+  public db: SQLiteDatabase.Database;
 
   constructor(path: string) {
-    this.db = new Database(path);
+    super();
+    this.db = new SQLiteDatabase(path);
   }
 
   // Returns sql IN statement
@@ -76,12 +60,12 @@ export class SQLite {
     return values;
   }
 
-  public find<T extends Model>( // todo
+  public async find<T extends Model>( // todo
     tableName: string,
     filters: Record<string, any> = {},
     options: Partial<QueryOptions> = {},
     ...returnFields: string[]
-  ): T[] {
+  ): Promise<T[]> {
 
     let results: T[] = [];
     // Compile query options
@@ -137,7 +121,7 @@ export class SQLite {
   }
 
   // delete one record
-  public deleteOne<T extends Model>(tableName: string, data: T): boolean {
+  public async deleteOne<T extends Model>(tableName: string, data: T): Promise<boolean> {
     try {
       const id = data.id;
       if (!id) throw new Error("No id provided");
@@ -157,7 +141,7 @@ export class SQLite {
   }
 
   // create one record 
-  public createOne<T extends Model>(tableName: string, data: T): T | null {
+  public async createOne<T extends Model>(tableName: string, data: T): Promise<T | null> {
     let dataModel: T | null = null;
     try {
       // Create sql string for field names   
@@ -187,7 +171,7 @@ export class SQLite {
   } 
 
   // Updates one record in the database
-  public updateOne<T extends Model>(tableName: string, data: T): T | null {
+  public async updateOne<T extends Model>(tableName: string, data: T): Promise<T | null> {
     let updated: T | null = null;
     try {
       const id = data.id;
@@ -217,7 +201,7 @@ export class SQLite {
   }
 
   // Create table in the database
-  public createTable(tableName: string, tableSchema: TableSchema): void {
+  public async createTable(tableName: string, tableSchema: TableSchema): Promise<void> {
     try {
       // confirm args and establish this.pool
       if (!tableName) throw new Error("No table name provided");
@@ -240,7 +224,7 @@ export class SQLite {
   };
 
   // Delete a table from the database
-  public deleteTable(tableName: string): void {
+  public async deleteTable(tableName: string): Promise<void> {
     try {
       // confirm args and establish this.pool
       if (!tableName) throw new Error("No table name provided");
@@ -317,30 +301,3 @@ export class SQLite {
     return columnType;
   }
 }
-
-const database = new SQLite("./lib/database/sqlite.db");
-// database.createTable();
-// database.deleteTable();
-
-
-
-
-/* 
-// Create and delete table
-  static createTable(tableName: string, tableSchema: Readonly<TableSchema>): void {
-    
-  }
-  public deleteTable(tableName: string): void {}
-
-  // Methods for creating, updating, and deleting records
-  public createOne<T extends Model>(tableName: string, data: T): T | null { return {} as T };
-  public updateOne<T extends Model>(tableName: string, data: T): T | null { return {} as T };
-  public deleteOne<T extends Model>(tableName: string, data: T): boolean { return true };
-
-  // Methods for getting records
-  public find<T extends Model>(
-    tableName: string,
-    filters: Record<string, any>,
-    options: Partial<QueryOptions>,
-    ...returnFields: string[]
-  ): T[] { return [] }; */

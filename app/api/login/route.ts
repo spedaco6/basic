@@ -1,6 +1,4 @@
 import type { FetchResponseData } from "@/hooks/useFetch";
-import { getDb } from "@/lib/database/db";
-import { SQLite } from "@/lib/database/SQLite";
 import { User } from "@/lib/models/User";
 import { createAccessToken, createRefreshToken } from "@/lib/tokens";
 import { NextResponse } from "next/server";
@@ -20,23 +18,19 @@ export async function POST(request: Request): Promise<Response> {
   const { email, password } = await request.json();
   // todo Sanitize and validate data
 
-  const db = getDb();
-  db.deleteTable("users");
-  User.init();
-
   // todo Authenticate user
   const newUser = new User({
     email: "test@save.com",
     password: "password",
     userRole: 30,
   });
-  newUser.save();
+  await newUser.save();
 
   newUser.email = "update@test.com";
   newUser.save();
 
-  const updatedUser = User.findById(newUser.id);
-  updatedUser?.delete();
+  const updatedUser = await User.findById(newUser.id);
+  await updatedUser?.delete();
 
 
   // const db = getDb(); // todo set proper db

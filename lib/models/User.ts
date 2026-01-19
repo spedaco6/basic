@@ -1,5 +1,6 @@
 import { Model } from "./Model";
-import type { TableSchema } from "../database/SQLite";
+import type { TableSchema } from "../database/Database";
+import { getDb } from "../database/db";
 
 export class User extends Model {
   protected static schema: TableSchema = [
@@ -30,3 +31,6 @@ export class User extends Model {
     Object.assign(this, props);
   }
 }
+
+const db = getDb();
+await User.init(db);

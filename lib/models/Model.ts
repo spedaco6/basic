@@ -1,5 +1,5 @@
 import { SQLite } from "../database/SQLite";
-import type { QueryOptions, TableSchema } from "../database/SQLite";
+import type { Database, QueryOptions, TableSchema } from "../database/Database";
 import { nanoid } from "nanoid";
 import { getDb } from "../database/db";
 
@@ -16,26 +16,28 @@ export abstract class Model {
   public secureKey?: string;
   public created_at?: string;
   public updated_at?: string;
+  static initialized: boolean = false;
+  static db?: Database;
 
   constructor() {}
 
   // find records by criteria
-  static find<T extends Model>(
+  static async find<T extends Model>(
     this: {
       new (...args: any[]): T,
       getTableName(): string;
     },
     filters: Record<string, any>,
-    options?: QueryOptions,
+    options: QueryOptions,
     ...returnFields: string[]
-  ): Record<string, any>[] | null {
+  ): Promise<Record<string, any>[] | null> {
     const db = getDb();
-    const models = db.find(this.getTableName(), filters, options, ...returnFields);
+    const models = await db.find(this.getTableName(), filters, options, ...returnFields);
     return models;
   }
 
   // find record by id
-  static findById<T extends Model>(
+  static async findById<T extends Model>(
     // This is defined as a class that creates an instance of Model
     // and contains a db property and getTableName() method
     this: { 
@@ -44,10 +46,10 @@ export abstract class Model {
     }, 
     id?: number | null,
     ...returnFields: string[]
-  ): InstanceType<typeof this> | null | Record<string, any> { // typeof this because this is a constructor
+  ): Promise<InstanceType<typeof this> | null | Record<string, any>> { // typeof this because this is a constructor
     const db = getDb();
     if (!id) throw new Error("No id provided");
-    const data = db.find(this.getTableName(), { id }, {}, ...returnFields);
+    const data = await db.find(this.getTableName(), { id }, {}, ...returnFields);
     const model = data.length ? data[0] : null;
     // If specific fields are requested, return a plain object of requested fields
     if (returnFields.length) return model;
@@ -55,34 +57,34 @@ export abstract class Model {
     return model ? new this(model) : model;
   }
 
-  static findOne<T extends Model>(
+  static async findOne<T extends Model>(
     this: {
       new (...args: any[]): T;
       getTableName(): string;
     },
     filters: Record<string, any>,
     ...returnFields: string[]
-  ): InstanceType<typeof this> | null | Record<string, any> {
+  ): Promise<InstanceType<typeof this> | null | Record<string, any>> {
     const db = getDb();
-    const data = db.find(this.getTableName(), filters, { limit: 1 }, ...returnFields);
+    const data = await db.find(this.getTableName(), filters, { limit: 1 }, ...returnFields);
     const model = data.length ? data[0] : null;
     if (returnFields.length) return model as Record<string, any>;
     return model ? new this(model) : model;
   }
 
   // Save new or update existing Model subclass
-  public save(): this {
+  public async save(): Promise<this> {
     // Save model to database
     const db = getDb();
     let saved = null;
     if (!this.id) {
       // add secure id locally if it doesn't already exist
       this.secureKey = this.secureKey ?? nanoid();
-      saved = db.createOne(this.tableName, this);
+      saved = await db.createOne(this.tableName, this);
       // If initial save fails, remove secure key
       if (!saved) this.secureKey = undefined;
     } else {
-      saved = db.updateOne(this.tableName, this);
+      saved = await db.updateOne(this.tableName, this);
     }
 
     if (!saved) throw new Error("Could not save model");
@@ -93,10 +95,10 @@ export abstract class Model {
   }
 
   // deletes user from the database
-  public delete(): void {
+  public async delete(): Promise<void> {
     const db = getDb();
     if (!this.id) throw new Error("No id provided for deletion");
-    db.deleteOne(this.tableName, this);
+    await db.deleteOne(this.tableName, this);
   }
 
   // Return an array of all property names todo
@@ -115,7 +117,7 @@ export abstract class Model {
   }
 
   // Make static db property available to class instances
-  protected get db(): SQLite {
+  protected get db(): Database {
     return getDb();
   }
   
@@ -132,17 +134,22 @@ export abstract class Model {
   }
 
   // Create the table in the database todo
-  static init(): void {
+  static async init(db: Database): Promise<void> {
+    if (this.initialized) return;
     // Ensure that init is not called on the parent Model class
     if (this === Model) throw new Error("Cannot initialize Model class directly");
+
     const name = this.getTableName();
+    
+    console.log(`Initializing ${name} table...`);
 
-    // Throw error if database or table schema is not defined
-    // if (!db) throw new Error(`Could not initialize ${name} table. No database provided`);
-
-    const db = getDb();
+    // Throw error if database is not defined
+    if (!db) throw new Error(`Could not initialize ${name} table. No database provided`);
+    this.db = db;
 
     // Create table in database using table schema
-    db.createTable(this.getTableName(), this.getSchema());
+    await this.db.createTable(this.getTableName(), this.getSchema());
+    this.initialized = true;
+    console.log(`${name} table created`);
   }
 }
