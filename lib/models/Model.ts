@@ -28,10 +28,10 @@ export abstract class Model {
       getTableName(): string;
     },
     filters: Record<string, any>,
-    options: QueryOptions,
+    options: Partial<QueryOptions> ={},
     ...returnFields: string[]
-  ): Promise<Record<string, any>[] | null> {
-    const models = await this.db.find(this.getTableName(), filters, options, ...returnFields);
+  ): Promise<T[] | null> {
+    const models = await this.db.find<T>(this.getTableName(), filters, options, ...returnFields);
     return models;
   }
 

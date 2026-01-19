@@ -2,7 +2,14 @@ import { Model } from "./Model";
 import type { TableSchema } from "../database/Database";
 import { getDb } from "../database/db";
 
-export class User extends Model {
+interface IUser {
+  id?: number,
+  email?: string,
+  password?: string,
+  role?: number,
+}
+
+export class User extends Model implements IUser {
   protected static schema: TableSchema = [
     {
       name: 'email',
@@ -16,7 +23,7 @@ export class User extends Model {
       required: true,
     },
     { 
-      name: "userRole",
+      name: "role",
       type: "INT",
       required: true,
       default: 30,
@@ -25,7 +32,7 @@ export class User extends Model {
   
   public email?: string;
   public password?: string; // todo remove sensitive fields like this
-  public userRole?: number;
+  public role?: number;
 
   constructor(props: Record<string, any>) {
     super();

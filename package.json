@@ -11,6 +11,7 @@
     "db": "sqlite3 ./lib/database/sqlite.db"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.6.2",
     "bootstrap-icons": "^1.13.1",
     "dotenv": "^17.2.3",
@@ -18,10 +19,12 @@
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "vitest": "^4.0.17"
+    "vitest": "^4.0.17",
+    "xss": "^1.0.15"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bcrypt": "^6.0.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",

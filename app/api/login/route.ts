@@ -2,52 +2,44 @@ import type { FetchResponseData } from "@/hooks/useFetch";
 import { User } from "@/lib/models/User";
 import { createAccessToken, createRefreshToken } from "@/lib/tokens";
 import { NextResponse } from "next/server";
+import bcrypt from "bcrypt";
+import xss from "xss";
 
 export interface LoginResponseData extends FetchResponseData {
   token: string
 }
 
-interface IUser {
-  id: number,
-  email: string,
-  password: string,
-  userRole: number,
-}
-
 export async function POST(request: Request): Promise<Response> {
-  const { email, password } = await request.json();
-  // todo Sanitize and validate data
+  const body = await request.json();
+  // Sanitize and validate data
+  const email = xss(body.email);
+  const password = xss(body.password);
 
-  // todo Authenticate user
- 
+  // todo Server-side validation
 
-  const savedUser = await User.findById(1);
-  if (savedUser) {
-    savedUser.password = "New";
-    await savedUser.save();
-    console.log(savedUser);
-  }
-  console.log(savedUser);
-  // await updatedUser?.delete();
-
-
-  // const db = getDb(); // todo set proper db
-  // const temp = db.prepare("SELECT * FROM users WHERE email = ?").get(email) as Partial<IUser>;
-  /* if (!user) return NextResponse.json({ 
+  // Authenticate user
+  const user = await User.findOne({ email });
+  if (!user) return NextResponse.json({ 
     success: false, 
     message: "Incorrect email or password" 
   }, { status: 403 });
-
-  // validate password todo hash password
-  if (user.password !== password) return NextResponse.json({ 
-    success: false, 
-    message: "Incorrect email or password" 
-  }, { status: 403 }); */
   
-  await new Promise(res => setTimeout(res, 2000)); // todo remove
-  
+  // validate password
+  try {
+    const decrypt = await bcrypt.compare(password, user.password);
+    if (!decrypt) return NextResponse.json({ 
+      success: false, 
+      message: "Incorrect email or password" 
+    }, { status: 403 });
+  } catch (err) {
+    return NextResponse.json({ 
+      success: false, 
+      message: "Something went wrong. Could not authenticate user" 
+    }, { status: 500 });
+  }
+    
   // Create access and refresh tokens
-  const payload = { userId: 1, userRole: 50 };
+  const payload = { userId: user.id, userRole: user.role };
   const accessToken = await createAccessToken(payload);
   const refreshToken = await createRefreshToken(payload);
     
