@@ -5,6 +5,10 @@ interface TokenPayload extends JWTPayload {
   userRole: number,
 }
 
+export interface RefreshTokenPayload extends TokenPayload {
+  jti: string,
+}
+
 export const getToken = async (): Promise<string> => {
   // Try to get existing token
   const token = localStorage.getItem("token");
@@ -59,7 +63,7 @@ export async function verifyAccessToken(accessToken: string): Promise<TokenPaylo
 }
 
 // Create refresh token
-export async function createRefreshToken<T extends TokenPayload>(payload: T): Promise<string> {
+export async function createRefreshToken<T extends RefreshTokenPayload>(payload: T): Promise<string> {
   const refreshTokenSecret = new TextEncoder().encode(process.env.REFRESH_TOKEN_SECRET);
   const refreshToken = await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
@@ -69,8 +73,8 @@ export async function createRefreshToken<T extends TokenPayload>(payload: T): Pr
 }
 
 // Verify refresh token
-export async function verifyRefreshToken(refreshToken: string): Promise<TokenPayload | null> {
+export async function verifyRefreshToken(refreshToken: string): Promise<RefreshTokenPayload | null> {
   const refreshTokenSecret = new TextEncoder().encode(process.env.REFRESH_TOKEN_SECRET);
-  const verified = await jwtVerify<TokenPayload>(refreshToken, refreshTokenSecret);
+  const verified = await jwtVerify<RefreshTokenPayload>(refreshToken, refreshTokenSecret);
   return verified.payload ?? null;
 }

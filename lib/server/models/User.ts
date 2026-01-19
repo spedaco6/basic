@@ -9,6 +9,7 @@ interface IUser {
   role?: number,
   firstName?: string,
   lastName?: string,
+  jti?: string,
 }
 
 export class User extends Model implements IUser {
@@ -35,7 +36,10 @@ export class User extends Model implements IUser {
     }, {
       name: "lastName",
       type: "TEXT",
-    } // todo ADD JTI
+    }, {
+      name: "jti",
+      type: "string",
+    }
   ];
   
   public email?: string;
@@ -43,6 +47,7 @@ export class User extends Model implements IUser {
   public role?: number;
   public firstName?: string;
   public lastName?: string;
+  public jti?: string;
 
   constructor(props: Record<string, any>) {
     super();
