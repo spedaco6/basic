@@ -19,18 +19,16 @@ export async function POST(request: Request): Promise<Response> {
   // todo Sanitize and validate data
 
   // todo Authenticate user
-  const newUser = new User({
-    email: "test@save.com",
-    password: "password",
-    userRole: 30,
-  });
-  await newUser.save();
+ 
 
-  newUser.email = "update@test.com";
-  newUser.save();
-
-  const updatedUser = await User.findById(newUser.id);
-  await updatedUser?.delete();
+  const savedUser = await User.findById(1);
+  if (savedUser) {
+    savedUser.password = "New";
+    await savedUser.save();
+    console.log(savedUser);
+  }
+  console.log(savedUser);
+  // await updatedUser?.delete();
 
 
   // const db = getDb(); // todo set proper db

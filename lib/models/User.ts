@@ -8,6 +8,7 @@ export class User extends Model {
       name: 'email',
       type: 'TEXT',
       required: true,
+      unique: true,
     },
     { 
       name: 'password',
@@ -19,7 +20,7 @@ export class User extends Model {
       type: "INT",
       required: true,
       default: 30,
-    },
+    }
   ];
   
   public email?: string;
@@ -31,6 +32,5 @@ export class User extends Model {
     Object.assign(this, props);
   }
 }
-
 const db = getDb();
 await User.init(db);

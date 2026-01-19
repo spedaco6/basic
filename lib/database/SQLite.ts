@@ -3,7 +3,7 @@ import { Database } from "./Database";
 import { Model } from "../models/Model";
 import { defaultQueryOptions } from "./Database";
 import type { TableSchema, ColumnSchema, QueryOptions, IDatabaseConfig } from "./Database";
-// import "server-only";
+import "server-only";
 
 export interface ISQLiteConfig extends IDatabaseConfig {
   path: string;
@@ -140,19 +140,21 @@ export class SQLite extends Database {
     } 
   }
 
+  // TODO currently this filters undefined records so DEFAULT schema applies
+  // Find a way to allow for fields to be set to undefined when desired...
   // create one record 
   public async createOne<T extends Model>(tableName: string, data: T): Promise<T | null> {
     let dataModel: T | null = null;
     try {
       // Create sql string for field names   
-      const fieldNames = Object.keys(data)
-        .filter(field => field !== "id")
-        .map(field => field) // todo check field against table schema column names
+      const fieldNames = Object.entries(data)
+        .filter(([col, val]) => col !== "id" && val) // Filter out id and undefined values
+        .map(([col]) => col) // todo check field against table schema column names
         .join(", ");
 
       // Create array of field values
       const fieldData = Object.entries(data)
-        .filter(([key]) => key !== "id")
+        .filter(([key, val]) => key !== "id" && val) // Filter out id and undefined values
         .map(([_, value]) => value);
 
       // Create SQL for insert statement todo check that tableName is safe
@@ -160,7 +162,6 @@ export class SQLite extends Database {
         ${ fieldNames }
       ) VALUES (${fieldData.map(d => "?").join(", ")})
       RETURNING *;`;
-
       // Query database to insert and retrieve the new record
       dataModel = this.db.prepare(sql).get(fieldData) as any;
     } catch (err) {
@@ -170,6 +171,7 @@ export class SQLite extends Database {
     }
   } 
 
+  // TODO See the note at the start of createOne and ensure similar login here
   // Updates one record in the database
   public async updateOne<T extends Model>(tableName: string, data: T): Promise<T | null> {
     let updated: T | null = null;
@@ -180,15 +182,17 @@ export class SQLite extends Database {
       if (!originalRecord) throw new Error(`Could not find a record with id ${id}`);
 
       // Filter out fields that cannot be edited
-      const editableFields = Object.entries(data).filter(([key]) => key !== "id" && key !== "secureKey");
-      const editableData = editableFields.map(([key, val]) => val);
+      const editableFields = Object.entries(data)
+        .filter(([key]) => key !== "id" && key !== "secureKey");
+      const editableData = editableFields
+        .map(([key, val]) => val);
 
       // Create strings that set updated values
       const fieldStr = editableFields.map(([key]) => `${key} = ?`).join(", "); // todo check key against tableschema column names
 
       //todo be sure tableName is safe
       const sql = `UPDATE ${tableName}
-        SET ${fieldStr}
+        SET ${fieldStr}, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
         RETURNING *;
       `;
@@ -212,11 +216,19 @@ export class SQLite extends Database {
 
       // Get SQL string for table columns
       const sql = this._createTableSchemaSQL(tableSchema);
-      
       // Interpolate column names to prevent sql injection
-     this.db.exec(`CREATE TABLE IF NOT EXISTS ${name} (
+      this.db.exec(`CREATE TABLE IF NOT EXISTS ${name} (
         ${ sql }
       );`);
+      this.db.exec(`DROP TRIGGER IF EXISTS trigger_on_${name}_update`);
+      this.db.exec(`CREATE TRIGGER trigger_on_${name}_update
+        BEFORE UPDATE ON ${name}
+        FOR EACH ROW
+        WHEN OLD.updated_at = NEW.updated_at
+        BEGIN
+          SELECT NEW.updated_at = CURRENT_TIMESTAMP;
+        END;
+      `);
         
     } catch (err) {
       console.error("Error in creating table", err);
@@ -265,11 +277,10 @@ export class SQLite extends Database {
     // Construct SQL string
     let sql: string = `${colSchema.name} ${colType}`; // todo trust column schema name?
     if (!colType.includes("TIMESTAMP")) {
-      sql += `${colSchema.primaryKey ? " PRIMARY KEY" : ""}`;
-      sql += `${colSchema.required ? " NOT NULL" : ""}`;
-      sql += `${colSchema.unique ? " UNIQUE" : ""}`;
-      // sql += `${colSchema.default ? `DEFAULT ${colSchema.default}` : ""}`
-      // todo add default (preexisting before sqlite)
+      if (colSchema.primaryKey) sql += " PRIMARY KEY";
+      if (colSchema.required) sql += " NOT NULL"; 
+      if (colSchema.unique) sql += " UNIQUE";
+      if (colSchema.default) sql += ` DEFAULT ${colSchema.default}`; // protect against injection
     }
     return sql;
   }
