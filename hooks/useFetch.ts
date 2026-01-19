@@ -24,6 +24,7 @@ export const useFetch = <
 
   const immediate: boolean = options?.immediate ?? true;
 
+  // todo should this try to grab a new token right before fetching?
   const fetch = useCallback(async (...args: Args | []) => {
     setLoading(true);
     setError("");

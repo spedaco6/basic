@@ -20,7 +20,10 @@ export const ProfileCard = (): React.ReactElement => {
 
   return <div>
     { data && !error && !loading && <div>
-      <p>{ data.firstName } {data.lastName }</p>
+      <div className="flex justify-between w-[40rem] items-center">
+        <p className="text-lg">Email: { data.email }</p>
+        <button className="border-1 bg-gray-700 hover:bg-gray-500 text-white cursor-pointer py-2 px-4 rounded-sm">Edit</button>
+      </div>
     </div> }
     { error && <p className="text-red-500">{ error }</p> }
     { loading && <div className="space-y-4">

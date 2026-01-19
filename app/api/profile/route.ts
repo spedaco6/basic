@@ -1,12 +1,11 @@
 import { FetchResponseData } from "@/hooks/useFetch";
 import { verifyAccessToken } from "@/lib/client/tokens";
+import { User } from "@/lib/server/models/User";
 import { NextResponse } from "next/server";
 
 export interface ProfileResponseData extends FetchResponseData {
   userId: number,
   userRole: number,
-  firstName: string,
-  lastName: string,
   email: string,
 }
 
@@ -23,21 +22,22 @@ export async function GET(req: Request): Promise<Response> {
   const verified = await verifyAccessToken(accessToken);
   if (!verified) return NextResponse.json({ success: false, message: "Invalid token" });
 
-  // Try to check refresh token?
-
   // Find user
+  const user = await User.findById(verified.userId);
+  if (!user) return NextResponse.json({ success: false, message: "Could not find user profile"});
 
   // Ensure user role allows for profile viewing
+  if (verified.userId !== user.id && verified.userRole >= 30) {
+    return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+  };
 
   // Return profile
   const response = NextResponse.json({ 
     success: true,
     message: "User profile provided",
-    userId: 1, 
-    userRole: 30,
-    firstName: "Purely",
-    lastName: "Fictitious",
-    email: "email@email.com",
+    userId: user.id, 
+    userRole: user.role,
+    email: user.email,
   });
 
   return response;

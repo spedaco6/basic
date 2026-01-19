@@ -1,4 +1,3 @@
-import { LoadingProfileCard } from "@/components/cards/LoadingProfileCard";
 import { ProfileCard } from "@/components/cards/ProfileCard";
 import { Metadata } from "next";
 import React from "react";

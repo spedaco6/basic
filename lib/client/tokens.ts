@@ -8,7 +8,8 @@ interface TokenPayload extends JWTPayload {
 export const getToken = async (): Promise<string> => {
   // Try to get existing token
   const token = localStorage.getItem("token");
-  if (token) return new Promise(res => res(token));
+  // todo add check for token expiration and call refresh if within a certain threshhold
+  if (token) return token;
 
   // Try to refresh token;
   const newToken = await refreshToken();
