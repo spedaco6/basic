@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db": "sqlite3 ./lib/database/sqlite.db"
+    "db": "sqlite3 ./lib/server/database/sqlite.db"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

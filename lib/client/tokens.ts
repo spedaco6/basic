@@ -19,6 +19,7 @@ export const getToken = async (): Promise<string> => {
   return newToken;
 }
 
+// Checks expiration returning true if token is still fresh
 export const checkExpiration = (token?: string | null): boolean => {
   if (!token) return false;
   try {

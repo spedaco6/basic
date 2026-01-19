@@ -7,6 +7,8 @@ export interface ProfileResponseData extends FetchResponseData {
   userId: number,
   userRole: number,
   email: string,
+  firstName?: string,
+  lastName?: string,
 }
 
 export async function GET(req: Request): Promise<Response> {
@@ -38,6 +40,8 @@ export async function GET(req: Request): Promise<Response> {
     userId: user.id, 
     userRole: user.role,
     email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
   });
 
   return response;
