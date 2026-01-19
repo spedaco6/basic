@@ -1,6 +1,7 @@
 import type { Database, QueryOptions, TableSchema } from "../database/Database";
 import { nanoid } from "nanoid";
 import { getDb } from "../database/db";
+import "server-only";
 
 export abstract class Model {
   protected static schema: Readonly<TableSchema> = [

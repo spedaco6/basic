@@ -1,4 +1,5 @@
 import { Model } from "../models/Model";
+import "server-only";
 
 export interface IDatabaseConfig {
   type: 'mysql' | 'sqlite';

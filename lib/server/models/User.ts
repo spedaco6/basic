@@ -1,6 +1,7 @@
 import { Model } from "./Model";
 import type { TableSchema } from "../database/Database";
 import { getDb } from "../database/db";
+import "server-only";
 
 interface IUser {
   id?: number,
