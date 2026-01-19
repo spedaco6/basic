@@ -2,7 +2,7 @@ import React from "react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Profile",
+  title: "Manage Users",
 };
 
 export default function UsersPage(): React.ReactElement {

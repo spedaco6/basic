@@ -6,7 +6,7 @@ import React, { useEffect } from "react";
 
 const logout: () => Promise<Response> = () => fetch("/api/logout");
 
-export function LogoutButton(): React.ReactElement {
+export function LogoutButton({ className="" }): React.ReactElement {
   const { data, error, loading, refetch } = useFetch(logout, {}, { immediate: false });
   const router = useRouter();
 
@@ -18,9 +18,9 @@ export function LogoutButton(): React.ReactElement {
   }, [data, router]);
 
   return <div>
-   { error && <p className="text-red-500">{error}</p>}
+   { error && <p className="text-red-500">{error}</p> }
     <button 
-      onClick={refetch} className="py-1 px-2 text-black flex justify-center rounded-lg cursor-pointer"
+      onClick={refetch} className={`${className} py-1 px-2 text-black flex justify-center rounded-lg cursor-pointer`}
       title="Logout"
     >
       { loading ? 

@@ -1,10 +1,12 @@
+"use client"
+
 import React from "react";
 import { SidebarHeading } from "./SidebarHeading";
 import { SidebarLink } from "./SidebarLink";
-import { SidebarAdmin } from "./SidebarAdmin";
+import { useToken } from "@/hooks/useToken";
 
 export const Sidebar = (): React.ReactElement => {
-
+  const { role } = useToken();
   return <div className="mt-12 text-gray-500 uppercase">
     <ul>
       <SidebarHeading>General</SidebarHeading>
@@ -17,7 +19,20 @@ export const Sidebar = (): React.ReactElement => {
         <span className="ml-2">Profile</span>
       </SidebarLink>
       
-      <SidebarAdmin />
+      { role < 30 && <><SidebarHeading>Admin</SidebarHeading>
+        <SidebarLink href="/auth/users">
+          <i className="bi bi-person-fill text-2xl" />
+          <span className="ml-2">Users</span>
+        </SidebarLink>
+      </> }
+  
+      { role < 20 && <>
+        <SidebarHeading>Maintenance</SidebarHeading>
+        <SidebarLink href="/auth/diagnostics">
+          <i className="bi bi-gear text-2xl" />
+          <span className="ml-2">Diagnostics</span>
+        </SidebarLink>
+      </> }
       
     </ul>
   </div>
