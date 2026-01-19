@@ -16,7 +16,7 @@ export default function AuthLayout({ children }: React.PropsWithChildren ): Reac
     
     <div className="flex-1 flex overflow-hidden">
 
-      <div className="w-[16rem] h-full overflow-y-scroll shadow-xl hidden md:block">
+      <div className="w-[16rem] h-full shadow-2xl hidden md:block"> {/* add overflow-y-scroll */}
         <Sidebar />
       </div>
 
