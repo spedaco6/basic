@@ -60,7 +60,7 @@ export class SQLite extends Database {
     return values;
   }
 
-  public async find<T extends Model>( // todo
+  public async find<T extends Model>(
     tableName: string,
     filters: Record<string, any> = {},
     options: Partial<QueryOptions> = {},
@@ -104,7 +104,7 @@ export class SQLite extends Database {
         }
       }
 
-      // Construct SQL todo protect against tableName injection
+      // Construct SQL
       const sql = `SELECT ${select} FROM ${tableName}
         ${ where }
         ${ order } ${ sort }
@@ -112,7 +112,7 @@ export class SQLite extends Database {
       `;
 
       // Run query
-      results = this.db.prepare(sql).all(values) as any; // todo change query to sqlite
+      results = this.db.prepare(sql).all(values) as any;
     } catch (err) {
       console.error(err);
     } finally {
@@ -128,7 +128,6 @@ export class SQLite extends Database {
       const existingRecord = this.find(tableName, { id });
       if (!existingRecord) throw new Error(`Could not find a record to delete with id ${id}`);
 
-      // todo confirm table name is safe
       const sql = `DELETE FROM ${tableName}
         WHERE id = ?;`;
       const result = this.db.prepare(sql).run(id) as any;
@@ -157,7 +156,7 @@ export class SQLite extends Database {
         .filter(([key, val]) => key !== "id" && val) // Filter out id and undefined values
         .map(([_, value]) => value);
 
-      // Create SQL for insert statement todo check that tableName is safe
+      // Create SQL for insert statement
       let sql = `INSERT INTO ${tableName} (
         ${ fieldNames }
       ) VALUES (${fieldData.map(d => "?").join(", ")})
@@ -190,7 +189,6 @@ export class SQLite extends Database {
       // Create strings that set updated values
       const fieldStr = editableFields.map(([key]) => `${key} = ?`).join(", "); // todo check key against tableschema column names
 
-      //todo be sure tableName is safe
       const sql = `UPDATE ${tableName}
         SET ${fieldStr}, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
@@ -211,24 +209,19 @@ export class SQLite extends Database {
       if (!tableName) throw new Error("No table name provided");
       if (!tableSchema) throw new Error(`No schema provided for ${tableName} table`);
 
-      // Escape table name to ensure it is sql safe
-      const name = tableName; // todo be sure tableName is safe
-
       // Get SQL string for table columns
       const sql = this._createTableSchemaSQL(tableSchema);
       // Interpolate column names to prevent sql injection
-      this.db.exec(`CREATE TABLE IF NOT EXISTS ${name} (
+      this.db.exec(`CREATE TABLE IF NOT EXISTS ${tableName} (
         ${ sql }
       );`);
-      this.db.exec(`DROP TRIGGER IF EXISTS trigger_on_${name}_update`);
-      this.db.exec(`CREATE TRIGGER trigger_on_${name}_update
-        BEFORE UPDATE ON ${name}
-        FOR EACH ROW
-        WHEN OLD.updated_at = NEW.updated_at
-        BEGIN
-          SELECT NEW.updated_at = CURRENT_TIMESTAMP;
-        END;
-      `);
+
+      // If timestamp_update exists, set a trigger for the table
+      const updateCol = tableSchema.find(col => col.type === "timestamp_update");
+      if (updateCol) {
+        const triggerSQL = this._createUpdateTrigger(tableName, updateCol);
+        this.db.exec(triggerSQL);
+      }
         
     } catch (err) {
       console.error("Error in creating table", err);
@@ -242,7 +235,7 @@ export class SQLite extends Database {
       if (!tableName) throw new Error("No table name provided");
 
       // Escape table name to ensure it is sql safe
-      const name = tableName; // todo be sure tableName is safe
+      const name = tableName;
   
       // Drop table from the database
       this.db.exec(`DROP TABLE IF EXISTS ${name};`);
@@ -251,6 +244,24 @@ export class SQLite extends Database {
     } finally {
     }
   };
+
+  private _createUpdateTrigger = (tableName: string, updateSchema: ColumnSchema): string => {
+    let triggerSQL = "";
+
+    if (updateSchema.type === "timestamp_update") {
+      triggerSQL = `
+        CREATE TRIGGER IF NOT EXISTS trigger_on_${tableName}_update
+        BEFORE UPDATE ON ${tableName}
+        FOR EACH ROW
+        WHEN OLD.${updateSchema.name} = NEW.${updateSchema.name}
+        BEGIN
+          SELECT NEW.${updateSchema.name} = CURRENT_TIMESTAMP;
+        END;
+      `;
+    }
+
+    return triggerSQL;
+  }
 
   // Construct table SQL string based on TableSchema object
   private _createTableSchemaSQL = (tableSchema: TableSchema): string => {
@@ -275,13 +286,14 @@ export class SQLite extends Database {
     const colType = this._mapColumnType(colSchema.type);
 
     // Construct SQL string
-    let sql: string = `${colSchema.name} ${colType}`; // todo trust column schema name?
+    let sql: string = `${colSchema.name} ${colType}`;
     if (!colType.includes("TIMESTAMP")) {
       if (colSchema.primaryKey) sql += " PRIMARY KEY";
       if (colSchema.required) sql += " NOT NULL"; 
       if (colSchema.unique) sql += " UNIQUE";
-      if (colSchema.default) sql += ` DEFAULT ${colSchema.default}`; // protect against injection
+      if (colSchema.default) sql += ` DEFAULT ${colSchema.default}`;
     }
+
     return sql;
   }
 
@@ -305,7 +317,7 @@ export class SQLite extends Database {
         columnType = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
         break;
       case "timestamp_update":
-        columnType = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"; // todo make a trigger or other logic to update on update
+        columnType = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
         break;
     }
     if (!columnType) throw new Error("Invalid column type");
