@@ -1,9 +1,9 @@
-import { ISQLiteConfig } from "./lib/database/SQLite";
+import { ISQLiteConfig } from "./lib/server/database/SQLite";
 
 // SQLite configuration
 export const dbConfig: ISQLiteConfig = {
   type: "sqlite",
-  path: "./lib/database/sqlite.db",
+  path: "./lib/server/database/sqlite.db",
 }
 
 

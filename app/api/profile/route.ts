@@ -1,5 +1,5 @@
 import { FetchResponseData } from "@/hooks/useFetch";
-import { verifyAccessToken } from "@/lib/tokens";
+import { verifyAccessToken } from "@/lib/client/tokens";
 import { NextResponse } from "next/server";
 
 export interface ProfileResponseData extends FetchResponseData {

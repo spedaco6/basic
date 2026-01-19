@@ -5,7 +5,8 @@ import React from "react";
 export default function AuthLayout({ children }: React.PropsWithChildren ): React.ReactElement {
   
   return <div className="flex flex-col h-[100dvh]">
-    <div className="p-2 bg-gray-100 flex justify-end shadow-md">
+    <div className="p-2 bg-gray-100 flex justify-between items-center shadow-md">
+      <h2 className="font-bold ml-4 text-xl text-gray-500 italic">SPEDACO</h2>
       <LogoutButton />
     </div>
     

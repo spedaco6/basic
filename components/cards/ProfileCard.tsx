@@ -2,7 +2,7 @@
 
 import { ProfileResponseData } from "@/app/api/profile/route";
 import { useFetch } from "@/hooks/useFetch"
-import { getToken } from "@/lib/tokens";
+import { getToken } from "@/lib/client/tokens";
 import React from "react"
 import { LoadingProfileCard } from "./LoadingProfileCard";
 

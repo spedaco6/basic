@@ -1,7 +1,7 @@
 import { FetchResponseData } from "@/hooks/useFetch";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { createAccessToken, createRefreshToken, verifyRefreshToken } from "@/lib/tokens";
+import { createAccessToken, createRefreshToken, verifyRefreshToken } from "@/lib/client/tokens";
 
 export interface RefreshResponseData extends FetchResponseData {
   token: string
