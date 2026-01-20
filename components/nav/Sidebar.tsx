@@ -12,7 +12,7 @@ export const Sidebar = (): React.ReactElement => {
   const conditionalCSS = open ?
     "block" :
     "hidden";
-  return <div className={`w-[16rem] h-full bg-white shadow-2xl ${conditionalCSS} z-50 fixed md:block md:relative`}>
+  return <div className={`w-[16rem] max-w-[80dvw] h-full bg-white shadow-2xl ${conditionalCSS} z-50 fixed md:block md:relative`}>
     <div className="mt-12 text-gray-500 uppercase">
       <ul>
         <SidebarHeading>General</SidebarHeading>

@@ -3,13 +3,14 @@
 import { useSidebarCtx } from "@/context/SidebarContext"
 
 export const MenuButton = () => {
-  const { toggle } = useSidebarCtx();
+  const { toggle, open } = useSidebarCtx();
   return <button 
-    className="block md:hidden cursor-pointer" 
+    className="block md:hidden cursor-pointer z-60" 
     title="Menu"
     onClick={toggle}  
   >
-    <i className="bi bi-list text-3xl" />
+    { !open && <i className="bi bi-list text-3xl" />}
+    { open && <i className="bi bi-x text-3xl hover:text-red-500" /> }
   </button>
 
 }
