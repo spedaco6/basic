@@ -16,16 +16,14 @@ export async function POST(request: Request): Promise<Response> {
     // Sanitize and validate data
     const email = xss(body.email);
     const password = xss(body.password);
-  
-    // todo Server-side validation
-  
+    
     // Authenticate user
     const user = await User.findOne({ email });
     if (!user) throw new Error("Incorrect email or password");
     
     // validate password
-    const decrypt = await bcrypt.compare(password, user.password);
-    if (!decrypt) throw new Error("Incorrect email or password");
+    const compare = await bcrypt.compare(password, user.password);
+    if (!compare) throw new Error("Incorrect email or password");
       
     // Create access token
     const payload = { userId: user.id, userRole: user.role };

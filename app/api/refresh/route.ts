@@ -37,9 +37,9 @@ export async function GET() {
 
 
     //TESTING
-/*     const updatedUser = await User.findById(user.id);
+    const updatedUser = await User.findById(user.id);
     if (updatedUser) console.log("user jti: ", updatedUser.jti);
-    console.log("new jti: ", jti); */
+    console.log("new jti: ", jti);
 
     
     // Create refresh token with new jti
