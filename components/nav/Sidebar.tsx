@@ -10,9 +10,9 @@ export const Sidebar = (): React.ReactElement => {
   const { open } = useSidebarCtx();
   const { role } = useToken();
   const conditionalCSS = open ?
-    "block" :
-    "hidden";
-  return <div className={`w-[16rem] max-w-[80dvw] h-full bg-white shadow-2xl ${conditionalCSS} z-50 fixed md:block md:relative`}>
+    "translate-x-0" :
+    "translate-x-[-100%]";
+  return <div className={`w-[16rem] max-w-[80dvw] h-full transition-translate duration-300 ease-in bg-white shadow-2xl ${conditionalCSS} z-50 fixed md:translate-x-0`}>
     <div className="mt-12 text-gray-500 uppercase">
       <ul>
         <SidebarHeading>General</SidebarHeading>
@@ -27,7 +27,7 @@ export const Sidebar = (): React.ReactElement => {
         
         { role < 30 && <><SidebarHeading>Admin</SidebarHeading>
           <SidebarLink href="/auth/users">
-            <i className="bi bi-person-fill text-2xl" />
+            <i className="bi bi-people-fill text-2xl" />
             <span className="ml-2">Users</span>
           </SidebarLink>
         </> }

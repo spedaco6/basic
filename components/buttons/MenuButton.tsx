@@ -6,7 +6,7 @@ export const MenuButton = () => {
   const { toggle, open } = useSidebarCtx();
   return <button 
     className="block md:hidden cursor-pointer z-60" 
-    title="Menu"
+    title={open ? "Close" : "Menu"}
     onClick={toggle}  
   >
     { !open && <i className="bi bi-list text-3xl" />}
