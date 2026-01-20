@@ -1,14 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useSidebarCtx } from "@/context/SidebarContext"
 
 export const MenuButton = () => {
-  const [show, setShow] = useState(false);
-
+  const { toggle } = useSidebarCtx();
   return <button 
     className="block md:hidden cursor-pointer" 
     title="Menu"
-    onClick={() => setShow(prev => !prev)}  
+    onClick={toggle}  
   >
     <i className="bi bi-list text-3xl" />
   </button>
