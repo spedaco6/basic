@@ -12,7 +12,7 @@ export const Sidebar = (): React.ReactElement => {
   const conditionalCSS = open ?
     "translate-x-0" :
     "translate-x-[-100%]";
-  return <div className={`w-[16rem] max-w-[80dvw] h-full transition-translate duration-300 ease-in bg-white shadow-2xl ${conditionalCSS} z-50 fixed md:translate-x-0`}>
+  return <div className={`w-[16rem] max-w-[80dvw] h-full transition-translate duration-300 ease-in bg-white shadow-2xl ${conditionalCSS} z-50 fixed md:relative md:translate-x-0`}>
     <div className="mt-12 text-gray-500 uppercase">
       <ul>
         <SidebarHeading>General</SidebarHeading>
