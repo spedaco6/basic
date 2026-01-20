@@ -19,12 +19,12 @@ export async function GET() {
     
     // Validate refresh token
     verified = await verifyRefreshToken(refreshToken.value);
-    if (!verified) throw new Error("Invalid token");
+    if (!verified) throw new Error("Unverified refresh token");
 
     // Check jti
     user = await User.findById(verified.userId);
-    if (!user) throw new Error("Invalid token");
-    if (!user.jti || user.jti !== verified.jti) throw new Error("Invalid token");
+    if (!user) throw new Error("No user found");
+    if (!user.jti || user.jti !== verified.jti) throw new Error("Invalid refresh token");
 
     // Get new access token
     const payload = { userId: verified.userId, userRole: verified.userRole };
@@ -35,6 +35,13 @@ export async function GET() {
     user.jti = jti;
     await user.save();
 
+
+    //TESTING
+/*     const updatedUser = await User.findById(user.id);
+    if (updatedUser) console.log("user jti: ", updatedUser.jti);
+    console.log("new jti: ", jti); */
+
+    
     // Create refresh token with new jti
     const newRefreshToken = await createRefreshToken({ ...payload, jti });
     const response = NextResponse.json({ success: true, token: accessToken, message: "Token refreshed" });
