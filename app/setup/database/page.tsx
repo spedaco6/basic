@@ -11,8 +11,6 @@ export default async function SetupPage({
   const setup_key = process.env.SETUP_KEY;
   if (!setup_key || setup_key !== url_setup_key) return redirect("/login");
 
-  if (await User.isInit()) return redirect("/login");
-
   const db = getDb();
   await User.init(db);
 
