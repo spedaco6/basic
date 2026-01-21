@@ -16,7 +16,7 @@ export abstract class Model {
   public secureKey?: string;
   public created_at?: string;
   public updated_at?: string;
-  static initialized: boolean = false;
+  // static initialized: boolean = false;
   static db: Database;
 
   constructor() {}
@@ -133,7 +133,7 @@ export abstract class Model {
 
   // Create the table in the database
   static async init(db: Database): Promise<void> {
-    if (this.initialized) return;
+    // if (this.initialized) return;
     // Ensure that init is not called on the parent Model class
     if (this === Model) throw new Error("Cannot initialize Model class directly");
 
@@ -147,7 +147,13 @@ export abstract class Model {
 
     // Create table in database using table schema
     await this.db.createTable(this.getTableName(), this.getSchema());
-    this.initialized = true;
-    console.log(`${name} table created`);
+    // this.initialized = true;
+    console.log(`${name} table created!`);
   }
+
+  static async isInit(): Promise<boolean> {
+    const result = await this.db.hasTable(this.getTableName());
+    return result;
+  }
+
 }

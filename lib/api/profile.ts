@@ -1,3 +1,4 @@
+import { SALT_ROUNDS } from "../server/const";
 import { HTTPError } from "../server/errors";
 import { User } from "../server/models/User";
 import { verifyAccessToken } from "../server/tokens";
@@ -105,7 +106,7 @@ export const changePassword = async (currentPassword: string, newPassword: strin
   if (!compare) throw new HTTPError("Incorrect password", 403);
 
   // Hash and save new password
-  const hash = await bcrypt.hash(updatedPassword, 10);
+  const hash = await bcrypt.hash(updatedPassword, SALT_ROUNDS);
   user.password = hash;
   await user.save();
 }

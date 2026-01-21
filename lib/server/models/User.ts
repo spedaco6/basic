@@ -55,11 +55,12 @@ export class User extends Model implements IUser {
     Object.assign(this, props);
   }
 }
-const db = getDb();
-await User.init(db);
+/* const db = getDb();
+User.db = db; */
+// await User.init(db);
 
 // todo delete this setup
-const users = await User.find({ or: { email: [
+/* const users = await User.find({ or: { email: [
   "user@email.com",
   "customer@email.com",
   "employee@email.com", 
@@ -107,4 +108,4 @@ if (users && !users.length) {
     role: 10
   });
   await admin.save();
-}
+} */
