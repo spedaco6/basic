@@ -5,7 +5,7 @@ import { verifyAccessToken } from "../server/tokens";
 // DO NOT USE ERROR HANDLING
 // HTTP ERRORS WILL BE HANDLED IN API ROUTES
 
-export interface ProfileData {
+interface ProfileData {
   userId: number,
   userRole: number,
   email: string,

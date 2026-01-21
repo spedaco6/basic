@@ -6,7 +6,7 @@ import { v4 } from "uuid";
 // DO NOT USE ERROR HANDLING
 // HTTP ERRORS WILL BE HANDLED IN API ROUTES
 
-interface TokenPackage {
+export interface TokenPackage {
   refreshToken: string,
   accessToken: string,
 }

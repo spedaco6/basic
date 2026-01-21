@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import xss from "xss";
 import { v4 } from "uuid";
 import { HTTPError } from "@/lib/server/errors";
+import { login } from "@/lib/api/auth";
 
 export interface LoginResponseData extends FetchResponseData {
   token: string
@@ -13,30 +14,11 @@ export interface LoginResponseData extends FetchResponseData {
 
 export async function POST(request: Request): Promise<Response> {
   try {
+    // Get request body
     const body = await request.json();
-    // Sanitize and validate data
-    const email = xss(body.email);
-    const password = xss(body.password);
     
-    // Authenticate user
-    const user = await User.findOne({ email });
-    if (!user) throw new HTTPError("Incorrect email or password", 403);
-    
-    // validate password
-    const compare = await bcrypt.compare(password, user.password);
-    if (!compare) throw new HTTPError("Incorrect email or password", 403);
-      
-    // Create access token
-    const payload = { userId: user.id, userRole: user.role };
-    const accessToken = await createAccessToken(payload);
-  
-    // Create jti and save to user
-    const jti = v4();
-    user.jti = jti;
-    await user.save();
-
-    // Create refresh token
-    const refreshToken = await createRefreshToken({ ...payload, jti });
+    // Authenticate user and get new token package
+    const { refreshToken, accessToken } = await login(body.email, body.password);
       
     // Return response with token and cookie
     const response = NextResponse.json({ success: true, token: accessToken, message: "Success" });
