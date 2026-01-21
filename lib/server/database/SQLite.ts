@@ -228,6 +228,21 @@ export class SQLite extends Database {
     }
   };
 
+  // Checks if table exists
+  public async hasTable(tableName: string): Promise<boolean> {
+    try {
+      const result = await this.db.prepare(`
+        SELECT 1
+        FROM sqlite_master
+        WHERE type = 'table'
+        AND name = ?;`).get(tableName) as boolean;
+      if (result) return true;
+      return false;
+    } catch (err) {
+      return false;
+    }
+  }
+
   // Delete a table from the database
   public async deleteTable(tableName: string): Promise<void> {
     try {

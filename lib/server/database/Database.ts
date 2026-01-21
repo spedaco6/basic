@@ -30,6 +30,7 @@ export type TableSchema = ColumnSchema[];
 
 export abstract class Database {
   abstract createTable(tableName: string, tableSchema: TableSchema): Promise<void>;
+  abstract hasTable(tableName: string): Promise<boolean>;
   abstract deleteTable(tableName: string): Promise<void>;
   abstract createOne<T extends Model>(tableName: string, data: T): Promise<T | null>;
   abstract deleteOne<T extends Model>(tableName: string, data: T): Promise<boolean>;  
