@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import xss from "xss";
 import { v4 } from "uuid";
+import { HTTPError } from "@/lib/server/errors";
 
 export interface LoginResponseData extends FetchResponseData {
   token: string
@@ -19,11 +20,11 @@ export async function POST(request: Request): Promise<Response> {
     
     // Authenticate user
     const user = await User.findOne({ email });
-    if (!user) throw new Error("Incorrect email or password");
+    if (!user) throw new HTTPError("Incorrect email or password", 403);
     
     // validate password
     const compare = await bcrypt.compare(password, user.password);
-    if (!compare) throw new Error("Incorrect email or password");
+    if (!compare) throw new HTTPError("Incorrect email or password", 403);
       
     // Create access token
     const payload = { userId: user.id, userRole: user.role };
@@ -50,6 +51,7 @@ export async function POST(request: Request): Promise<Response> {
     return response;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Something went wrong";
-    return NextResponse.json({ success: false, message }, { status: 403 });
+    const status = err instanceof HTTPError ? err.status : 500;
+    return NextResponse.json({ success: false, message }, { status });
   }
 }

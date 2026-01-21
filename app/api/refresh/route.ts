@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { createAccessToken, createRefreshToken, verifyRefreshToken } from "@/lib/server/tokens";
 import { User } from "@/lib/server/models/User";
 import { v4 } from "uuid";
+import { HTTPError } from "@/lib/server/errors";
 
 export interface RefreshResponseData extends FetchResponseData {
   token: string
@@ -14,17 +15,17 @@ export async function GET() {
   let verified;
   try {
     const cookieStore = await cookies();
-      const refreshToken = cookieStore.get("refresh");
+    const refreshToken = cookieStore.get("refresh");
     if (!refreshToken) return NextResponse.redirect("/login");
     
     // Validate refresh token
     verified = await verifyRefreshToken(refreshToken.value);
-    if (!verified) throw new Error("Unverified refresh token");
+    if (!verified) throw new HTTPError("Unverified refresh token", 401);
 
     // Check jti
     user = await User.findById(verified.userId);
-    if (!user) throw new Error("No user found");
-    if (!user.jti || user.jti !== verified.jti) throw new Error("Invalid refresh token");
+    if (!user) throw new HTTPError("No user found", 404);
+    if (!user.jti || user.jti !== verified.jti) throw new HTTPError("Invalid refresh token", 401);
 
     // Get new access token
     const payload = { userId: verified.userId, userRole: verified.userRole };
@@ -36,7 +37,7 @@ export async function GET() {
     await user.save();
 
 
-    //TESTING
+    // TESTING todo
     const updatedUser = await User.findById(user.id);
     if (updatedUser) console.log("user jti: ", updatedUser.jti);
     console.log("new jti: ", jti);
@@ -57,7 +58,8 @@ export async function GET() {
 
     return response;
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unable to refresh user token";
-    return NextResponse.json({ success: false, message }, { status: 401 });
+    const message = err instanceof Error ? err.message : "Something went wrong";
+    const status = err instanceof HTTPError ? err.status : 500;
+    return NextResponse.json({ success: false, message }, { status });
   }
 }
