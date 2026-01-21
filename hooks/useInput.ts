@@ -23,10 +23,12 @@ export function useInput<T>(name: string, initValue: T) {
     setValue(val as T);
   }
 
+
   return {
     name: inputName,
     value,
     required,
     onChange,
+    setValue,
   }
 }

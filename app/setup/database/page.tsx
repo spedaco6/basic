@@ -64,7 +64,16 @@ export default async function SetupPage({
     await admin.save();
   }
 
-  return <div>
-    Successfully initialized users
+  return <div className="p-2">
+    <p>Successfully initialized users table!</p>
+
+    <p>Successfullly set up users:</p>
+    <ul>
+      <li className="ml-4">user@email.com</li>
+      <li className="ml-4">customer@email.com</li>
+      <li className="ml-4">employee@email.com</li>
+      <li className="ml-4">manager@email.com</li>
+      <li className="ml-4">admin@email.com</li>
+    </ul>
   </div>
 }

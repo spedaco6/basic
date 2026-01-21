@@ -11,7 +11,7 @@ export const Input = ({
   name,
   value,
   label,
-  placeholder,
+  placeholder="",
   id,
   className="",
   hook,
