@@ -9,8 +9,21 @@ export interface IUseInput {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
+interface InputCondition {
+  touched: boolean,
+  blurred: boolean,
+  saved: boolean,
+  pending: boolean,
+}
+
 export function useInput<T>(name: string, initValue: T) {
   const [ value, setValue ] = useState<T>(initValue);
+  const [ condition, setCondition ] = useState<InputCondition>({
+    touched: false, // has been changed
+    blurred: false, // has lost focus at least once
+    saved: true, // has been saved
+    pending: false, // is being updated remotely
+  });
   
   const matches = name.match(/^(?<name>.+)\*$/);
   const required = Boolean(matches);
@@ -21,8 +34,14 @@ export function useInput<T>(name: string, initValue: T) {
     if (typeof initValue === "number") val = Number(val);
     else if (typeof initValue === "boolean") val = e.target.checked;
     setValue(val as T);
+    setCondition(prev => {
+      return {
+        ...prev,
+        updated: val !== initValue,
+        saved: false,
+      }
+    });
   }
-
 
   return {
     name: inputName,
@@ -30,5 +49,6 @@ export function useInput<T>(name: string, initValue: T) {
     required,
     onChange,
     setValue,
+    condition,
   }
 }
