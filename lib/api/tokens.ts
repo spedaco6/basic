@@ -11,8 +11,9 @@ export interface TokenPackage {
   accessToken: string,
 }
 
-export const refreshTokens = async (oldToken: string): Promise<TokenPackage> => {
+export const refreshTokens = async (oldToken?: string): Promise<TokenPackage> => {
     // Validate refresh token
+    if (!oldToken) throw new HTTPError("No token provided", 401);
     const verified = await verifyRefreshToken(oldToken);
     if (!verified) throw new HTTPError("Unverified refresh token", 401);
 
