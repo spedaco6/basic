@@ -1,7 +1,7 @@
 import { FetchResponseData } from "@/hooks/useFetch";
 import { NextResponse } from "next/server";
 import { HTTPError } from "@/lib/server/errors";
-import { getProfile, updateProfile } from "@/lib/api/profile";
+import { deleteProfile, getProfile, updateProfile } from "@/lib/api/profile";
 
 export interface ProfileResponseData extends FetchResponseData {
   userId: number,
@@ -25,11 +25,10 @@ export async function GET(req: Request): Promise<Response> {
     const userProfile = await getProfile(accessToken);
 
     // Return profile
-    const response = NextResponse.json({ 
+    return NextResponse.json({ 
       success: true, message: "User profile provided", ...userProfile
     });
 
-    return response;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Something went wrong";
     const status = err instanceof HTTPError ? err.status : 500;
@@ -37,7 +36,9 @@ export async function GET(req: Request): Promise<Response> {
   }
 }
 
-export async function POST(req: Request): Promise<Response> {
+// todo EVENTUALLY MAKE A POST FOR CREATING ACCOUNTS
+
+export async function PUT(req: Request): Promise<Response> {
   try {
     // Get body
     const body = await req.json();
@@ -61,5 +62,28 @@ export async function POST(req: Request): Promise<Response> {
     const status = err instanceof HTTPError ? err.status : 500;
     const payload = err instanceof HTTPError ? err.payload : [];
     return NextResponse.json({ success: false, message, validationErrors: payload }, { status });
+  }
+}
+
+export async function DELETE(req: Request): Promise<Response> {
+  try {
+    // Get body
+    const body = await req.json();
+
+    // Get token from auth header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new HTTPError("No token provided", 401);
+    const token = authHeader.split(" ")[1];
+
+    // Delete profile
+    await deleteProfile(body.password, token);
+
+    // Return deleted confirmation response
+    return NextResponse.json({ success: true, message: "Profile deleted" });
+
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Something went wrong";
+    const status = err instanceof HTTPError ? err.status : 500;
+    return NextResponse.json({ success: false, message }, { status });
   }
 }
