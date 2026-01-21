@@ -1,6 +1,7 @@
 "use client"
-import { useSidebarCtx } from "@/context/SidebarContext";
+
 import React from "react";
+import { useSidebarCtx } from "@/context/SidebarContext";
 
 export const Backdrop = (): React.ReactElement => {
   const { open, close } = useSidebarCtx();

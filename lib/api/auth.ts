@@ -3,7 +3,7 @@ import { TokenPackage } from "./tokens";
 import { User } from "../server/models/User";
 import { HTTPError } from "../server/errors";
 import bcrypt from "bcrypt";
-import { createAccessToken, createRefreshToken, verifyAccessToken } from "../server/tokens";
+import { createAccessToken, createRefreshToken } from "../server/tokens";
 import { v4 } from "uuid";
 
 // DO NOT USE ERROR HANDLING

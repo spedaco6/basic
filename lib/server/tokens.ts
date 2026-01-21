@@ -1,4 +1,4 @@
-import { JWTPayload, jwtVerify, SignJWT } from "jose";
+import { jwtVerify, SignJWT } from "jose";
 import "server-only";
 import { TokenPayload } from "../client/tokens";
 
