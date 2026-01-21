@@ -39,3 +39,4 @@ export async function verifyRefreshToken(refreshToken: string): Promise<RefreshT
   const verified = await jwtVerify<RefreshTokenPayload>(refreshToken, refreshTokenSecret);
   return verified.payload ?? null;
 }
+

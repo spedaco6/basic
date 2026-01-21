@@ -1,8 +1,7 @@
 import { FetchResponseData } from "@/hooks/useFetch";
-import { verifyAccessToken } from "@/lib/server/tokens";
-import { User } from "@/lib/server/models/User";
 import { NextResponse } from "next/server";
 import { HTTPError } from "@/lib/server/errors";
+import { getProfile } from "@/lib/api/profile";
 
 export interface ProfileResponseData extends FetchResponseData {
   userId: number,
@@ -18,30 +17,16 @@ export async function GET(req: Request): Promise<Response> {
     // Get Authorization header
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new HTTPError("No authorization token provided", 401);
-
-    // Validate token
+    
+    // Get access token
     const accessToken = authHeader.split(' ')[1];
-    const verified = await verifyAccessToken(accessToken);
-    if (!verified) throw new HTTPError("Invalid token", 401);
-
-    // Find user
-    const user = await User.findById(verified.userId);
-    if (!user) throw new HTTPError("Could not find user profile", 404);
-
-    // Ensure user role allows for profile viewing
-    if (verified.userId !== user.id && verified.userRole >= 30) {
-      throw new HTTPError("User not authorized to view this profile", 401);
-    };
+    
+    // Get profile
+    const userProfile = await getProfile(accessToken);
 
     // Return profile
     const response = NextResponse.json({ 
-      success: true,
-      message: "User profile provided",
-      userId: user.id, 
-      userRole: user.role,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      success: true, message: "User profile provided", ...userProfile
     });
 
     return response;

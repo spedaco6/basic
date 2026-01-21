@@ -1,11 +1,10 @@
-
-// DO NOT USE ERROR HANDLING
-// HTTP ERRORS WILL BE HANDLED IN API ROUTES
-
 import { HTTPError } from "../server/errors";
 import { User } from "../server/models/User";
 import { createAccessToken, createRefreshToken, verifyRefreshToken } from "../server/tokens";
 import { v4 } from "uuid";
+
+// DO NOT USE ERROR HANDLING
+// HTTP ERRORS WILL BE HANDLED IN API ROUTES
 
 interface TokenPackage {
   refreshToken: string,
