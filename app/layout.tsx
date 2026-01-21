@@ -2,7 +2,8 @@ import { config } from "dotenv";
 import type { Metadata } from "next";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./globals.css";
-import { Alert } from "@/components/alert/Alert";
+import { Alerts } from "@/components/alert/Alerts";
+import { AlertContextProvider } from "@/context/AlertContext";
 
 config();
 
@@ -19,8 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
-        <Alert />
+        <AlertContextProvider>
+          {children}
+          <Alerts />
+        </AlertContextProvider>
       </body>
     </html>
   );
