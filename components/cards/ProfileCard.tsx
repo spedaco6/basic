@@ -8,7 +8,6 @@ import { LoadingProfileCard } from "./LoadingProfileCard";
 
 const getProfile = async (): Promise<Response> => {
   const token = await getToken();
-  console.log("profile:", token);
   return fetch("/api/profile", {
     headers: {
       Authorization: `Bearer ${token}`,

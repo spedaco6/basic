@@ -8,7 +8,7 @@ import xss from "xss";
 // DO NOT USE ERROR HANDLING
 // HTTP ERRORS WILL BE HANDLED IN API ROUTES
 
-interface ProfileData {
+export interface ProfileData {
   userId: number,
   userRole: number,
   email: string,

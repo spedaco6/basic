@@ -1,8 +1,8 @@
 "use client"
 
+import React, { useEffect, useState } from "react";
 import { FetchResponseData, useFetch } from "@/hooks/useFetch";
 import { useInput } from "@/hooks/useInput";
-import React, { useEffect, useState } from "react";
 import { Input } from "../inputs/Input";
 import { useAlertCtx } from "@/context/AlertContext";
 
@@ -19,10 +19,9 @@ export const DiagnosticGetAndEdit = (): React.ReactNode => {
   const { data: getData, refetch } = useFetch<FetchResponseData & { email: string }>(get);  
   const { data: postData, refetch: postFetch, loading } = useFetch<FetchResponseData, [string]>(post, {}, { immediate: false });
   const [ edit, setEdit ] = useState(false);
+  const [canceled, setCanceled ] = useState(false);
   const email = useInput("email", "");
   const { addAlert } = useAlertCtx();
-  const [canceled, setCanceled ] = useState(false);
-
 
   useEffect(() => {
     if (getData && getData.email) {

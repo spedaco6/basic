@@ -3,10 +3,11 @@
 import { ChangeEvent, useState } from "react"
 
 export interface IUseInput {
-  name: string,
-  value: any,
-  required: boolean,
+  name: string;
+  value: any;
+  required: boolean;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  setValue: (value: any) => void;
 }
 
 interface InputCondition {
