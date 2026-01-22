@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 import xss from "xss";
 import { v4 } from "uuid";
 import { HTTPError } from "@/lib/server/errors";
-import { login } from "@/lib/api/auth";
+import { login } from "@/lib/server/api/auth";
 
 export interface LoginResponseData extends FetchResponseData {
   token: string

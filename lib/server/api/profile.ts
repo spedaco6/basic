@@ -1,7 +1,7 @@
-import { SALT_ROUNDS } from "../server/const";
-import { HTTPError } from "../server/errors";
-import { User } from "../server/models/User";
-import { verifyAccessToken } from "../server/tokens";
+import { SALT_ROUNDS } from "../const";
+import { HTTPError } from "../errors";
+import { User } from "../models/User";
+import { verifyAccessToken } from "../tokens";
 import bcrypt from "bcrypt";
 import xss from "xss";
 
@@ -12,8 +12,8 @@ export interface ProfileData {
   userId: number,
   userRole: number,
   email: string,
-  firstName?: string,
-  lastName?: string,
+  firstName: string,
+  lastName: string,
 }
 
 export const getProfile = async (accessToken?: string): Promise<ProfileData> => {
@@ -40,7 +40,7 @@ export const getProfile = async (accessToken?: string): Promise<ProfileData> => 
 }
 
 export const updateProfile = async (
-  profile: ProfileData,
+  profile: Omit<ProfileData, "userId" | "userRole">,
   accessToken: string, 
 ): Promise<ProfileData> => {
 

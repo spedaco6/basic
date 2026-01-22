@@ -1,14 +1,16 @@
 import { FetchResponseData } from "@/hooks/useFetch";
 import { NextResponse } from "next/server";
 import { HTTPError } from "@/lib/server/errors";
-import { deleteProfile, getProfile, updateProfile } from "@/lib/api/profile";
+import { deleteProfile, getProfile, updateProfile } from "@/lib/server/api/profile";
 
 export interface ProfileResponseData extends FetchResponseData {
-  userId: number,
-  userRole: number,
-  email: string,
-  firstName?: string,
-  lastName?: string,
+  profile: {
+    userId: number,
+    userRole: number,
+    email: string,
+    firstName: string,
+    lastName: string,
+  }
 }
 
 export async function GET(req: Request): Promise<Response> {
@@ -26,7 +28,7 @@ export async function GET(req: Request): Promise<Response> {
 
     // Return profile
     return NextResponse.json({ 
-      success: true, message: "User profile provided", ...userProfile
+      success: true, message: "User profile provided", profile: userProfile
     });
 
   } catch (err) {
@@ -55,7 +57,7 @@ export async function PUT(req: Request): Promise<Response> {
     return NextResponse.json({ 
       success: true, 
       message: "Profile updated",
-      ...updatedProfile,
+      profile: updatedProfile,
     }, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Something went wrong";

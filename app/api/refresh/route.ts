@@ -2,7 +2,7 @@ import { FetchResponseData } from "@/hooks/useFetch";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { HTTPError } from "@/lib/server/errors";
-import { refreshTokens } from "@/lib/api/tokens";
+import { refreshTokens } from "@/lib/server/api/tokens";
 
 export interface RefreshResponseData extends FetchResponseData {
   token: string

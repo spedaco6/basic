@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { HTTPError } from "@/lib/server/errors";
-import { changePassword } from "@/lib/api/profile";
+import { changePassword } from "@/lib/server/api/profile";
 
 export const POST = async (req: Request) => {
   try {

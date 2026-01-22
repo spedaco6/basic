@@ -1,6 +1,6 @@
-import { HTTPError } from "../server/errors";
-import { User } from "../server/models/User";
-import { createAccessToken, createRefreshToken, verifyRefreshToken } from "../server/tokens";
+import { HTTPError } from "../errors";
+import { User } from "../models/User";
+import { createAccessToken, createRefreshToken, verifyRefreshToken } from "../tokens";
 import { v4 } from "uuid";
 
 // DO NOT USE ERROR HANDLING
