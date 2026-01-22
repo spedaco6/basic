@@ -1,87 +1,115 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
-import { FetchResponseData, useFetch } from "@/hooks/useFetch";
+import React, { useEffect, useState } from "react"
+import { ProfileResponseData } from "@/app/api/profile/route";
+import { useFetch } from "@/hooks/useFetch"
+import { LoadingProfileCard } from "../cards/LoadingProfileCard";
+import { ProfileData } from "@/lib/server/api/profile";
 import { useInput } from "@/hooks/useInput";
 import { Input } from "../inputs/Input";
-import { useAlertCtx } from "@/context/AlertContext";
+import { getProfile } from "@/lib/client/api/profile";
 
-const get = async () => fetch("/api/test");
-const post = async (name: string, data: { email: string, password: string }) => fetch("/api/test", {
-  method: "post",
+const getFetch = () => fetch("/api/test/error");
+const putFetch = () => fetch("/api/test/error", { 
+  method: "put", 
   headers: {
-    "Content-Type": "application/json",
+    "Content-Type": "application/json" 
   },
-  body: JSON.stringify({ name, data }),
+  body: JSON.stringify({ dummy: "data" }),
 });
 
-interface TestResponseData extends FetchResponseData {
-  name: string,
-  email: string,
-  password: string,
-}
+export const DiagnosticGetAndEdit = (): React.ReactElement => {
+  const { data, error: errorGET, loading, refetch } = useFetch<ProfileResponseData>(getProfile);
+  const put = useFetch<ProfileResponseData, [Partial<ProfileData>]>(putFetch, {}, { immediate: false });
 
-export const DiagnosticGetAndEdit = (): React.ReactNode => {
-  const { data: getData, refetch } = useFetch<TestResponseData>(get);  
-  const { data: postData, refetch: postFetch, loading } = useFetch<FetchResponseData, [string, { email: string, password: string }]>(post, {}, { immediate: false });
+  const isLoading = loading || put.loading;
   
   const [ edit, setEdit ] = useState(false);
-  const [canceled, setCanceled ] = useState(false);
+  const [ canceled, setCanceled ] = useState(false);
 
-  const name = useInput("name", "");
+  console.log(data);
+
   const email = useInput("email", "");
-  const password = useInput("password", "");
+  const firstName = useInput("firstName", "");
+  const lastName = useInput("lastName", "");
 
-  const { addAlert } = useAlertCtx();
-
+  // Update local state with each GET response
   useEffect(() => {
-    if (getData && getData.name && getData.password && getData.email) {
-      name.setValue(getData.name);
-      email.setValue(getData.email);
-      password.setValue(getData.password);
-    }
-  }, [getData]);
+    if (data?.profile?.email) email.setValue(data.profile.email);
+    if (data?.profile?.firstName) firstName.setValue(data.profile.firstName);
+    if (data?.profile?.lastName) lastName.setValue(data.profile.lastName);
+  }, [data.profile]);
 
+  // Send new GET request upon PUT response
   useEffect(() => {
-    if (postData.success === true) {
-      addAlert("Saved");
+    if (put.data.profile) refetch();
+    if (put.error) {
+      if (data.profile?.email) email.setValue(data.profile.email);
+      if (data.profile?.firstName) firstName.setValue(data.profile.firstName);
+      if (data.profile?.lastName) lastName.setValue(data.profile.lastName);
     }
-    refetch();
-  }, [postData]);
-  
+  }, [put.data, put.error]);
+
+  // Handle click event
   const onClick = () => {
-    if (edit) {
-      postFetch(name.value, { email: email.value, password: password.value });
+    if (!edit) {
       setCanceled(false);
+      put.clearError();
+    } else {
+      const args = { email: email.value, firstName: firstName.value, lastName: lastName.value };
+      put.refetch(args);
     }
     setEdit(prev => !prev);
   }
 
+  // Handle cancel event
   const onCancel = () => {
-    setEdit(false);
     setCanceled(true);
-    if (getData.name) {
-      name.setValue(getData.name);
-    }
+    setEdit(false);
+    if (data.profile?.email) email.setValue(data.profile.email);
+    if (data.profile?.firstName) firstName.setValue(data.profile.firstName);
+    if (data.profile?.lastName) lastName.setValue(data.profile.lastName);
   }
 
-  return <div className="mt-4 flex items-center gap-4 justify-between w-[20rem]">
-    { !edit && name.value && <p>{ name.value }</p> }
-    { edit && <Input hook={name} /> } 
+  return <div className="mt-4">
+    <div className="flex justify-between w-full items-start">
+      <div className="flex flex-col">
 
-    { !edit && email.value && <p>{ email.value }</p> }
-    { edit && <Input hook={email} /> } 
-    
-    { !edit && password.value && <p>{ password.value }</p> }
-    { edit && <Input hook={password} /> } 
-    
-    { edit && <button onClick={onCancel}>Cancel</button> }
-    <button onClick={onClick} className="flex items-center gap-2 py-1 min-w-fit justify-between px-2 bg-gray-700 hover:bg-gray-500 text-white rounded-lg cursor-pointer">
-      { edit ? "Save" : "Edit" }
-      { !edit && loading && <div className="animate-spin w-fit">
-        <i className="bi bi-arrow-clockwise text-xl" />
+        { !edit && data.profile && !errorGET && <div>
+          <p className="text-lg">{ firstName.value } { lastName.value }</p>
+          <p className="text-lg">{ email.value }</p>
+        </div> }
+
+        { edit && data.profile && !errorGET && <div>
+          <div className="flex gap-2">
+            <Input hook={firstName} label="First Name"/>
+            <Input hook={lastName} label="Last Name" />
+          </div>
+          <Input hook={email} label="Email" />
+        </div> }
+
+        { errorGET && <p className="text-red-500">{ errorGET }</p> } 
+        { put.error && <p className="text-red-500">{ put.error }</p> }
+
+       </div>
+
+      { data.profile && <div className="flex gap-4 items-center">
+        { edit && <button onClick={onCancel}>Cancel</button> }
+        <button 
+          disabled={isLoading}
+          className={`${isLoading ? "bg-gray-400" : "bg-gray-700 hover:bg-gray-500"} flex items-center gap-2 text-white cursor-pointer h-fit py-2 px-4 rounded-sm`}
+          onClick={onClick}
+        >
+          { edit ? "Save" : "Edit"}
+          { isLoading && <div className="animate-spin w-fit"><i className="bi bi-arrow-repeat text-xl" /></div> }
+          { put.data.success && !isLoading && !canceled && !edit && <i className="bi bi-check text-2xl" /> }
+          { put.error && !isLoading && !canceled && !edit && <i className="bi bi-exclamation-circle text-xl" /> }
+        </button>
       </div> }
-      { !edit && !canceled && postData.success && !loading && <i className="bi bi-check text-2xl" /> }
-    </button>
+    </div>
+
+    { isLoading && !data.profile && <div className="space-y-4">
+      <LoadingProfileCard /> 
+    </div> }
   </div>
 }

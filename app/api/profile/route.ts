@@ -22,7 +22,6 @@ export async function GET(req: Request): Promise<Response> {
     
     // Get access token
     const accessToken = authHeader.split(' ')[1];
-    
     // Get profile
     const userProfile = await getProfile(accessToken);
 
