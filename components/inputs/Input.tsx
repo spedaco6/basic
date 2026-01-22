@@ -28,7 +28,7 @@ export const Input = ({
   const devId = (label && !id) ? devName : undefined;
 
   return <div className="flex flex-col">
-    { label && <label htmlFor={devId}>{`${label}${devRequired ? "*" : ""}`}</label> }
+    { label && <label className="uppercase text-xs p-1" htmlFor={devId}>{`${label}${devRequired ? "*" : ""}`}</label> }
     <input 
       className={`rounded-sm p-1 ${className}`} 
       type={type} name={devName} 

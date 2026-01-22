@@ -57,10 +57,10 @@ export const EditableProfileCard = (): React.ReactElement => {
 
       { edit && profile && !error && <div>
         <div className="flex gap-2">
-          <Input hook={firstName} />
-          <Input hook={lastName} />
+          <Input hook={firstName} label="First Name"/>
+          <Input hook={lastName} label="Last Name" />
         </div>
-        <Input hook={email} />
+        <Input hook={email} label="Email" />
       </div> }
       
       { profile && <div className="flex gap-4 items-center">
