@@ -42,6 +42,10 @@ export const useFetch = <
     }
   }, [fetchFn]);
 
+  const clearError = useCallback(() => {
+    setError("");
+  }, []);
+
   useEffect(() => {
     if (immediate) {
       fetch();
@@ -50,6 +54,7 @@ export const useFetch = <
 
   return {
     error,
+    clearError,
     loading,
     data,
     refetch: fetch,

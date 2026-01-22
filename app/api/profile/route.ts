@@ -50,8 +50,8 @@ export async function PUT(req: Request): Promise<Response> {
     if (!authHeader) throw new HTTPError("No token provided", 401);
     const token = authHeader.split(" ")[1];
     // Complete action
-    const updatedProfile = await updateProfile(body, token);
     await new Promise(res => setTimeout(res, 2000));
+    const updatedProfile = await updateProfile(body, token);
     // Send response
     return NextResponse.json({ 
       success: true, 

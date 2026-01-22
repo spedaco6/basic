@@ -34,12 +34,8 @@ export const DiagnosticGetAndEdit = (): React.ReactNode => {
 
   const { addAlert } = useAlertCtx();
 
-  console.log(getData);
-
   useEffect(() => {
-    console.log("fetching");
     if (getData && getData.name && getData.password && getData.email) {
-      console.log("fetching complete");
       name.setValue(getData.name);
       email.setValue(getData.email);
       password.setValue(getData.password);
