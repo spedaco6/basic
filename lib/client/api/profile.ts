@@ -21,3 +21,19 @@ export const putProfile = async (profile: Partial<ProfileData>) => {
     body: JSON.stringify(profile),
   })
 }
+
+export const changePassword = async (currentPassword: string, newPassword: string, confirmPassword: string) => {
+  const token = await getToken();
+  return fetch("/api/profile/password/change", {
+    method: "put",
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    })
+  });
+}

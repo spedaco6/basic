@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 export interface FetchResponseData {
   success: boolean,
   message?: string,
-  error?: string,
+  validationErrors?: string[],
 }
 
 interface FetchOptions {
@@ -32,8 +32,8 @@ export const useFetch = <
     try {
       const response = await fetchFn(...(args as Args));
       const result: Partial<Data> = await response.json();
+      setData(result); // todo this might need to be after the reponse.ok check but when it is no validationErrors populate      
       if (!response.ok) throw new Error(result.message ?? "There was a problem logging in");
-      setData(result);      
     } catch (err) {
       if (err instanceof Error) setError(err.message);
       else setError("Something went wrong");
@@ -42,6 +42,11 @@ export const useFetch = <
     }
   }, [fetchFn]);
 
+  const reset = useCallback(() => {
+    setData({});
+    setError("");
+    setLoading(false);
+  }, []);
   const clearError = useCallback(() => {
     setError("");
   }, []);
@@ -58,5 +63,6 @@ export const useFetch = <
     loading,
     data,
     refetch: fetch,
+    reset
   }
 }
