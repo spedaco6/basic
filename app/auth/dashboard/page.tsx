@@ -1,4 +1,3 @@
-import { Alerts } from "@/components/alert/Alerts";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

@@ -60,7 +60,7 @@ export const EditableProfileCard = (): React.ReactElement => {
     if (profile?.lastName) lastName.setValue(profile.lastName);
   }
 
-  return <div>
+  return <div className="max-w-[50rem]">
     <div className="flex justify-between w-full items-start">
       <div className="flex flex-col">
 

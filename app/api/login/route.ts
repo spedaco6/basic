@@ -1,10 +1,5 @@
 import type { FetchResponseData } from "@/hooks/useFetch";
-import { User } from "@/lib/server/models/User";
-import { createAccessToken, createRefreshToken } from "@/lib/server/tokens";
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
-import xss from "xss";
-import { v4 } from "uuid";
 import { HTTPError } from "@/lib/server/errors";
 import { login } from "@/lib/server/api/auth";
 

@@ -5,7 +5,6 @@ import { useAlertCtx } from "@/context/AlertContext";
 import { useFetch } from "@/hooks/useFetch";
 import React, { useState } from "react"
 import { Modal } from "../ui/Modal";
-import { ChangePasswordForm } from "../forms/ChangePasswordButton";
 
 const refresh: () => Promise<Response> = () => fetch("/api/refresh");
 
@@ -40,6 +39,5 @@ export const DiagnosticToolbar = (): React.ReactElement => {
       </div>
     </Modal> 
 
-    <ChangePasswordForm />
   </div>
 }
