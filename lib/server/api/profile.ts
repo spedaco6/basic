@@ -47,14 +47,15 @@ export const updateProfile = async (
   // Sanitize data
   const validatedProfile: Partial<ProfileData> = {};
   validatedProfile["email"] = xss(profile.email).trim();
-  validatedProfile["firstName"] = profile.firstName ? xss(profile.firstName).trim() : "";
-  validatedProfile["lastName"] = profile.lastName ? xss(profile.lastName).trim() : "";
-
+  validatedProfile["firstName"] = xss(profile.firstName).trim();
+  validatedProfile["lastName"] = xss(profile.lastName).trim();
+  
+  
   // Validate data
   const validationErrors = [];
-  const matches = validatedProfile.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ /i);
+  const matches = validatedProfile.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i);
   if (!matches) validationErrors.push("Invalid email");
-  if (validationErrors) throw new HTTPError(
+  if (validationErrors.length) throw new HTTPError(
     "Invalid profile information provided", 
     422, 
     validationErrors

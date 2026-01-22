@@ -22,8 +22,8 @@ export const ProfileCard = (): React.ReactElement => {
     { error && <p className="text-red-500">{ error }</p> }
     { data && !error && !loading && <div className="flex justify-between items-end max-w-[40rem]">
       <div>
-        <p className="text-lg">{ data.firstName } { data.lastName }</p>
-        <p className="text-lg">{ data.email }</p>
+        <p className="text-lg">{ data.profile?.firstName } { data.profile?.lastName }</p>
+        <p className="text-lg">{ data.profile?.email }</p>
       </div>
       <button className="border-1 bg-gray-700 hover:bg-gray-500 text-white cursor-pointer py-2 px-4 rounded-sm">Edit</button>
     </div> }
