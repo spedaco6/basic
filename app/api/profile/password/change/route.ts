@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { HTTPError } from "@/lib/server/errors";
 import { changePassword } from "@/lib/server/api/profile";
 
-export const POST = async (req: Request) => {
+export const PUT = async (req: Request) => {
   try {
     // Get request body
     const body = await req.json();
@@ -15,7 +15,7 @@ export const POST = async (req: Request) => {
     const token = header.split(" ")[1];
 
     // Change password
-    await changePassword(body.currentPassword, body.newPassword, token);
+    await changePassword(body.currentPassword, body.newPassword, body.confirmPassword, token);
 
     // Send response
     return NextResponse.json({ success: true, message: "Password changed" }, { status: 201 });

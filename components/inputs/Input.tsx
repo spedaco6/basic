@@ -37,7 +37,7 @@ export const Input = ({
       onChange={devOnChange}
       required={devRequired}
       disabled={disabled}
-      placeholder={`${placeholder}${devRequired ? "*" : ""}`}
+      placeholder={`${placeholder}${devRequired && placeholder ? "*" : ""}`}
       { ...props } 
     />
   </div>

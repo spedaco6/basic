@@ -2,6 +2,7 @@ import React from "react";
 import { Metadata } from "next";
 import { DiagnosticToolbar } from "@/components/tools/DiagnosticToolbar";
 import { SetupToolbar } from "@/components/tools/SetupToolbar";
+import { Modal } from "@/components/ui/Modal";
 
 export const metadata: Metadata = {
   title: "Diagnostics",

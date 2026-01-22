@@ -82,7 +82,12 @@ export const updateProfile = async (
   }
 }
 
-export const changePassword = async (currentPassword: string, newPassword: string, accessToken?: string): Promise<void> => {
+export const changePassword = async (
+  currentPassword: string, 
+  newPassword: string, 
+  confirmPassword: string, 
+  accessToken?: string
+): Promise<void> => {
   const password = xss(currentPassword).trim();
   const updatedPassword = xss(newPassword).trim();
 
@@ -91,21 +96,20 @@ export const changePassword = async (currentPassword: string, newPassword: strin
   if (updatedPassword.length < 8) validationErrors.push("Passwords must be 8 characters");
   const matches = updatedPassword.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/);
   if (!matches) validationErrors.push("Passwords must contain an upper- and lower-case letter, a number, and a special character.");
-  if (validationErrors) throw new HTTPError("New password is invalid", 422, validationErrors);
+  if (confirmPassword !== updatedPassword) validationErrors.push("Passwords do not match");
+  if (validationErrors.length) throw new HTTPError("New password is invalid", 422, validationErrors);
 
   // Authenticate / Authorize
   if (!accessToken) throw new HTTPError("No token provided", 401);
   const payload = await verifyAccessToken(accessToken);
   if (!payload) throw new HTTPError("Invalid token", 401);
-
   // Find user
   const user = await User.findById(payload.userId);
   if (!user) throw new HTTPError("Could not find user", 404);
-  
   // Authenticate password
-  const compare = bcrypt.compare(password, user.password);  
+  const compare = await bcrypt.compare(password, user.password); 
   if (!compare) throw new HTTPError("Incorrect password", 403);
-
+  
   // Hash and save new password
   const hash = await bcrypt.hash(updatedPassword, SALT_ROUNDS);
   user.password = hash;
