@@ -24,6 +24,7 @@ export default function LoginForm({ className="" }): React.ReactElement {
   const password = useInput("password", "");
 
   useEffect(() => {
+    password.setValue("");
     if (data?.success && data.token) {
       localStorage.setItem("token", data.token);
       router.push("/auth/dashboard");  
