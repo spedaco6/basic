@@ -19,6 +19,10 @@ export const getToken = async (): Promise<string> => {
   return newToken;
 }
 
+export const deleteToken = () => {
+  localStorage.removeItem("token");
+}
+
 // Checks expiration returning true if token is still fresh
 export const checkExpiration = (token?: string | null): boolean => {
   if (!token) return false;

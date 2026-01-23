@@ -79,8 +79,16 @@ export async function DELETE(req: Request): Promise<Response> {
     await deleteProfile(body.password, token);
 
     // Return deleted confirmation response
-    return NextResponse.json({ success: true, message: "Profile deleted" });
+    const response = NextResponse.json({ success: true, message: "Profile deleted" });
+    response.cookies.set("refresh", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: 'strict',
+      path: "/",
+      maxAge: 0,
+    });
 
+    return response;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Something went wrong";
     const status = err instanceof HTTPError ? err.status : 500;
