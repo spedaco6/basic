@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest",
     "db": "sqlite3 ./lib/server/database/sqlite.db"
   },
   "dependencies": {
@@ -20,11 +21,11 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "uuid": "^13.0.0",
-    "vitest": "^4.0.17",
     "xss": "^1.0.15"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/react": "^16.3.2",
     "@types/bcrypt": "^6.0.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
@@ -33,6 +34,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.0.18"
   }
 }
