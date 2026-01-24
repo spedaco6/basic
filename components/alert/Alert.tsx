@@ -37,7 +37,7 @@ export const Alert = ({ children, message, onTransitionEnd }: IAlert): React.Rea
 
   return <div 
     className={`${ isVisible ? visible : invisible } transition-all shadow-xl duration-300 ease-in
-    cursor-pointer group bg-gray-300 min-w-[14rem] w-fit h-[5rem] rounded-md flex items-center p-4 text-xl`}
+    cursor-pointer group bg-gray-300 min-w-56 w-fit h-20 rounded-md flex items-center p-4 text-xl`}
     onTransitionEnd={removeAlert}
     onClick={onDismiss}
   >

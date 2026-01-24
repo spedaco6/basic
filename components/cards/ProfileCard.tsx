@@ -20,12 +20,12 @@ export const ProfileCard = (): React.ReactElement => {
 
   return <div>
     { error && <p className="text-red-500">{ error }</p> }
-    { data && !error && !loading && <div className="flex justify-between items-end max-w-[40rem]">
+    { data && !error && !loading && <div className="flex justify-between items-end max-w-160">
       <div>
         <p className="text-lg">{ data.profile?.firstName } { data.profile?.lastName }</p>
         <p className="text-lg">{ data.profile?.email }</p>
       </div>
-      <button className="border-1 bg-gray-700 hover:bg-gray-500 text-white cursor-pointer py-2 px-4 rounded-sm">Edit</button>
+      <button className="border bg-gray-700 hover:bg-gray-500 text-white cursor-pointer py-2 px-4 rounded-sm">Edit</button>
     </div> }
     { loading && <div className="space-y-4">
       <LoadingProfileCard /> 

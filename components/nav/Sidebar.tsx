@@ -11,7 +11,7 @@ export const Sidebar = (): React.ReactElement => {
   const { role } = useToken();
   const conditionalCSS = open ?
     "translate-x-0" :
-    "translate-x-[-100%]";
+    "-translate-x-full";
   return <div className={`w-[16rem] max-w-[80dvw] h-full transition-translate duration-300 ease-in bg-white shadow-2xl ${conditionalCSS} z-50 fixed md:relative md:translate-x-0`}>
     <div className="mt-12 text-gray-500 uppercase">
       <ul>

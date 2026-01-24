@@ -8,7 +8,7 @@ import React from "react";
 export default function AuthLayout({ children }: React.PropsWithChildren ): React.ReactElement {
   
   return <SidebarContextProvider>
-    <div className="flex flex-col h-[100dvh]">
+    <div className="flex flex-col h-dvh">
       <div className="bg-gray-100 flex justify-between items-center shadow-md pl-2">
         <div className="flex items-center">
           <MenuButton />
