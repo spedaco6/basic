@@ -8,6 +8,7 @@ import { ProfileData } from "@/lib/server/api/profile";
 import { useInput } from "@/hooks/useInput";
 import { putProfile, getProfile } from "@/lib/client/api/profile";
 import { Input } from "../inputs/Input";
+import { Button } from "../buttons/Button";
 
 export const EditableProfileCard = (): React.ReactElement => {
   const { data: { profile }, error: errorGET, loading, refetch } = useFetch<ProfileResponseData>(getProfile);
@@ -83,8 +84,8 @@ export const EditableProfileCard = (): React.ReactElement => {
        </div>
 
       { profile && <div className="flex gap-4 items-center">
-        { edit && <button onClick={onCancel}>Cancel</button> }
-        <button 
+        { edit && <Button btnStyle="outline" onClick={onCancel}>Cancel</Button> }
+        <Button 
           disabled={isLoading}
           className={`${isLoading ? "bg-gray-400" : "bg-gray-700 hover:bg-gray-500"} flex items-center gap-2 text-white cursor-pointer h-fit py-2 px-4 rounded-sm`}
           onClick={onClick}
@@ -93,7 +94,7 @@ export const EditableProfileCard = (): React.ReactElement => {
           { isLoading && <div className="animate-spin w-fit"><i className="bi bi-arrow-repeat text-xl" /></div> }
           { put.data.success && !isLoading && !canceled && !edit && <i className="bi bi-check text-2xl" /> }
           { put.error && !isLoading && !canceled && !edit && <i className="bi bi-exclamation-circle text-xl" /> }
-        </button>
+        </Button>
       </div> }
     </div>
 

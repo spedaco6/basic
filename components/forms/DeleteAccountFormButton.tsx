@@ -7,6 +7,7 @@ import { useInput } from "@/hooks/useInput";
 import { useFetch } from "@/hooks/useFetch";
 import { deleteToken, getToken } from "@/lib/client/tokens";
 import { useRouter } from "next/navigation";
+import { Button } from "../buttons/Button";
 
 
 const deleteAccount = async (password: string) => {
@@ -47,11 +48,11 @@ export const DeleteAccountFormButton = (): React.ReactNode => {
   }
 
   return <div>
-    <button 
-      className="border bg-gray-700 hover:bg-gray-500 text-white cursor-pointer py-2 px-4 rounded-sm"
+    <Button 
+      btnStyle="outlineDanger"
       onClick={() => setOpen(true)}>
         Delete Account
-    </button>
+    </Button>
     <Modal open={open}>
       <form onSubmit={onSubmit} className="p-4">
         <h2 className="text-xl font-bold">Are you sure?</h2>
@@ -60,8 +61,8 @@ export const DeleteAccountFormButton = (): React.ReactNode => {
         { error && <p className="text-red-500">{ error }</p> }
         <Input hook={password} placeholder="Password" type="password" className="bg-white my-4" />
         <div className="flex gap-4 justify-end">
-          <button className="hover:border-black border-gray-200 transition-border duration-100 border cursor-pointer py-2 rounded-sm px-4" type="button" onClick={handleCancel}>Cancel</button>
-          <button className="border bg-gray-700 hover:bg-gray-500 text-white cursor-pointer py-2 rounded-sm px-4">Submit</button>
+          <Button btnStyle="flat" type="button" onClick={handleCancel}>Cancel</Button>
+          <Button btnStyle="danger">Submit</Button>
         </div>
       </form>
     </Modal>

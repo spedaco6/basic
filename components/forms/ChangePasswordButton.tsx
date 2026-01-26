@@ -6,6 +6,7 @@ import { Input } from "../inputs/Input";
 import { FetchResponseData, useFetch } from "@/hooks/useFetch";
 import { changePassword } from "@/lib/client/api/profile";
 import { Modal } from "../ui/Modal";
+import { Button } from "../buttons/Button";
 
 export const ChangePasswordButton = (): React.ReactNode => {
   const [ open, setOpen ] = useState(false);
@@ -38,11 +39,11 @@ export const ChangePasswordButton = (): React.ReactNode => {
   }
 
   return <>
-    <button 
+    <Button 
       className="border bg-gray-700 hover:bg-gray-500 text-white cursor-pointer py-2 rounded-sm px-4"
       onClick={() => setOpen(true)}>
         Change Password
-    </button>
+    </Button>
     <Modal open={open} className="min-w-fit w-120 p-8">
       { !data.success && <form
         onSubmit={handleSubmit} 
@@ -57,18 +58,18 @@ export const ChangePasswordButton = (): React.ReactNode => {
         <Input hook={currentPassword} type="password" placeholder="Current Password" className="mb-4 bg-white" />
         <Input hook={newPassword} type="password" placeholder="New Password" className="bg-white" />
         <Input hook={confirmPassword} type="password" placeholder="Confirm Password" className="bg-white" />
-        <div className="flex gap-4 justify-end">
-          <button className="hover:border-black border-gray-200 transition-border duration-100 border cursor-pointer py-2 rounded-sm px-4" type="button" onClick={handleCancel}>Cancel</button>
-          <button className="border bg-gray-700 hover:bg-gray-500 text-white cursor-pointer py-2 rounded-sm px-4">Submit</button>
+        <div className="flex gap-4 justify-end mt-4">
+          <Button btnStyle="flat" type="button" onClick={handleCancel}>Cancel</Button>
+          <Button>Submit</Button>
         </div>
       </form> }
 
       { data.success && <div className="flex flex-col gap-8 justify-center min-h-60">
         <h2 className="text-2xl flex-1 flex justify-center items-center">Success!</h2>
         <div className="flex justify-end w-full">
-          <button 
+          <Button 
             className="hover:border-black border-gray-200 transition-border duration-100 border cursor-pointer py-2 rounded-sm px-4" 
-            onClick={handleCancel}>Close</button>
+            onClick={handleCancel}>Close</Button>
         </div>
       </div> }
     </Modal>

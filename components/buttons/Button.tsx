@@ -1,11 +1,11 @@
-import React from "react";
+import React, { ButtonHTMLAttributes } from "react";
 
-interface IButton extends React.PropsWithChildren {
-  type?: "default" | "secondary" | "outline" | "flat" | "danger" | "secondaryDanger" | "outlineDanger" | "flatDanger" |
+interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
+  btnStyle?: "default" | "secondary" | "outline" | "flat" | "danger" | "secondaryDanger" | "outlineDanger" | "flatDanger" |
   "accept" | "secondaryAccept" | "outlineAccept" | "flatAccept";
 }
 
-export const Button = ({ children, type="default", ...props }: IButton): React.ReactNode => {
+export const Button = ({ children, btnStyle="default", className="", ...props }: IButton): React.ReactNode => {
   const styles = {
     default: "bg-gray-600 text-white border border-gray-600 hover:border-gray-800 hover:bg-gray-800",
     secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300",
@@ -19,12 +19,11 @@ export const Button = ({ children, type="default", ...props }: IButton): React.R
     secondaryAccept: "bg-green-100 text-green-800 hover:bg-green-200",
     outlineAccept: "text-green-500 hover:border-green-600 hover:text-green-600 shadow-green-200 border",
     flatAccept: "hover:shadow-green-600 text-green-500 hover:text-green-600",
-    
   }
 
 
   return <button
-    className={`${styles[type]} cursor-pointer py-2 px-3 min-w-fit rounded-md hover:shadow-sm`}
+    className={`${className} ${styles[btnStyle]} cursor-pointer py-2 px-3 min-w-fit rounded-md hover:shadow-sm`}
     { ...props }>
       { children }
   </button>
