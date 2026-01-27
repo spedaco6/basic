@@ -7,6 +7,7 @@ import React, { useEffect } from "react"
 import { Input } from "../inputs/Input";
 import { useInput } from "@/hooks/useInput";
 import { Button } from "../buttons/Button";
+import Link from "next/link";
 
 const login = (email: string, password: string): Promise<Response> => {
   return fetch("/api/login", {
@@ -48,6 +49,9 @@ export default function LoginForm({ className="" }): React.ReactElement {
           <i className="bi bi-arrow-clockwise text-2xl" />
         </div> }
       </Button>
+    </div>
+    <div className="flex justify-end mt-4">
+      <Link href="/forgot-password">Forgot password?</Link>
     </div>
   </form>
 
