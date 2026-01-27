@@ -6,6 +6,7 @@ import { Button } from "../buttons/Button";
 import { FormEvent, useEffect } from "react";
 import { useFetch } from "@/hooks/useFetch";
 import { forgotPassword } from "@/lib/client/api/profile";
+import Link from "next/link";
 
 export const ForgotPasswordForm = ({ className="" }) => {
   const email = useInput("email*", "");
@@ -21,7 +22,7 @@ export const ForgotPasswordForm = ({ className="" }) => {
   }
 
   return <form 
-    className={`${className} flex flex-col gap-4 m-4 p-6 bg-gray-200 justify-between rounded-lg h-auto w-100`}
+    className={`${className} flex flex-col gap-2 m-4 p-6 bg-gray-200 justify-between rounded-lg h-auto w-100`}
     onSubmit={handleSubmit}>
     <h2 className="text-lg">Enter Email for Reset Link:</h2>
     { error && <p className="text-red-500">{ error }</p> }
@@ -36,7 +37,9 @@ export const ForgotPasswordForm = ({ className="" }) => {
         "Get Reset Link"
       }
     </Button>
-   
+    <div className="flex justify-end">
+      <Link href="/login" className="mt-4">Back to login</Link>
+    </div>
   </form>
   
 }
