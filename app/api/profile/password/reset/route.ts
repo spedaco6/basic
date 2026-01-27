@@ -20,6 +20,6 @@ export const PATCH  = async (req: Request) => {
     const message = err instanceof Error ? err.message : "Something went wrong";
     const status = err instanceof HTTPError ? err.status : 500;
     const payload = err instanceof HTTPError ? err.payload : [];
-    return NextResponse.json({ success: false, message, payload }, { status });
+    return NextResponse.json({ success: false, message, validationErrors: payload }, { status });
   }
 }
