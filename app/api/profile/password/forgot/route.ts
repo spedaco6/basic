@@ -2,7 +2,7 @@ import { forgotPassword } from "@/lib/server/api/profile";
 import { HTTPError } from "@/lib/server/errors";
 import { NextResponse } from "next/server";
 
-export const POST = async (req: Request) => {
+export const POST = async (req: Request): Promise<Response> => {
   try {
     const body = await req.json();
     

@@ -2,7 +2,7 @@ import { HTTPError } from "@/lib/server/errors";
 import { NextResponse } from "next/server";
 import { resetPassword } from "@/lib/server/api/profile";
 
-export const PATCH  = async (req: Request) => {
+export const PATCH  = async (req: Request): Promise<Response> => {
   try {
     const body = await req.json();
 

@@ -29,7 +29,8 @@ export const Sidebar = (): React.ReactElement => {
           <span className="ml-2">Checklists</span>
         </SidebarLink>
         
-        { role < 30 && <><SidebarHeading>Admin</SidebarHeading>
+        { role < 30 && <>
+          <SidebarHeading>Admin</SidebarHeading>
           <SidebarLink href="/auth/users">
             <i className="bi bi-people-fill text-2xl" />
             <span className="ml-2">Users</span>

@@ -11,7 +11,19 @@ export const getProfile = async (): Promise<Response> => {
   });
 }
 
-export const putProfile = async (profile: Partial<ProfileData>) => {
+export const postProfile = async (profile: Partial<ProfileData>): Promise<Response> => {
+  const token = await getToken();
+  return fetch("/api/profile", {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+    body: JSON.stringify(profile),
+  });
+}
+
+export const putProfile = async (profile: Partial<ProfileData>): Promise<Response> => {
   const token = await getToken();
   return fetch("/api/profile", {
     method: "put",
@@ -22,7 +34,7 @@ export const putProfile = async (profile: Partial<ProfileData>) => {
   })
 }
 
-export const changePassword = async (currentPassword: string, newPassword: string, confirmPassword: string) => {
+export const changePassword = async (currentPassword: string, newPassword: string, confirmPassword: string): Promise<Response> => {
   const token = await getToken();
   return fetch("/api/profile/password/change", {
     method: "put",
@@ -38,7 +50,7 @@ export const changePassword = async (currentPassword: string, newPassword: strin
   });
 }
 
-export const forgotPassword = async (email: string) => {
+export const forgotPassword = async (email: string): Promise<Response> => {
   return fetch("/api/profile/password/forgot", {
     method: "post",
     headers: {

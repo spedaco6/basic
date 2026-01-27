@@ -14,8 +14,8 @@ export interface ProfileData {
   userId: number,
   userRole: number,
   email: string,
-  firstName: string,
-  lastName: string,
+  firstName?: string,
+  lastName?: string,
 }
 
 export const getProfile = async (accessToken?: string): Promise<ProfileData> => {
@@ -41,6 +41,64 @@ export const getProfile = async (accessToken?: string): Promise<ProfileData> => 
   }
 }
 
+// Create a user
+export const createProfile = async (
+  profile: Partial<ProfileData>,
+  accessToken: string
+): Promise<void> => {
+  // sanitize and validate
+  const sanitized: Record<string, any> = {};
+  Object.entries(profile).forEach(field => {
+    sanitized[field[0]] = typeof field[1] === "string" ? xss(field[1]).trim() : field[1];
+  });
+
+  // authenticate/authorize
+  let userId = null;
+  if (accessToken) {
+    const verified = await verifyAccessToken(accessToken);
+    if (!verified) throw new HTTPError("Unverified token", 401);
+    userId = verified.userId;
+  }
+  
+  // validate data
+  const validationErrors = [];
+  if (!sanitized.email || !isEmail(sanitized.email)) validationErrors.push("Invalid email");
+  // Ensure all passwords are at least 8 characters
+  if (sanitized.password.length < 8) validationErrors.push("Passwords must be 8 characters");
+  // Bypass password requirements when created by authorized user
+  if (!userId || userId > 20) {
+    const matches = sanitized.password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/);
+    if (!matches) validationErrors.push("Passwords must contain an upper- and lower-case letter, a number, and a special character.");
+  }
+  if (validationErrors.length) throw new HTTPError("Invalid data", 422, validationErrors);
+
+  // Sets default role to 50
+  if (sanitized.role && sanitized.role !== 50) {
+    if (!userId || (userId && userId > sanitized.role)) {
+      throw new HTTPError("Cannot change user role", 401);
+    }
+  } else {
+    sanitized.role = 50;
+  }
+
+  // Ensure user does not already exist
+  const user = await User.findOne({ email: sanitized.email });
+  if (user) throw new HTTPError("User already exists", 422);
+  
+  // hash password
+  const hash = await bcrypt.hash(sanitized.password, SALT_ROUNDS);
+
+  // complete action
+  const newUser = new User({
+    firstName: sanitized.firstName ?? "",
+    lastName: sanitized.lastName ?? "",
+    email: sanitized.email,
+    password: hash,
+    role: sanitized.role,
+  });
+  await newUser.save();
+}
+
 export const updateProfile = async (
   profile: Omit<ProfileData, "userId" | "userRole">,
   accessToken: string, 
@@ -49,8 +107,8 @@ export const updateProfile = async (
   // Sanitize data
   const validatedProfile: Partial<ProfileData> = {};
   validatedProfile["email"] = xss(profile.email).trim();
-  validatedProfile["firstName"] = xss(profile.firstName).trim();
-  validatedProfile["lastName"] = xss(profile.lastName).trim();
+  validatedProfile["firstName"] = profile.firstName ? xss(profile.firstName).trim() : "";
+  validatedProfile["lastName"] = profile.lastName ? xss(profile.lastName).trim() : "";
   
   
   // Validate data

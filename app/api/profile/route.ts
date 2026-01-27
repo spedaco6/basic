@@ -1,7 +1,7 @@
 import { FetchResponseData } from "@/hooks/useFetch";
 import { NextResponse } from "next/server";
 import { HTTPError } from "@/lib/server/errors";
-import { deleteProfile, getProfile, updateProfile } from "@/lib/server/api/profile";
+import { createProfile, deleteProfile, getProfile, updateProfile } from "@/lib/server/api/profile";
 
 export interface ProfileResponseData extends FetchResponseData {
   profile: {
@@ -37,7 +37,27 @@ export async function GET(req: Request): Promise<Response> {
   }
 }
 
-// todo EVENTUALLY MAKE A POST FOR CREATING ACCOUNTS
+export async function POST(req: Request): Promise<Response> {
+  const body = await req.json();
+  try {
+    // Get Authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new HTTPError("No authorization token provided", 401);
+    
+    // Get access token
+    const accessToken = authHeader.split(' ')[1];
+
+    // Complete action
+    await createProfile(body, accessToken);
+
+    // Send response
+    return NextResponse.json({ success: true, message: "Account created" }, { status: 201 })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Something went wrong";
+    const status = err instanceof HTTPError ? err.status : 500;
+    return NextResponse.json({ success: false, message }, { status });
+  }
+}
 
 export async function PUT(req: Request): Promise<Response> {
   try {

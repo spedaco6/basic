@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { HTTPError } from "@/lib/server/errors";
 import { changePassword } from "@/lib/server/api/profile";
 
-export const PUT = async (req: Request) => {
+export const PUT = async (req: Request): Promise<Response> => {
   try {
     // Get request body
     const body = await req.json();
