@@ -1,9 +1,11 @@
 import { SALT_ROUNDS } from "../const";
 import { HTTPError } from "../errors";
 import { User } from "../models/User";
-import { verifyAccessToken } from "../tokens";
+import { createResetToken, verifyAccessToken } from "../tokens";
 import bcrypt from "bcrypt";
 import xss from "xss";
+import { isEmail } from "../validation";
+import { sendResetToken } from "../email";
 
 // DO NOT USE ERROR HANDLING
 // HTTP ERRORS WILL BE HANDLED IN API ROUTES
@@ -114,6 +116,22 @@ export const changePassword = async (
   const hash = await bcrypt.hash(updatedPassword, SALT_ROUNDS);
   user.password = hash;
   await user.save();
+}
+
+export const forgotPassword = async (email: string) => {
+  // validate email
+    const userEmail = xss(email).trim();
+    if (!userEmail || !isEmail(userEmail)) throw new HTTPError("Invalid email", 422);
+    const user = await User.findOne({ email: userEmail });
+    if (!user) throw new HTTPError("Could not find an account with that email", 404);
+    
+    // Save reset token to user
+    const token = await createResetToken({ userId: user.id, userRole: user.role });
+    user.resetToken = token;
+    await user.save();
+
+    // Send reset email
+    await sendResetToken(user.email, token);
 }
 
 export const deleteProfile = async (currentPassword: string, accessToken?: string): Promise<void> => {

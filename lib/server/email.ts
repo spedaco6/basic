@@ -10,10 +10,10 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-export const sendResetToken = async (token: string) => {
+export const sendResetToken = async (email: string, token: string) => {
   await transporter.sendMail({
-    to: emailConfig.user,
-    from: "Basic Account",
+    to: email,
+    from: emailConfig.from,
     subject: "Forgot Password",
     html: `
       <html>

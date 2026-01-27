@@ -37,3 +37,13 @@ export const changePassword = async (currentPassword: string, newPassword: strin
     })
   });
 }
+
+export const forgotPassword = async (email: string) => {
+  return fetch("/api/profile/password/forgot", {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email }),
+  });
+};
