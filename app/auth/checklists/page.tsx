@@ -12,6 +12,7 @@ return <main className="p-4">
       <li>Style disabled buttons</li>
       <li>Create tests</li>
       <li>Extract components where possible</li>
+      <li>Remove promises in api routes</li>
     </ul>
   </main>
 }
