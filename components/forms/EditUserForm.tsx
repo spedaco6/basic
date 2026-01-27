@@ -20,7 +20,7 @@ export const EditUserForm = (): React.ReactNode => {
     .sort((a, b) => a.value - b.value );
 
   return <div className="flex flex-wrap gap-4 rounded-md">
-    <div>
+    <div className="flex gap-2 flex-1">
       <Select className="bg-gray-100" hook={userRole} options={availableRoles} label="User role" />
       <Input className="bg-gray-100" hook={email} type="email" label="Email" />
     </div>
