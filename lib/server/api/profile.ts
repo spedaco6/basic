@@ -1,7 +1,7 @@
 import { SALT_ROUNDS } from "../const";
 import { HTTPError } from "../errors";
 import { User } from "../models/User";
-import { createResetToken, verifyAccessToken } from "../tokens";
+import { createResetToken, verifyAccessToken, verifyResetToken } from "../tokens";
 import bcrypt from "bcrypt";
 import xss from "xss";
 import { isEmail } from "../validation";
@@ -120,18 +120,50 @@ export const changePassword = async (
 
 export const forgotPassword = async (email: string) => {
   // validate email
-    const userEmail = xss(email).trim();
-    if (!userEmail || !isEmail(userEmail)) throw new HTTPError("Invalid email", 422);
-    const user = await User.findOne({ email: userEmail });
-    if (!user) throw new HTTPError("Could not find an account with that email", 404);
-    
-    // Save reset token to user
-    const token = await createResetToken({ userId: user.id, userRole: user.role });
-    user.resetToken = token;
-    await user.save();
+  const userEmail = xss(email).trim();
+  if (!userEmail || !isEmail(userEmail)) throw new HTTPError("Invalid email", 422);
 
-    // Send reset email
-    await sendResetToken(user.email, token);
+  // find user
+  const user = await User.findOne({ email: userEmail });
+  if (!user) throw new HTTPError("Could not find an account with that email", 404);
+  
+  // Save reset token to user
+  const token = await createResetToken({ userId: user.id, userRole: user.role });
+  user.resetToken = token;
+  await user.save();
+
+  // Send reset email
+  await sendResetToken(user.email, token);
+}
+
+export const resetPassword = async (newPassword: string, confirmPassword: string, token: string) => {
+  // Validate password
+  const newPass = xss(newPassword).trim();
+  const conPass = xss(confirmPassword).trim();
+  
+  // Validate
+  const validationErrors = [];
+  if (newPass.length < 8) validationErrors.push("Passwords must be 8 characters");
+  const matches = newPass.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/);
+  if (!matches) validationErrors.push("Passwords must contain an upper- and lower-case letter, a number, and a special character.");
+  if (conPass !== newPass) validationErrors.push("Passwords do not match");
+  if (validationErrors.length) throw new HTTPError("New password is invalid", 422, validationErrors);
+
+  // verify token
+  if (!token) throw new HTTPError("No reset token provided", 401);
+  const verified = await verifyResetToken(token);
+  if (!verified) throw new HTTPError("Unverified token", 401);
+
+  // find user and match token
+  const user = await User.findById(verified.userId);
+  if (!user) throw new HTTPError("Could not find user", 404);
+  if (user.resetToken !== token) throw new HTTPError("Token mismatch", 401);
+
+  // Save new password
+  const hash = await bcrypt.hash(newPass, SALT_ROUNDS);
+  user.password = hash;
+  user.resetToken = "";
+  await user.save();
 }
 
 export const deleteProfile = async (currentPassword: string, accessToken?: string): Promise<void> => {

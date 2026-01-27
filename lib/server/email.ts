@@ -18,7 +18,7 @@ export const sendResetToken = async (email: string, token: string) => {
     html: `
       <html>
         <body>
-          <a href="http://localhost:3000/password/reset?auth=${token}">Reset my Password</a>
+          <a href="http://localhost:3000/password/reset?auth=${token}">Reset my password</a>
         </body>
       </html>
     `,

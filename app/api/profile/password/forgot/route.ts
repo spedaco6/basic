@@ -1,11 +1,6 @@
 import { forgotPassword } from "@/lib/server/api/profile";
-import { sendResetToken } from "@/lib/server/email";
 import { HTTPError } from "@/lib/server/errors";
-import { User } from "@/lib/server/models/User";
-import { createResetToken } from "@/lib/server/tokens";
-import { isEmail } from "@/lib/server/validation";
 import { NextResponse } from "next/server";
-import xss from "xss";
 
 export const POST = async (req: Request) => {
   try {

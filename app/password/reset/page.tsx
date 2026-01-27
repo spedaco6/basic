@@ -10,7 +10,7 @@ export default async function ResetPasswordPage({
   const token = sp.auth;
   if (!token) return redirect("/password/forgot");
 
-  return <main>
-    <ResetPasswordForm token={token} />
-  </main>
+  return <main className="flex justify-center items-center">
+      <ResetPasswordForm token={token} className="mt-[20dvh]" />
+    </main>
 }
