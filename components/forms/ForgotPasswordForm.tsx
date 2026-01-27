@@ -3,7 +3,7 @@
 import { useInput } from "@/hooks/useInput"
 import { Input } from "../inputs/Input";
 import { Button } from "../buttons/Button";
-import { FormEvent } from "react";
+import { FormEvent, useEffect } from "react";
 import { useFetch } from "@/hooks/useFetch";
 
 const sendForgotPasswordLink = async (email: string) => {
@@ -18,8 +18,11 @@ const sendForgotPasswordLink = async (email: string) => {
 
 export const ForgotPasswordForm = () => {
   const email = useInput("email*", "");
-  const { refetch, loading, error } = useFetch(sendForgotPasswordLink, {}, { immediate: false }); 
+  const { data, refetch, loading, error } = useFetch(sendForgotPasswordLink, {}, { immediate: false }); 
 
+  useEffect(() => {
+    email.setValue("");
+  }, [data]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

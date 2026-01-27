@@ -1,3 +1,4 @@
+import { ResetPasswordForm } from "@/components/forms/ResetPasswordForm";
 import { redirect } from "next/navigation";
 
 export default async function ResetPasswordPage({ 
@@ -10,6 +11,6 @@ export default async function ResetPasswordPage({
   if (!token) return redirect("/password/forgot");
 
   return <main>
-    <p>Change Password Form</p>
+    <ResetPasswordForm token={token} />
   </main>
 }
