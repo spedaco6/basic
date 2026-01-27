@@ -78,7 +78,6 @@ export const EditableProfileCard = (): React.ReactElement => {
           <Input hook={email} label="Email" />
         </div> }
 
-        { errorGET && <p className="text-red-500">{ errorGET }</p> } 
         { put.error && <p className="text-red-500">{ put.error }</p> }
 
        </div>
@@ -97,6 +96,16 @@ export const EditableProfileCard = (): React.ReactElement => {
         </Button>
       </div> }
     </div>
+
+    { errorGET && <div className="flex justify-between items-center">
+      <p className="text-red-500">There was a problem loading profile</p>
+      <Button 
+        onClick={refetch}
+        className="flex items-center gap-2"
+      >
+        <i className="bi bi-arrow-repeat text-2xl" /> Refresh
+      </Button> 
+    </div> }  
 
     { isLoading && !profile && <div className="space-y-4">
       <LoadingProfileCard /> 
