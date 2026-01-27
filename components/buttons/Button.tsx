@@ -15,7 +15,7 @@ export const Button = ({ children, btnStyle="default", className="", ...props }:
     secondaryDanger: "bg-red-100 text-red-800 hover:bg-red-200",
     outlineDanger: "text-red-500 hover:border-red-600 hover:text-red-600 shadow-red-600 border",
     flatDanger: "hover:shadow-red-600 text-red-500 hover:text-red-600",
-    accept: "bg-green-500 hover:bg-green-600 text-white",
+    accept: "bg-green-500 border border-green-500 hover:border-green-600 hover:bg-green-600 text-white",
     secondaryAccept: "bg-green-100 text-green-800 hover:bg-green-200",
     outlineAccept: "text-green-500 hover:border-green-600 hover:text-green-600 shadow-green-200 border",
     flatAccept: "hover:shadow-green-600 text-green-500 hover:text-green-600",

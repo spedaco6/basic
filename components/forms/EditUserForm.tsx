@@ -6,36 +6,28 @@ import { ROLES } from "@/lib/server/const";
 import { useToken } from "@/hooks/useToken";
 import { Button } from "../buttons/Button";
 import React from "react";
+import { Select } from "../inputs/Select";
 
 export const EditUserForm = (): React.ReactNode => {
   const email = useInput("email*", "");
-  const password = useInput("password*", "");
-  const userRole = useInput("role", "");
+  const password = useInput("password", "");
+  const userRole = useInput("role", 50);
 
   const { role } = useToken();
   const availableRoles = ROLES
     .filter(r => r.permissions >= role)
-    .sort((a, b) => b.permissions - a.permissions );
+    .map(r => ({ name: r.role, value: r.permissions }))
+    .sort((a, b) => a.value - b.value );
 
-  return <div className="bg-gray-200 p-4 m-4 flex flex-wrap gap-4 rounded-md">
-    <div className="flex-3 flex flex-wrap gap-2">
-      <div className="flex flex-col">
-        <label className="uppercase text-xs p-1">User Role:</label>
-        <select name="role" className="bg-white rounded-md p-1">
-          { availableRoles && availableRoles.map(r => <option
-            key={r.permissions}
-            value={r.permissions}
-            > 
-            { r.role }
-          </option>)}
-        </select>
-      </div>
-      <Input className="bg-white" hook={email} type="email" label="Email" />
-      <Input className="bg-white" hook={password} type="password" label="Temporary Password" />
+  return <div className="flex flex-wrap gap-4 rounded-md">
+    <div>
+      <Select className="bg-gray-100" hook={userRole} options={availableRoles} label="User role" />
+      <Input className="bg-gray-100" hook={email} type="email" label="Email" />
     </div>
-    <div className="flex flex-1 flex-col justify-center gap-2">
-      <Button>Add User</Button>
-      <Button btnStyle="outline">Cancel</Button>
+    <div className="flex gap-2 items-end flex-1">
+      <Input className="bg-gray-100" hook={password} type="password" label="Temporary Password" />
+      <Button btnStyle="accept"><i className="bi bi-save" /></Button>
+      <Button btnStyle="outlineDanger"><i className="bi bi-trash" /></Button>
     </div>
   </div>
 }

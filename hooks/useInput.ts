@@ -6,7 +6,7 @@ export interface IUseInput {
   name: string;
   value: any;
   required: boolean;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: ChangeEvent<HTMLInputElement> & ChangeEvent<HTMLSelectElement>) => void;
   setValue: (value: any) => void;
 }
 
