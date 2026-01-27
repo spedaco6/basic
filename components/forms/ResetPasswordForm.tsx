@@ -6,25 +6,7 @@ import { Button } from "../buttons/Button";
 import { FormEvent, useEffect } from "react";
 import { useFetch } from "@/hooks/useFetch";
 import Link from "next/link";
-
-const resetPassword = async (
-  newPassword: string, 
-  confirmPassword: string, 
-  resetToken: string
-) => {
-  console.log("HERE");
-  return fetch("/api/profile/password/reset", {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + resetToken,
-    },
-    body: JSON.stringify({
-      newPassword,
-      confirmPassword,
-    }),
-  })
-};
+import { resetPassword } from "@/lib/client/api/profile";
 
 export const ResetPasswordForm = ({ 
   token,
