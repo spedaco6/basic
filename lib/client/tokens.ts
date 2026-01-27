@@ -1,8 +1,9 @@
 import { decodeJwt, JWTPayload } from "jose";
 
 export interface TokenPayload extends JWTPayload {
-  userId: number,
-  userRole: number,
+  userId: number;
+  userRole: number;
+  type: "general" | "refresh" | "reset" | "verify";
 }
 
 export const getToken = async (): Promise<string> => {

@@ -11,6 +11,7 @@ interface IUser {
   firstName?: string,
   lastName?: string,
   jti?: string,
+  resetToken?: string,
 }
 
 export class User extends Model implements IUser {
@@ -40,6 +41,9 @@ export class User extends Model implements IUser {
     }, {
       name: "jti",
       type: "string",
+    }, {
+      name: "resetToken",
+      type: "string",
     }
   ];
   
@@ -49,6 +53,7 @@ export class User extends Model implements IUser {
   public firstName?: string;
   public lastName?: string;
   public jti?: string;
+  public resetToken?: string;
 
   constructor(props: Record<string, any>) {
     super();

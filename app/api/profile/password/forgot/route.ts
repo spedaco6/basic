@@ -1,6 +1,7 @@
-import { sendMail } from "@/lib/server/email";
+import { sendResetToken } from "@/lib/server/email";
 import { HTTPError } from "@/lib/server/errors";
 import { User } from "@/lib/server/models/User";
+import { createResetToken } from "@/lib/server/tokens";
 import { isEmail } from "@/lib/server/validation";
 import { NextResponse } from "next/server";
 import xss from "xss";
@@ -15,8 +16,13 @@ export const POST = async (req: Request) => {
     const user = await User.findOne({ email });
     if (!user) throw new HTTPError("Could not find an account with that email", 404);
     
+    // Save reset token to user
+    const token = await createResetToken({ userId: user.id, userRole: user.role });
+    user.resetToken = token;
+    await user.save();
+
     // Send reset email
-    await sendMail();
+    await sendResetToken(token);
     
     return NextResponse.json({ success: true, message: "Email send with reset link" });
   } catch (err) {

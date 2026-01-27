@@ -51,7 +51,7 @@ export default function LoginForm({ className="" }): React.ReactElement {
       </Button>
     </div>
     <div className="flex justify-end mt-4">
-      <Link href="/forgot-password">Forgot password?</Link>
+      <Link href="/password/forgot">Forgot password?</Link>
     </div>
   </form>
 
