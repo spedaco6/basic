@@ -47,3 +47,21 @@ export const forgotPassword = async (email: string) => {
     body: JSON.stringify({ email }),
   });
 };
+
+export const resetPassword = async (
+  newPassword: string, 
+  confirmPassword: string, 
+  resetToken: string
+) => {
+  return fetch("/api/profile/password/reset", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + resetToken,
+    },
+    body: JSON.stringify({
+      newPassword,
+      confirmPassword,
+    }),
+  })
+};
