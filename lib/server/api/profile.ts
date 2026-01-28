@@ -9,16 +9,18 @@ import { sendResetToken } from "../email";
 
 // DO NOT USE ERROR HANDLING
 // HTTP ERRORS WILL BE HANDLED IN API ROUTES
+const readonly = ["id", "createdAt", "modifiedAt"];
 
 export interface ProfileData {
-  userId: number,
-  userRole: number,
+  id: number,
+  role: number,
   email: string,
   firstName?: string,
   lastName?: string,
+  password: string,
 }
 
-export const getProfile = async (accessToken?: string): Promise<ProfileData> => {
+export const getProfile = async (accessToken?: string): Promise<Omit<ProfileData, "password">> => {
   if (!accessToken) throw new HTTPError("No token provided", 401);
   const verified = await verifyAccessToken(accessToken);
   if (!verified) throw new HTTPError("Invalid token", 401);
@@ -33,8 +35,8 @@ export const getProfile = async (accessToken?: string): Promise<ProfileData> => 
   };
 
   return {
-    userId: user.id,
-    userRole: user.role,
+    id: user.id,
+    role: user.role,
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
@@ -59,7 +61,6 @@ export const createProfile = async (
     if (!verified) throw new HTTPError("Unverified token", 401);
     userId = verified.userId;
   }
-  
   // validate data
   const validationErrors = [];
   if (!sanitized.email || !isEmail(sanitized.email)) validationErrors.push("Invalid email");
@@ -73,11 +74,15 @@ export const createProfile = async (
   if (validationErrors.length) throw new HTTPError("Invalid data", 422, validationErrors);
 
   // Sets default role to 50
-  if (sanitized.role && sanitized.role !== 50) {
+  if (sanitized.role && sanitized.role < 50) {
+    // Ensure user requesting role change is authorized to change to target role
     if (!userId || (userId && userId > sanitized.role)) {
       throw new HTTPError("Cannot change user role", 401);
     }
+    // Ensure 10 is the lowest permissions level granted
+    if (sanitized.role < 10) sanitized.role = 10;
   } else {
+    // Set role to 50 for all other scenarios
     sanitized.role = 50;
   }
 
@@ -96,25 +101,26 @@ export const createProfile = async (
     password: hash,
     role: sanitized.role,
   });
+
   await newUser.save();
+  console.log(newUser);
 }
 
 export const updateProfile = async (
   profile: Omit<ProfileData, "userId" | "userRole">,
   accessToken: string, 
-): Promise<ProfileData> => {
+): Promise<Omit<ProfileData, "password">> => {
 
-  // Sanitize data
-  const validatedProfile: Partial<ProfileData> = {};
-  validatedProfile["email"] = xss(profile.email).trim();
-  validatedProfile["firstName"] = profile.firstName ? xss(profile.firstName).trim() : "";
-  validatedProfile["lastName"] = profile.lastName ? xss(profile.lastName).trim() : "";
-  
+  const sanitized: Record<string, any> = {};
+  Object.entries(profile)
+    .filter(([ name ]) => !readonly.includes(name))
+    .forEach(field => {
+      sanitized[field[0]] = typeof field[1] === "string" ? xss(field[1]).trim() : field[1];
+    });
   
   // Validate data
   const validationErrors = [];
-  const matches = validatedProfile.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i);
-  if (!matches) validationErrors.push("Invalid email");
+  if (!isEmail(sanitized.email)) validationErrors.push("Invalid email");
   if (validationErrors.length) throw new HTTPError(
     "Invalid profile information provided", 
     422, 
@@ -125,17 +131,31 @@ export const updateProfile = async (
   if (!accessToken) throw new HTTPError("No token provided", 401);
   const verified = await verifyAccessToken(accessToken);
   if (!verified) throw new HTTPError("Token could not be verified", 401);
+  const userId = verified.userId;
 
   // Find user for update
-  const user = await User.findById(verified.userId);
+  const user = await User.findOne({ email: sanitized.email });
   if (!user) throw new HTTPError("Could not find user profile", 404);
 
-  Object.assign(user, validatedProfile);
-  await user.save();
+  // Check permissions for protected fields
+  if ((sanitized.role && sanitized.role < 50) || user.id === userId) {
+    // Ensure user requesting role change is authorized to change to target role
+    if (userId && userId > sanitized.role) {
+      throw new HTTPError("Cannot change user role", 401);
+    }
+    // Ensure 10 is the lowest permissions level granted
+    if (sanitized.role < 10) sanitized.role = 10;
+  } else {
+    // Set role to 50 for all other scenarios
+    sanitized.role = user.role;
+  }
 
+  Object.assign(user, sanitized);
+  await user.save();
+  console.log("TO HERE");
   return {
-    userId: user.id,
-    userRole: user.role,
+    id: user.id,
+    role: user.role,
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,

@@ -11,10 +11,10 @@ export const getProfile = async (): Promise<Response> => {
   });
 }
 
-export const postProfile = async (profile: Partial<ProfileData>): Promise<Response> => {
+export const updateRole = async (profile: Partial<ProfileData>): Promise<Response> => {
   const token = await getToken();
-  return fetch("/api/profile", {
-    method: "post",
+  return fetch("/api/profile/role", {
+    method: "PATCH",
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer " + token,
