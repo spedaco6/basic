@@ -1,12 +1,12 @@
 "use client"
 
 import { useInput } from "@/hooks/useInput"
-import { Input } from "../inputs/Input";
+import { Input } from "@/components/inputs/Input";
 import { ROLES } from "@/lib/server/const";
 import { useToken } from "@/hooks/useToken";
-import { Button } from "../buttons/Button";
+import { Button } from "@/components/buttons/Button";
 import React, { useEffect } from "react";
-import { Select } from "../inputs/Select";
+import { Select } from "@/components/inputs/Select";
 import { useFetch } from "@/hooks/useFetch";
 import { updateRole } from "@/lib/client/api/profile";
 import { getUsers } from "@/lib/client/api/users";

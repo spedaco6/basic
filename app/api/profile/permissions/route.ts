@@ -39,7 +39,10 @@ export async function PATCH(req: Request): Promise<Response> {
     const user = await User.findOne({ email: body.email });
 
     // Complete action
+    // Create profile if one does not exist
     if (!user) await createProfile(body, token);
+
+    // Update permissions
     if (user) await updateProfile(body, token);
 
     // Send response

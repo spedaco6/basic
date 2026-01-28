@@ -17,8 +17,8 @@ export const getUsers = async (accessToken: string): Promise<Partial<ProfileData
   // Find user
   const users = await User.find({ role: accessible });
   const desensitized = users?.map(user => ({
-    userId: user.id,
-    userRole: user.role,
+    id: user.id,
+    role: user.role,
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,

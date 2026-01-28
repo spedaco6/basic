@@ -1,6 +1,6 @@
 import { EditableProfileCard } from "@/components/cards/EditableProfileCard";
-import { ChangePasswordButton } from "@/components/forms/ChangePasswordButton";
-import { DeleteAccountFormButton } from "@/components/forms/DeleteAccountFormButton";
+import { ChangePasswordButton } from "@/components/forms/profile/ChangePasswordButton";
+import { DeleteAccountFormButton } from "@/components/forms/profile/DeleteAccountFormButton";
 import { Metadata } from "next";
 import React from "react";
 

@@ -89,7 +89,7 @@ export const EditableProfileCard = (): React.ReactElement => {
           className={`${isLoading ? "bg-gray-400" : "bg-gray-700 hover:bg-gray-500"} flex items-center gap-2 text-white cursor-pointer h-fit py-2 px-4 rounded-sm`}
           onClick={onClick}
         >
-          { edit ? "Save" : "Edit"}
+          { !errorGET && edit ? "Save" : "Edit"}
           { isLoading && <div className="animate-spin w-fit"><i className="bi bi-arrow-repeat text-xl" /></div> }
           { put.data.success && !isLoading && !canceled && !edit && <i className="bi bi-check text-2xl" /> }
           { put.error && !isLoading && !canceled && !edit && <i className="bi bi-exclamation-circle text-xl" /> }

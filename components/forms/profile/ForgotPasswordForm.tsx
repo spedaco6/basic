@@ -1,8 +1,8 @@
 "use client"
 
 import { useInput } from "@/hooks/useInput"
-import { Input } from "../inputs/Input";
-import { Button } from "../buttons/Button";
+import { Input } from "@/components/inputs/Input";
+import { Button } from "@/components/buttons/Button";
 import { FormEvent, useEffect } from "react";
 import { useFetch } from "@/hooks/useFetch";
 import { forgotPassword } from "@/lib/client/api/profile";

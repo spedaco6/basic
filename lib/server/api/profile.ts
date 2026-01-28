@@ -103,14 +103,12 @@ export const createProfile = async (
   });
 
   await newUser.save();
-  console.log(newUser);
 }
 
 export const updateProfile = async (
   profile: Omit<ProfileData, "userId" | "userRole">,
   accessToken: string, 
 ): Promise<Omit<ProfileData, "password">> => {
-
   const sanitized: Record<string, any> = {};
   Object.entries(profile)
     .filter(([ name ]) => !readonly.includes(name))
@@ -118,27 +116,41 @@ export const updateProfile = async (
       sanitized[field[0]] = typeof field[1] === "string" ? xss(field[1]).trim() : field[1];
     });
   
+  // Find target user for update
+  const user = await User.findOne({ email: sanitized.email });
+  if (!user) throw new HTTPError("Could not find user profile", 404);
+
+  // Verify token of requesting user
+  if (!accessToken) throw new HTTPError("No token provided", 401);
+  const verified = await verifyAccessToken(accessToken);
+  if (!verified) throw new HTTPError("Token could not be verified", 401);
+  const userId = verified.userId; // requesting user id
+
   // Validate data
   const validationErrors = [];
   if (!isEmail(sanitized.email)) validationErrors.push("Invalid email");
+  if (sanitized.password.length < 8) validationErrors.push("Passwords must be 8 characters");
+  
+  // Bypass password requirements when created by a different authorized user
+  if (!userId || userId > 20 || userId === user.id) {
+    const matches = sanitized.password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/);
+    if (!matches) validationErrors.push("Passwords must contain an upper- and lower-case letter, a number, and a special character.");
+  }
+
   if (validationErrors.length) throw new HTTPError(
     "Invalid profile information provided", 
     422, 
     validationErrors
   );
 
-  // Verify token
-  if (!accessToken) throw new HTTPError("No token provided", 401);
-  const verified = await verifyAccessToken(accessToken);
-  if (!verified) throw new HTTPError("Token could not be verified", 401);
-  const userId = verified.userId;
-
-  // Find user for update
-  const user = await User.findOne({ email: sanitized.email });
-  if (!user) throw new HTTPError("Could not find user profile", 404);
+  
+  // Allow password change only if userId matches user.id
+  if (user.id !== userId) {
+    sanitized.password = user.password;
+  }
 
   // Check permissions for protected fields
-  if ((sanitized.role && sanitized.role < 50) || user.id === userId) {
+  if ((sanitized.role && sanitized.role < 50) || user.id !== userId) {
     // Ensure user requesting role change is authorized to change to target role
     if (userId && userId > sanitized.role) {
       throw new HTTPError("Cannot change user role", 401);
@@ -152,7 +164,7 @@ export const updateProfile = async (
 
   Object.assign(user, sanitized);
   await user.save();
-  console.log("TO HERE");
+
   return {
     id: user.id,
     role: user.role,

@@ -1,13 +1,13 @@
 "use client"
 
 import React, { FormEventHandler, useEffect, useState } from "react"
-import { Modal } from "../ui/Modal";
-import { Input } from "../inputs/Input";
+import { Modal } from "@/components/ui/Modal";
+import { Input } from "@/components/inputs/Input";
 import { useInput } from "@/hooks/useInput";
 import { useFetch } from "@/hooks/useFetch";
 import { deleteToken, getToken } from "@/lib/client/tokens";
 import { useRouter } from "next/navigation";
-import { Button } from "../buttons/Button";
+import { Button } from "@/components/buttons/Button";
 
 
 const deleteAccount = async (password: string) => {

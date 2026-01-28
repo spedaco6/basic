@@ -4,9 +4,9 @@ import type { LoginResponseData } from "@/app/api/login/route";
 import { useFetch } from "@/hooks/useFetch";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react"
-import { Input } from "../inputs/Input";
+import { Input } from "@/components/inputs/Input";
 import { useInput } from "@/hooks/useInput";
-import { Button } from "../buttons/Button";
+import { Button } from "@/components/buttons/Button";
 import Link from "next/link";
 
 const login = (email: string, password: string): Promise<Response> => {

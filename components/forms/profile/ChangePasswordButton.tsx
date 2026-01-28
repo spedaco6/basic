@@ -2,11 +2,11 @@
 
 import { useInput } from "@/hooks/useInput";
 import React, { FormEventHandler, useEffect, useState } from "react";
-import { Input } from "../inputs/Input";
+import { Input } from "@/components/inputs/Input";
 import { FetchResponseData, useFetch } from "@/hooks/useFetch";
 import { changePassword } from "@/lib/client/api/profile";
-import { Modal } from "../ui/Modal";
-import { Button } from "../buttons/Button";
+import { Modal } from "@/components/ui/Modal";
+import { Button } from "@/components/buttons/Button";
 
 export const ChangePasswordButton = (): React.ReactNode => {
   const [ open, setOpen ] = useState(false);
