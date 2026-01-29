@@ -1,5 +1,4 @@
-import { createProfile, updatePermissions, updateProfile } from "@/lib/server/api/profile";
-import { getUsers } from "@/lib/server/api/users";
+import { createProfile, getAuthorizedProfiles, updatePermissions } from "@/lib/server/api/profile";
 import { HTTPError } from "@/lib/server/errors";
 import { User } from "@/lib/server/models/User";
 import { NextResponse } from "next/server";
@@ -14,7 +13,7 @@ export async function GET(req: Request): Promise<Response> {
     const token = authHeader.split(' ')[1];
 
     // Complete action
-    const users = await getUsers(token);
+    const users = await getAuthorizedProfiles(token);
     
     // Send response
     return NextResponse.json({ success: true, message: "Users found", users })
