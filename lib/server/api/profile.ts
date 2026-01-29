@@ -21,6 +21,8 @@ export interface ProfileData {
   password: string,
 }
 
+// CRUD PROFILE FUNCTIONS
+
 export const getProfile = async (accessToken?: string): Promise<Omit<ProfileData, "password">> => {
   if (!accessToken) throw new HTTPError("No token provided", 401);
   const verified = await verifyAccessToken(accessToken);
@@ -150,27 +152,24 @@ export const updateProfile = async (
   }
 }
 
-export const updatePermissions = async (body: Partial<ProfileData>, token: string): Promise<void> => {
-  const email = body?.email ? xss(body?.email).trim() : "";
-  let role = body?.role ?? 50;
+export const deleteProfile = async (currentPassword: string, accessToken?: string): Promise<void> => {
+  // Verify token
+  if (!accessToken) throw new HTTPError("No token provided", 401);
+  const verified = await verifyAccessToken(accessToken);
+  if (!verified) throw new HTTPError("Token could not be verified", 401);
 
-  // Verify requesting user
-  if (!token) throw new HTTPError("No token provided", 401);
-  const verified = await verifyAccessToken(token);
-  if (!verified) throw new HTTPError("Unverified token", 401);
-  const { userRole, userId } = verified;
+  // Find user for update
+  const user = await User.findById(verified.userId);
+  if (!user) throw new HTTPError("Could not find user profile", 404);
 
-  // Find user to be updated 
-  const user = await User.findOne({ email });
-  if (!user) throw new HTTPError("No user found", 404);
+  // validate password
+  const compare = await bcrypt.compare(currentPassword, user.password);
+  if (!compare) throw new HTTPError("Incorrect password", 403);
 
-  // Update user if valid
-  if (userId === user.id || role < userRole) throw new HTTPError("Unauthorized user", 401);
-  
-  // Update and save user
-  user.role = role;
-  await user.save();
+  await user.delete();
 }
+
+// CRUD PASSWORD FUNCTIONS
 
 export const changePassword = async (
   currentPassword: string, 
@@ -254,34 +253,19 @@ export const resetPassword = async (newPassword: string, confirmPassword: string
   await user.save();
 }
 
-export const deleteProfile = async (currentPassword: string, accessToken?: string): Promise<void> => {
-  // Verify token
-  if (!accessToken) throw new HTTPError("No token provided", 401);
-  const verified = await verifyAccessToken(accessToken);
-  if (!verified) throw new HTTPError("Token could not be verified", 401);
-
-  // Find user for update
-  const user = await User.findById(verified.userId);
-  if (!user) throw new HTTPError("Could not find user profile", 404);
-
-  // validate password
-  const compare = await bcrypt.compare(currentPassword, user.password);
-  if (!compare) throw new HTTPError("Incorrect password", 403);
-
-  await user.delete();
-}
+// CRUD PERMISSIONS FUNCTIONS
 
 export const getAuthorizedProfiles = async (accessToken: string): Promise<Partial<ProfileData>[]> => {
   if (!accessToken) throw new HTTPError("No token provided", 401);
   const verified = await verifyAccessToken(accessToken);
   if (!verified) throw new HTTPError("Invalid token", 401);
 
-  const userRole = verified.userId;
+  const { userRole } = verified;
   if (userRole >= 40) throw new HTTPError("Unauthorized user", 401);
 
   // Only return information greater than userRole
   const permissions = [10, 20, 30, 40];
-  const accessible = permissions.filter(p => p > userRole);
+  const accessible = permissions.filter(p => p >= userRole);
 
   // Find user
   const users = await User.find({ role: accessible });
@@ -293,4 +277,50 @@ export const getAuthorizedProfiles = async (accessToken: string): Promise<Partia
     email: user.email,
   }));
   return desensitizedInformation ?? [];
+}
+
+export const updatePermissions = async (body: Partial<ProfileData>, token: string): Promise<void> => {
+  const email = body?.email ? xss(body?.email).trim() : "";
+  let role = body?.role ?? 50;
+
+  // Verify requesting user
+  if (!token) throw new HTTPError("No token provided", 401);
+  const verified = await verifyAccessToken(token);
+  if (!verified) throw new HTTPError("Unverified token", 401);
+  const { userRole, userId } = verified;
+
+  // Find user to be updated 
+  const user = await User.findOne({ email });
+  if (!user) throw new HTTPError("No user found", 404);
+
+  // Update user if valid
+  if (userId === user.id || role < userRole) throw new HTTPError("Unauthorized user", 401);
+  
+  // Update and save user
+  user.role = role;
+  await user.save();
+}
+
+export const revokePermissions = async (id: number, accessToken: string): Promise<void> => {
+  // Validate data
+  if (!id) throw new HTTPError("No user id provided", 404);
+  
+  // Validate access token
+  if (!accessToken) throw new HTTPError("No token provided", 401);
+  const verified = await verifyAccessToken(accessToken);
+  if (!verified) throw new HTTPError("Invalid token", 401);
+
+  // Identify requesting user
+  const {userRole, userId} = verified;
+  if (userId === id) throw new HTTPError("User cannot revoke own privileges", 401);
+  
+  // Find user
+  const user = await User.findById(id);
+  if (!user) throw new HTTPError("Could not find user", 404);
+  
+  // Don't allow users to revoke privileges of higher permission levels
+  if (userRole > user.role) throw new HTTPError("Unauthorized user", 401);
+
+  user.role = 50;
+  await user.save();
 }

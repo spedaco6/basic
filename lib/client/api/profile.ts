@@ -86,3 +86,14 @@ export const getAuthorizedProfiles = async () => {
     },
   });
 }
+
+export const revokePermissions = async (id?: number) => {
+  const token = await getToken();
+  return fetch("/api/profile/permissions", {
+    method: "delete",
+    headers: {
+      "Authorization": "Bearer " + token,
+    },
+    body: JSON.stringify({ id }),
+  });
+}

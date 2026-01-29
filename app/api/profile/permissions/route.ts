@@ -1,8 +1,9 @@
-import { createProfile, getAuthorizedProfiles, updatePermissions } from "@/lib/server/api/profile";
+import { createProfile, getAuthorizedProfiles, revokePermissions, updatePermissions } from "@/lib/server/api/profile";
 import { HTTPError } from "@/lib/server/errors";
 import { User } from "@/lib/server/models/User";
 import { NextResponse } from "next/server";
 
+// Get all authorized profiles
 export async function GET(req: Request): Promise<Response> {
   try {
     // Get Authorization header
@@ -24,6 +25,7 @@ export async function GET(req: Request): Promise<Response> {
   }
 }
 
+// Update permissions (and create bare profile if necessary)
 export async function PATCH(req: Request): Promise<Response> {
   const body = await req.json();
   try {
@@ -43,8 +45,6 @@ export async function PATCH(req: Request): Promise<Response> {
     // Update permissions
     await updatePermissions(body, token);
 
-
-    console.log(await User.findOne({ email: body.email }));
     // Send response
     return NextResponse.json({ success: true, message: "Account created" }, { status: 201 })
   } catch (err) {
@@ -52,5 +52,28 @@ export async function PATCH(req: Request): Promise<Response> {
     const status = err instanceof HTTPError ? err.status : 500;
     const payload = err instanceof HTTPError ? err.payload : [];
     return NextResponse.json({ success: false, message, validationErrors: payload }, { status });
+  }
+}
+
+// Revoke permissions from a single user
+export async function DELETE(req: Request): Promise<Response> {
+  const body = await req.json();
+  try {
+    // Get Authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new HTTPError("No authorization token provided", 401);
+    
+    // Get access token
+    const token = authHeader.split(' ')[1];
+
+    // complete action
+    await revokePermissions(body.id, token);
+
+    // Send response
+    return NextResponse.json({ success: true, message: "Permissions revoked" }, { status: 201 })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Something went wrong";
+    const status = err instanceof HTTPError ? err.status : 500;
+    return NextResponse.json({ success: false, message }, { status });
   }
 }

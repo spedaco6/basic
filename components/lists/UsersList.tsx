@@ -1,17 +1,18 @@
 "use client"
 
 import { GetList } from "./GetList"
-import { FetchResponseData } from "@/hooks/useFetch"
+import { FetchResponseData, useFetch } from "@/hooks/useFetch"
 import { ProfileData } from "@/lib/server/api/profile"
 import { ROLES } from "@/lib/server/const"
 import { Button } from "../buttons/Button"
-import { getAuthorizedProfiles } from "@/lib/client/api/profile"
+import { getAuthorizedProfiles, revokePermissions } from "@/lib/client/api/profile"
 
 interface UsersResponseData extends FetchResponseData {
   users: Partial<ProfileData>[]
 }
 
 export const UsersList = () => {
+  const { refetch } = useFetch(revokePermissions, {}, { immediate: false });
 
   return <GetList<UsersResponseData> fetch={getAuthorizedProfiles}>
     {(data) => {
@@ -29,7 +30,7 @@ export const UsersList = () => {
             <span className="col-span-1 text-left">{user.firstName} {user.lastName}</span>
             <div className="flex gap-2 w-fit justify-end">
               <Button btnStyle="outline"><i className="bi bi-pen" /></Button>
-              <Button btnStyle="outlineDanger"><i className="bi bi-trash" /></Button>
+              <Button onClick={() => refetch(user.id)} btnStyle="outlineDanger"><i className="bi bi-trash" /></Button>
             </div>
           </li> 
         })}

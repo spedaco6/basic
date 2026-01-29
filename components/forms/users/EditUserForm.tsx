@@ -8,12 +8,11 @@ import { Button } from "@/components/buttons/Button";
 import React, { useEffect } from "react";
 import { Select } from "@/components/inputs/Select";
 import { useFetch } from "@/hooks/useFetch";
-import { updateRole } from "@/lib/client/api/profile";
-import { getUsers } from "@/lib/client/api/users";
+import { updateRole, getAuthorizedProfiles } from "@/lib/client/api/profile";
 
 export const EditUserForm = (): React.ReactNode => {
   const { data: patchData, refetch: patchFetch } = useFetch(updateRole, {}, { immediate: false });
-  const { data, refetch } = useFetch(getUsers);
+  const { data, refetch } = useFetch(getAuthorizedProfiles);
 
   const email = useInput("email*", "");
   const password = useInput("password", "");
@@ -42,8 +41,6 @@ export const EditUserForm = (): React.ReactNode => {
       password: password.value,
     });
   }
-
-  console.log(data);
 
   return <div className="flex flex-wrap gap-4 rounded-md">
     <div className="flex gap-2 flex-1">
