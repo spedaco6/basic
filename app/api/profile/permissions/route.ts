@@ -1,4 +1,4 @@
-import { createProfile, updateProfile } from "@/lib/server/api/profile";
+import { createProfile, updatePermissions, updateProfile } from "@/lib/server/api/profile";
 import { getUsers } from "@/lib/server/api/users";
 import { HTTPError } from "@/lib/server/errors";
 import { User } from "@/lib/server/models/User";
@@ -41,10 +41,11 @@ export async function PATCH(req: Request): Promise<Response> {
     // Complete action
     // Create profile if one does not exist
     if (!user) await createProfile(body, token);
-
     // Update permissions
-    if (user) await updateProfile(body, token);
+    await updatePermissions(body, token);
 
+
+    console.log(await User.findOne({ email: body.email }));
     // Send response
     return NextResponse.json({ success: true, message: "Account created" }, { status: 201 })
   } catch (err) {

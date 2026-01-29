@@ -9,7 +9,8 @@ import { sendResetToken } from "../email";
 
 // DO NOT USE ERROR HANDLING
 // HTTP ERRORS WILL BE HANDLED IN API ROUTES
-const readonly = ["id", "createdAt", "modifiedAt"];
+const readonly = ["id", "created_at", "updated_at", "secureKey", "role"];
+const editable = ["firstName", "lastName", "password", "email"];
 
 export interface ProfileData {
   id: number,
@@ -61,34 +62,22 @@ export const createProfile = async (
     if (!verified) throw new HTTPError("Unverified token", 401);
     userId = verified.userId;
   }
+
+  // Ensure user does not already exist
+  const user = await User.findOne({ email: sanitized.email });
+  if (user) throw new HTTPError("User already exists", 422);
+
   // validate data
   const validationErrors = [];
   if (!sanitized.email || !isEmail(sanitized.email)) validationErrors.push("Invalid email");
   // Ensure all passwords are at least 8 characters
   if (sanitized.password.length < 8) validationErrors.push("Passwords must be 8 characters");
-  // Bypass password requirements when created by authorized user
+  // Bypass password requirements when created by an authorized user
   if (!userId || userId > 20) {
     const matches = sanitized.password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/);
     if (!matches) validationErrors.push("Passwords must contain an upper- and lower-case letter, a number, and a special character.");
   }
   if (validationErrors.length) throw new HTTPError("Invalid data", 422, validationErrors);
-
-  // Sets default role to 50
-  if (sanitized.role && sanitized.role < 50) {
-    // Ensure user requesting role change is authorized to change to target role
-    if (!userId || (userId && userId > sanitized.role)) {
-      throw new HTTPError("Cannot change user role", 401);
-    }
-    // Ensure 10 is the lowest permissions level granted
-    if (sanitized.role < 10) sanitized.role = 10;
-  } else {
-    // Set role to 50 for all other scenarios
-    sanitized.role = 50;
-  }
-
-  // Ensure user does not already exist
-  const user = await User.findOne({ email: sanitized.email });
-  if (user) throw new HTTPError("User already exists", 422);
   
   // hash password
   const hash = await bcrypt.hash(sanitized.password, SALT_ROUNDS);
@@ -99,7 +88,7 @@ export const createProfile = async (
     lastName: sanitized.lastName ?? "",
     email: sanitized.email,
     password: hash,
-    role: sanitized.role,
+    role: 50,
   });
 
   await newUser.save();
@@ -109,12 +98,12 @@ export const updateProfile = async (
   profile: Omit<ProfileData, "userId" | "userRole">,
   accessToken: string, 
 ): Promise<Omit<ProfileData, "password">> => {
+  // Sanitize user provided input
   const sanitized: Record<string, any> = {};
-  Object.entries(profile)
-    .filter(([ name ]) => !readonly.includes(name))
-    .forEach(field => {
-      sanitized[field[0]] = typeof field[1] === "string" ? xss(field[1]).trim() : field[1];
-    });
+  for (const field in profile) {
+    const val = typeof sanitized[field] === "string" ? xss(sanitized[field]) : field[1];
+    sanitized[field] = val;
+  }
   
   // Find target user for update
   const user = await User.findOne({ email: sanitized.email });
@@ -124,47 +113,34 @@ export const updateProfile = async (
   if (!accessToken) throw new HTTPError("No token provided", 401);
   const verified = await verifyAccessToken(accessToken);
   if (!verified) throw new HTTPError("Token could not be verified", 401);
-  const userId = verified.userId; // requesting user id
 
   // Validate data
   const validationErrors = [];
   if (!isEmail(sanitized.email)) validationErrors.push("Invalid email");
   if (sanitized.password.length < 8) validationErrors.push("Passwords must be 8 characters");
-  
-  // Bypass password requirements when created by a different authorized user
-  if (!userId || userId > 20 || userId === user.id) {
-    const matches = sanitized.password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/);
-    if (!matches) validationErrors.push("Passwords must contain an upper- and lower-case letter, a number, and a special character.");
-  }
+  const matches = sanitized.password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/);
+  if (!matches) validationErrors.push("Passwords must contain an upper- and lower-case letter, a number, and a special character.");
 
+  // Return validation errors if they exist
   if (validationErrors.length) throw new HTTPError(
     "Invalid profile information provided", 
     422, 
     validationErrors
   );
 
-  
-  // Allow password change only if userId matches user.id
-  if (user.id !== userId) {
-    sanitized.password = user.password;
-  }
+  // Filter fields to include only fields that are editable
+  const desensitized: Record<string, any> = {};
+  Object.entries(sanitized)
+    .filter(([name]) => editable.includes(name))
+    .forEach(entry => {
+      desensitized[entry[0]] = entry[1];
+    });
 
-  // Check permissions for protected fields
-  if ((sanitized.role && sanitized.role < 50) || user.id !== userId) {
-    // Ensure user requesting role change is authorized to change to target role
-    if (userId && userId > sanitized.role) {
-      throw new HTTPError("Cannot change user role", 401);
-    }
-    // Ensure 10 is the lowest permissions level granted
-    if (sanitized.role < 10) sanitized.role = 10;
-  } else {
-    // Set role to 50 for all other scenarios
-    sanitized.role = user.role;
-  }
-
-  Object.assign(user, sanitized);
+  // Update and save user profile
+  Object.assign(user, desensitized);
   await user.save();
 
+  // Return select updated profile information
   return {
     id: user.id,
     role: user.role,
@@ -172,6 +148,28 @@ export const updateProfile = async (
     firstName: user.firstName,
     lastName: user.lastName,
   }
+}
+
+export const updatePermissions = async (body: Partial<ProfileData>, token: string): Promise<void> => {
+  const email = body?.email ? xss(body?.email).trim() : "";
+  let role = body?.role ?? 50;
+
+  // Verify requesting user
+  if (!token) throw new HTTPError("No token provided", 401);
+  const verified = await verifyAccessToken(token);
+  if (!verified) throw new HTTPError("Unverified token", 401);
+  const { userRole, userId } = verified;
+
+  // Find user to be updated 
+  const user = await User.findOne({ email });
+  if (!user) throw new HTTPError("No user found", 404);
+
+  // Update user if valid
+  if (userId === user.id || role < userRole) throw new HTTPError("Unauthorized user", 401);
+  
+  // Update and save user
+  user.role = role;
+  await user.save();
 }
 
 export const changePassword = async (

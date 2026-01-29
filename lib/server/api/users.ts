@@ -11,17 +11,18 @@ export const getUsers = async (accessToken: string): Promise<Partial<ProfileData
   const userRole = verified.userId;
   if (userRole >= 40) throw new HTTPError("Unauthorized user", 401);
 
+  // Only return information greater than userRole
   const permissions = [10, 20, 30, 40];
-  const accessible = permissions.filter(p => p >= userRole);
+  const accessible = permissions.filter(p => p > userRole);
 
   // Find user
   const users = await User.find({ role: accessible });
-  const desensitized = users?.map(user => ({
+  const desensitizedInformation = users?.map(user => ({
     id: user.id,
     role: user.role,
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
   }));
-  return desensitized ?? [];
+  return desensitizedInformation ?? [];
 }
