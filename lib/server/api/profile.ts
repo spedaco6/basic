@@ -9,7 +9,6 @@ import { sendResetToken } from "../email";
 
 // DO NOT USE ERROR HANDLING
 // HTTP ERRORS WILL BE HANDLED IN API ROUTES
-const readonly = ["id", "created_at", "updated_at", "secureKey", "role"];
 const editable = ["firstName", "lastName", "password", "email"];
 
 export interface ProfileData {
@@ -96,17 +95,19 @@ export const createProfile = async (
   await newUser.save();
 }
 
+// only updates profile email and name
 export const updateProfile = async (
   profile: Omit<ProfileData, "userId" | "userRole">,
   accessToken: string, 
 ): Promise<Omit<ProfileData, "password">> => {
   // Sanitize user provided input
   const sanitized: Record<string, any> = {};
-  for (const field in profile) {
-    const val = typeof sanitized[field] === "string" ? xss(sanitized[field]) : field[1];
-    sanitized[field] = val;
-  }
-  
+
+  Object.entries(profile)
+    .forEach(([name, val]) => {
+      sanitized[name] = typeof val === "string" ? xss(val).trim() : val;
+    }); 
+
   // Find target user for update
   const user = await User.findOne({ email: sanitized.email });
   if (!user) throw new HTTPError("Could not find user profile", 404);
@@ -119,9 +120,6 @@ export const updateProfile = async (
   // Validate data
   const validationErrors = [];
   if (!isEmail(sanitized.email)) validationErrors.push("Invalid email");
-  if (sanitized.password.length < 8) validationErrors.push("Passwords must be 8 characters");
-  const matches = sanitized.password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/);
-  if (!matches) validationErrors.push("Passwords must contain an upper- and lower-case letter, a number, and a special character.");
 
   // Return validation errors if they exist
   if (validationErrors.length) throw new HTTPError(

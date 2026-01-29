@@ -8,10 +8,10 @@ import { Button } from "@/components/buttons/Button";
 import React, { useEffect } from "react";
 import { Select } from "@/components/inputs/Select";
 import { useFetch } from "@/hooks/useFetch";
-import { updateRole, getAuthorizedProfiles } from "@/lib/client/api/profile";
+import { updatePermissions, getAuthorizedProfiles } from "@/lib/client/api/profile";
 
 export const EditUserForm = (): React.ReactNode => {
-  const { data: patchData, refetch: patchFetch } = useFetch(updateRole, {}, { immediate: false });
+  const { data: patchData, refetch: patchFetch } = useFetch(updatePermissions, {}, { immediate: false });
   const { data, refetch } = useFetch(getAuthorizedProfiles);
 
   const email = useInput("email*", "");

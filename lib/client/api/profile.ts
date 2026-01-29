@@ -11,18 +11,6 @@ export const getProfile = async (): Promise<Response> => {
   });
 }
 
-export const updateRole = async (profile: Partial<ProfileData>): Promise<Response> => {
-  const token = await getToken();
-  return fetch("/api/profile/permissions", {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token,
-    },
-    body: JSON.stringify(profile),
-  });
-}
-
 export const putProfile = async (profile: Partial<ProfileData>): Promise<Response> => {
   const token = await getToken();
   return fetch("/api/profile", {
@@ -95,5 +83,17 @@ export const revokePermissions = async (id?: number) => {
       "Authorization": "Bearer " + token,
     },
     body: JSON.stringify({ id }),
+  });
+}
+
+export const updatePermissions = async (profile: Partial<ProfileData>): Promise<Response> => {
+  const token = await getToken();
+  return fetch("/api/profile/permissions", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+    body: JSON.stringify(profile),
   });
 }
