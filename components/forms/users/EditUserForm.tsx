@@ -56,12 +56,24 @@ export const EditUserForm = (): React.ReactNode => {
   return <div className="flex flex-wrap gap-4 rounded-md">
     <div className="flex gap-2 flex-1">
       <Select className="bg-gray-100" hook={userRole} options={availableRoles} label="User role" />
-      <Input className="bg-gray-100" hook={email} type="email" label="Email" />
+      <Input 
+        className="bg-gray-100" 
+        hook={email} 
+        type="email" 
+        label="Email" 
+        title="User with existing email will be updated. Otherwise, user will be created." 
+      />
     </div>
     <div className="flex gap-2 items-end flex-1">
-      <Input className="bg-gray-100" hook={password} type="password" label="Temporary Password" />
-      <Button onClick={handleSubmit} btnStyle="accept"><i className="bi bi-save" /></Button>
-      <Button onClick={handleCancel} btnStyle="outlineDanger"><i className="bi bi-trash" /></Button>
+      <Input 
+        className="bg-gray-100" 
+        hook={password} 
+        type="password" 
+        label="Temporary Password" 
+        title="Password required when creating new account"
+      />
+      <Button onClick={handleSubmit} btnStyle="accept" title="Save"><i className="bi bi-save" /></Button>
+      <Button onClick={handleCancel} btnStyle="outlineDanger" title="Cancel"><i className="bi bi-trash" /></Button>
     </div>
   </div>
 }

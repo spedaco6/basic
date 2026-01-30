@@ -50,10 +50,10 @@ export const UsersListItem = ({ user, className="", ...props }: { user: Partial<
       <span className="col-span-1 text-left">{roleInfo?.role ?? "Unknown: " + user.role }</span>}
     <span className="col-span-1 text-left">{user.firstName} {user.lastName}</span>
     <div className="flex gap-2 w-fit justify-end">
-      <Button onClick={handleClick} btnStyle={edit ? "accept" : "outline"}>
+      <Button onClick={handleClick} btnStyle={edit ? "accept" : "outline"} title={edit ? "Save" : "Edit"}>
         { edit ? <i className="bi bi-save" /> : <i className="bi bi-pen" />}
       </Button>
-      <Button onClick={() => refetch(user.id)} btnStyle="outlineDanger"><i className="bi bi-trash" /></Button>
+      <Button onClick={() => refetch(user.id)} btnStyle="outlineDanger" title="Remove permissions"><i className="bi bi-trash" /></Button>
     </div>
   </li>
 }

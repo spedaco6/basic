@@ -10,6 +10,7 @@ export const Input = ({
   type = "text",
   name,
   value,
+  title,
   label,
   placeholder="",
   id,
@@ -28,11 +29,12 @@ export const Input = ({
   const devId = (label && !id) ? devName : undefined;
 
   return <div className="flex flex-col flex-1">
-    { label && <label className="uppercase text-xs p-1" htmlFor={devId}>{`${label}${devRequired ? "*" : ""}`}</label> }
+    { label && <label title={title} className="uppercase text-xs p-1" htmlFor={devId}>{`${label}${devRequired ? "*" : ""}`}</label> }
     <input 
       className={`rounded-sm p-1 ${className}`} 
       type={type} name={devName} 
       id={devId} 
+      title={title}
       value={devValue} 
       onChange={devOnChange}
       required={devRequired}
