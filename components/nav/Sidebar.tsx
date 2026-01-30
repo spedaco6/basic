@@ -31,9 +31,9 @@ export const Sidebar = (): React.ReactElement => {
         
         { role < 30 && <>
           <SidebarHeading>Admin</SidebarHeading>
-          <SidebarLink href="/auth/users">
+          <SidebarLink href="/auth/permissions">
             <i className="bi bi-people-fill text-2xl" />
-            <span className="ml-2">Users</span>
+            <span className="ml-2">Permissions</span>
           </SidebarLink>
         </> }
     
