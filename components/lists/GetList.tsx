@@ -6,17 +6,18 @@ import { useRefreshContext } from "@/context/RefreshContext";
 
 interface FetchListProps<T extends FetchResponseData> {
   children: (data: Partial<T>) => React.ReactNode;
-  fetch: () => Promise<Response>
+  fetch: () => Promise<Response>;
+  fresh: boolean;
+  refresh: () => void;
 }
 
-export function GetList<T extends FetchResponseData>({ children, fetch }: FetchListProps<T>) {
+export function GetList<T extends FetchResponseData>({ children, fetch, fresh=true, refresh }: FetchListProps<T>) {
   const { data, loading, error, refetch } = useFetch<T>(fetch);
-  const { refresh, cancelRefresh } = useRefreshContext();
 
+  // Runs refresh action based on fresh trigger
   useEffect(() => {
-    if (refresh) {
-      cancelRefresh();
-      // setTimeout(() => refetch(), 500);
+    if (!fresh && refresh) {
+      refresh();
       refetch();
     }
   }, [refresh]);

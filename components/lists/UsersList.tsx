@@ -5,13 +5,19 @@ import { FetchResponseData } from "@/hooks/useFetch"
 import { ProfileData } from "@/lib/server/api/profile"
 import { getAuthorizedProfiles } from "@/lib/client/api/profile"
 import { UsersListItem } from "./UsersListItem"
+import { useRefreshContext } from "@/context/RefreshContext"
 
 interface UsersResponseData extends FetchResponseData {
   users: Partial<ProfileData>[]
 }
 
 export const UsersList = () => {
-  return <GetList<UsersResponseData> fetch={getAuthorizedProfiles}>
+  const { refresh, cancelRefresh } = useRefreshContext();
+  return <GetList<UsersResponseData> 
+    fetch={getAuthorizedProfiles}
+    fresh={!refresh}
+    refresh={cancelRefresh}
+  >
     {(data) => {
       return <ul className="mt-6">
         <li className="grid grid-cols-[2fr_1fr_2fr_6rem] gap-2 font-bold">
