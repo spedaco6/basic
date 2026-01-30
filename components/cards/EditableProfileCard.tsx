@@ -82,7 +82,7 @@ export const EditableProfileCard = (): React.ReactElement => {
 
        </div>
 
-      { profile && <div className="flex gap-4 items-center">
+      { profile && !errorGET && <div className="flex gap-4 items-center">
         { edit && <Button btnStyle="outline" onClick={onCancel}>Cancel</Button> }
         <Button 
           disabled={isLoading}
