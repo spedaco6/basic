@@ -43,10 +43,14 @@ export async function PATCH(req: Request): Promise<Response> {
     // Create profile if one does not exist
     if (!user) await createProfile(body, token);
     // Update permissions
-    await updatePermissions(body, token);
+    const updatedProfile = await updatePermissions(body, token);
 
     // Send response
-    return NextResponse.json({ success: true, message: "Account created" }, { status: 201 })
+    return NextResponse.json({ 
+      success: true, 
+      message: "Account created", 
+      profile: updatedProfile 
+    }, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Something went wrong";
     const status = err instanceof HTTPError ? err.status : 500;

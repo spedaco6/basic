@@ -277,7 +277,10 @@ export const getAuthorizedProfiles = async (accessToken: string): Promise<Partia
   return desensitizedInformation ?? [];
 }
 
-export const updatePermissions = async (body: Partial<ProfileData>, token: string): Promise<void> => {
+export const updatePermissions = async (
+  body: Partial<ProfileData>, 
+  token: string
+): Promise<Partial<ProfileData>> => {
   const email = body?.email ? xss(body?.email).trim() : "";
   let role = body?.role ?? 50;
 
@@ -297,6 +300,13 @@ export const updatePermissions = async (body: Partial<ProfileData>, token: strin
   // Update and save user
   user.role = role;
   await user.save();
+  return {
+    id: user.id,
+    role: user.role,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+  };
 }
 
 export const revokePermissions = async (id: number, accessToken: string): Promise<void> => {

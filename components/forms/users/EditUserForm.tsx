@@ -9,10 +9,15 @@ import React, { useEffect } from "react";
 import { Select } from "@/components/inputs/Select";
 import { useFetch } from "@/hooks/useFetch";
 import { updatePermissions, getAuthorizedProfiles } from "@/lib/client/api/profile";
+import { ProfileResponseData } from "@/app/api/profile/route";
+import { ProfileData } from "@/lib/server/api/profile";
 
 export const EditUserForm = (): React.ReactNode => {
-  const { data: patchData, refetch: patchFetch } = useFetch(updatePermissions, {}, { immediate: false });
-  const { data, refetch } = useFetch(getAuthorizedProfiles);
+  const { 
+    data: patchData, 
+    refetch: patchFetch 
+  } = useFetch<ProfileResponseData, [Partial<ProfileData>]>(updatePermissions, {}, { immediate: false });
+  const { refetch } = useFetch(getAuthorizedProfiles);
 
   const email = useInput("email*", "");
   const password = useInput("password", "");
