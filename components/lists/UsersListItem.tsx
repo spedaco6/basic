@@ -6,11 +6,11 @@ import { useFetch } from "@/hooks/useFetch";
 import { revokePermissions, updatePermissions } from "@/lib/client/api/profile";
 import { ROLES } from "@/lib/server/const";
 import { ProfileData } from "@/lib/server/api/profile";
-import { Input } from "../inputs/Input";
 import { useInput } from "@/hooks/useInput";
 import { ProfileResponseData } from "@/app/api/profile/route";
 import { Select } from "../inputs/Select";
 import { useToken } from "@/hooks/useToken";
+import { useRefreshContext } from "@/context/RefreshContext";
 
 export const UsersListItem = ({ user, className="", ...props }: { user: Partial<ProfileData>, className: string }): React.ReactNode => {
   const { data, refetch } = useFetch<ProfileResponseData, [number | undefined]>(revokePermissions, {}, { immediate: false });
@@ -18,12 +18,20 @@ export const UsersListItem = ({ user, className="", ...props }: { user: Partial<
   const [ edit, setEdit ] = useState(false);
   const role = useInput("role", user.role);
   const { role: userRole } = useToken();
+  const { callRefresh } = useRefreshContext();
 
+  // Runs each time permissions are revoked
   useEffect(() => {
     if (data.profile) {
       role.setValue(data.profile.userRole);
     }
+    if (data && data.success) callRefresh();
   }, [data]);
+
+  // Runs each time permissions are updated
+  useEffect(() => {
+    if (update.data && update.data.success) callRefresh();
+  }, [update.data]);
 
   const roleInfo = ROLES.find(r => r.permissions === role.value);
   const options = ROLES

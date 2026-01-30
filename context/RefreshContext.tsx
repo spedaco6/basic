@@ -2,16 +2,16 @@
 
 import React, { createContext, useContext, useState } from "react"
 
-type RefreshType = (() => Promise<void>) | null;
-
 interface RefreshContextProps {
-  refresh: RefreshType;
-  createRefresh: (fn: RefreshType) => void;
+  refresh: boolean;
+  callRefresh: () => void;
+  cancelRefresh: () => void;
 }
 
 const RefreshContext = createContext<RefreshContextProps>({
-  refresh: null,
-  createRefresh: (fn: RefreshType) => {},
+  refresh: false,
+  callRefresh: () => {},
+  cancelRefresh: () => {},
 });
 
 export const useRefreshContext = () => {
@@ -23,15 +23,16 @@ export const useRefreshContext = () => {
 }
 
 export const RefreshContextProvider = ({ children }: React.PropsWithChildren) => {
-  const [ refresh, setRefresh ] = useState<RefreshType>(null);
-
-  const createRefresh = (fn: RefreshType) => {
-    setRefresh(fn);
+  const [ refresh, setRefresh ] = useState(false);
+  const callRefresh = () => {
+    setRefresh(true);
   }
+  const cancelRefresh = () => setRefresh(false);
 
   const value = {
     refresh,
-    createRefresh,
+    callRefresh,
+    cancelRefresh,
   }
 
   return <RefreshContext.Provider value={value}>

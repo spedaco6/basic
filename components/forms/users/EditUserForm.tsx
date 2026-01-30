@@ -8,23 +8,26 @@ import { Button } from "@/components/buttons/Button";
 import React, { useEffect } from "react";
 import { Select } from "@/components/inputs/Select";
 import { useFetch } from "@/hooks/useFetch";
-import { updatePermissions, getAuthorizedProfiles } from "@/lib/client/api/profile";
+import { updatePermissions } from "@/lib/client/api/profile";
 import { ProfileResponseData } from "@/app/api/profile/route";
 import { ProfileData } from "@/lib/server/api/profile";
+import { useRefreshContext } from "@/context/RefreshContext";
 
 export const EditUserForm = (): React.ReactNode => {
   const { 
     data: patchData, 
     refetch: patchFetch 
   } = useFetch<ProfileResponseData, [Partial<ProfileData>]>(updatePermissions, {}, { immediate: false });
-  const { refetch } = useFetch(getAuthorizedProfiles);
-
+  
+  const { callRefresh } = useRefreshContext();
+  
   const email = useInput("email*", "");
   const password = useInput("password", "");
   const userRole = useInput("role", 50);
 
+  // Send signal to context that refresh is required
   useEffect(() => {
-    refetch();
+    callRefresh();
   }, [patchData]);
 
   const { role } = useToken();
@@ -45,6 +48,9 @@ export const EditUserForm = (): React.ReactNode => {
       role: userRole.value,
       password: password.value,
     });
+    email.setValue("");
+    password.setValue("");
+    userRole.setValue(50);
   }
 
   return <div className="flex flex-wrap gap-4 rounded-md">
