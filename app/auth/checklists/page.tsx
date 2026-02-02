@@ -1,3 +1,5 @@
+import { Checklist } from "@/components/checklist/Checklist";
+
 export default async function ChecklistsPage() {
 
 return <main className="p-4">
@@ -16,5 +18,6 @@ return <main className="p-4">
       <li>Create tests</li>
       <li>Extract components where possible</li>
     </ul>
+    <Checklist />
   </main>
 }

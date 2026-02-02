@@ -2,7 +2,6 @@
 
 import React, { useEffect } from "react";
 import { FetchResponseData, useFetch } from "@/hooks/useFetch"
-import { useRefreshContext } from "@/context/RefreshContext";
 
 interface FetchListProps<T extends FetchResponseData> {
   children: (data: Partial<T>) => React.ReactNode;
