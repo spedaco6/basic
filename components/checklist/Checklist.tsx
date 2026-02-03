@@ -1,15 +1,18 @@
 "use client"
 
-import React, { ChangeEventHandler, FocusEventHandler, FormEventHandler, useState } from "react";
+import { useToken } from "@/hooks/useToken";
+import React, { ChangeEventHandler, FormEventHandler, useState } from "react";
 
-interface ChecklistItem {
+export interface IChecklistItem {
   title: string,
   complete: boolean,
+  creatorId: number,
 }
 
 export const Checklist = (): React.ReactNode => {
-  const [ list, setList ] = useState<ChecklistItem[]>([]);
+  const [ list, setList ] = useState<IChecklistItem[]>([]);
   const [ newItem, setNewItem ] = useState("");
+  const { id } = useToken();
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e): void => {
     const { value } = e.target;
@@ -29,6 +32,7 @@ export const Checklist = (): React.ReactNode => {
       const updatedItem = {
         title,
         complete: !prev[itemIndex].complete,
+        creatorId: id,
       };
       updated[itemIndex] = updatedItem;
       return updated;
@@ -40,7 +44,7 @@ export const Checklist = (): React.ReactNode => {
       setList(prev => {
         const updated = [
           ...prev,
-          { title: newItem, complete: false }
+          { title: newItem, complete: false, creatorId: id }
         ];
         return updated;
       });

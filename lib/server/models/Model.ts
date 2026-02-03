@@ -131,7 +131,7 @@ export abstract class Model {
   }
 
   // Create the table in the database
-  static async init(db: Database): Promise<void> {
+  static async init(db: Database): Promise<boolean> {
     // Ensure that init is not called on the parent Model class
     if (this === Model) throw new Error("Cannot initialize Model class directly");
 
@@ -147,5 +147,6 @@ export abstract class Model {
     await this.db.createTable(this.getTableName(), this.getSchema());
   
     console.log(`${name} table created!`);
+    return true;
   }
 }

@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/server/database/db";
+import { ChecklistItem } from "@/lib/server/models/ChecklistItem";
 import { User } from "@/lib/server/models/User";
 import { redirect } from "next/navigation";
 
@@ -12,7 +13,8 @@ export default async function SetupPage({
   if (!setup_key || setup_key !== url_setup_key) return redirect("/login");
 
   const db = getDb();
-  await User.init(db);
+  const setupUser = await User.init(db);
+  const setupChecklistItem = await ChecklistItem.init(db);
 
   const user = await User.findOne({ email: "admin@email.com" });
   if (!user) {
@@ -28,7 +30,8 @@ export default async function SetupPage({
   }
 
   return <div className="p-2">
-    <p>Successfully initialized users table!</p>
+    { setupUser && <p>Successfully initialized users table!</p>}
+    { setupChecklistItem && <p>Successfully initialized checklist items table!</p>}
 
     <p>Successfullly set up users:</p>
     <ul>

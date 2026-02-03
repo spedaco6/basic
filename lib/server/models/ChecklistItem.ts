@@ -1,0 +1,43 @@
+import { TableSchema } from "../database/Database";
+import { getDb } from "../database/db";
+import { Model } from "./Model";
+
+interface IChecklistItem {
+  title: string,
+  complete: boolean,
+  creatorId: number,
+}
+
+export class ChecklistItem extends Model {
+  public title: string;
+  public complete: boolean;
+  public creatorId: number;
+
+  protected static schema: TableSchema = [
+    {
+      name: "title",
+      type: "text",
+      required: true,
+    }, {
+      name: "complete",
+      type: "bool",
+      default: "false"
+    }, {
+      name: "creatorId",
+      type: "number",
+      required: true,
+    }
+  ];
+  
+  constructor(props: Omit<IChecklistItem, "complete">) {
+    super();
+    Object.assign(this, props);
+    this.title = props.title;
+    this.complete = false;
+    this.creatorId = props.creatorId;
+  }
+}
+
+// Ensure db is set
+const db = getDb();
+ChecklistItem.db = db;
