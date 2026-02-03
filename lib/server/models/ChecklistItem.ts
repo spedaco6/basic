@@ -1,3 +1,4 @@
+import "server-only";
 import { TableSchema } from "../database/Database";
 import { getDb } from "../database/db";
 import { Model } from "./Model";

@@ -1,3 +1,4 @@
+import "server-only";
 import { HTTPError } from "../errors";
 import { User } from "../models/User";
 import { createAccessToken, createRefreshToken, verifyRefreshToken } from "../tokens";

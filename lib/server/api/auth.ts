@@ -1,3 +1,4 @@
+import "server-only";
 import xss from "xss";
 import { TokenPackage } from "./tokens";
 import { User } from "../models/User";

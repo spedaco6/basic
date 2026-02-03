@@ -1,3 +1,5 @@
+import "server-only";
+
 export class HTTPError extends Error {
   public status: number;
   public payload?: object;
