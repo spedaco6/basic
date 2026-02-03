@@ -1,4 +1,4 @@
-import "server-only"
+import "server-only";
 import { SALT_ROUNDS } from "../const";
 import { HTTPError } from "../errors";
 import { User } from "../models/User";

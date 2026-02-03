@@ -1,3 +1,4 @@
+import "server-only";
 import { emailConfig } from "@/config.email";
 import nodemailer from "nodemailer";
 
