@@ -38,7 +38,6 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     // complete action
-    await new Promise(res => setTimeout(res, 2000));
     const item = await createChecklistItem(body, token);
     
     // send response
@@ -87,7 +86,6 @@ export async function DELETE(req: Request) {
     // get body
     const body = await req.json();
 
-    await new Promise(res => setTimeout(res, 2000));
     // complete action
     await deleteChecklistItem(body.id, token);
     

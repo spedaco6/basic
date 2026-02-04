@@ -14,7 +14,6 @@ export interface ProfileResponseData extends FetchResponseData {
 }
 
 export async function GET(req: Request): Promise<Response> {
-  await new Promise(res => setTimeout(res, 2000));
   try {
     // Get Authorization header
     const authHeader = req.headers.get("Authorization");
@@ -47,7 +46,6 @@ export async function PUT(req: Request): Promise<Response> {
     if (!authHeader) throw new HTTPError("No token provided", 401);
     const token = authHeader.split(" ")[1];
     // Complete action
-    await new Promise(res => setTimeout(res, 2000));
     const updatedProfile = await updateProfile(body, token);
     // Send response
     return NextResponse.json({ 
