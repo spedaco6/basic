@@ -10,7 +10,7 @@ export interface IChecklistItem {
   id?: number,
   title: string,
   complete: boolean,
-  creatorId: number,
+  creatorId?: number,
 }
 
 export const Checklist = (): React.ReactNode => {
@@ -21,7 +21,7 @@ export const Checklist = (): React.ReactNode => {
   >(deleteChecklistItem, {} , {immediate: false});
   const post = useFetch<
     ChecklistItemReponseData, 
-    [IChecklistItem]
+    [Partial<IChecklistItem>]
   >(createChecklistItem, {}, {immediate: false});
   const put = useFetch<
     ChecklistItemReponseData,
