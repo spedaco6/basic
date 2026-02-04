@@ -88,7 +88,6 @@ export async function DELETE(req: Request) {
     const body = await req.json();
 
     await new Promise(res => setTimeout(res, 2000));
-
     // complete action
     await deleteChecklistItem(body.id, token);
     

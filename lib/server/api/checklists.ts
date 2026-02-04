@@ -56,7 +56,6 @@ export const updateChecklistItem = async (
 
   
   Object.assign(existingItem, editedItem);
-  console.log(existingItem); 
   await existingItem.save();
   return existingItem;
 }

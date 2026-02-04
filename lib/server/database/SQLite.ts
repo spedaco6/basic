@@ -198,8 +198,6 @@ export class SQLite extends Database {
       WHERE id = ?
       RETURNING *;
       `;
-      console.log("HERE");
-      console.log(editableData);
       updated = this.db.prepare(sql).get([...editableData, id]) as any;
     } catch (err) {
       console.error(err);

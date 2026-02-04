@@ -55,7 +55,10 @@ export const Checklist = (): React.ReactNode => {
         return updated;
       });
     } 
-  }, [post.data]);
+    if (post.error) {
+      get.refetch();
+    }
+  }, [post.data, post.error]);
 
   // for put routes
   useEffect(() => {
@@ -70,16 +73,19 @@ export const Checklist = (): React.ReactNode => {
         return updated;
       });
     } 
-  }, [put.data]);
+    if (put.error) {
+      get.refetch();
+    }
+  }, [put.data, put.error]);
 
   // For delete routes
   useEffect(() => {
-    if (deleteItem.data.success && !deleteItem.loading) {
+    if (deleteItem.error) {
       get.refetch();
     }
-  }, [deleteItem.data]);
+  }, [deleteItem.error]);
 
-  const handleChange: ChangeEventHandler<HTMLInputElement> = (e): void => {
+  const handleChange: ChangeEventHandler<HTMLTextAreaElement> = (e): void => {
     const { value } = e.target;
     setNewItem(value);
   }
@@ -133,19 +139,25 @@ export const Checklist = (): React.ReactNode => {
 
   return <div className="mt-8 w-1/2">
     <h1 className="mb-4 font-bold">CHECKLIST COMPONENT</h1>
+    { get.error && <p className="text-red-500">{ get.error }</p> }
     <ul className="flex flex-col gap-2">
       { list.length > 0 && list.map(item => <li 
         key={item.title}
         onClick={() => handleClick(item.title)}
         className="flex justify-between p-1"
       >
-        <span className={`${item.complete ? "line-through" : "" } cursor-pointer`}>{ item.title } { item.pending ? "Saving..." : "" }</span>
+        <span 
+          className={`${item.complete ? "line-through" : "" } cursor-pointer`}
+        >
+          { item.title }
+        </span>
         <div className="flex gap-2">
+          { item.pending && <div className="animate-spin"><i className="bi bi-arrow-repeat text-2xl w-fit" /></div> }
           <button onClick={() => handleDelete(item.id)} className="cursor-pointer"><i className="bi bi-trash hover:text-red-500" /></button>
         </div>
       </li>) }
       <form onSubmit={handleSubmit}>
-        <input 
+        <textarea 
           className="border w-full p-1 rounded-sm" 
           onBlur={handleBlur} 
           onChange={handleChange} 
