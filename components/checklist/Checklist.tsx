@@ -3,7 +3,7 @@
 import { ChecklistItemReponseData } from "@/app/api/checklists/route";
 import { FetchResponseData, useFetch } from "@/hooks/useFetch";
 import { useToken } from "@/hooks/useToken";
-import { createChecklistItem, deleteChecklistItem, getAllChecklistItems } from "@/lib/client/api/checklists";
+import { createChecklistItem, deleteChecklistItem, getAllChecklistItems, updateChecklistItem } from "@/lib/client/api/checklists";
 import React, { ChangeEventHandler, FormEventHandler, useEffect, useState } from "react";
 
 export interface IChecklistItem {
@@ -23,11 +23,16 @@ export const Checklist = (): React.ReactNode => {
     ChecklistItemReponseData, 
     [IChecklistItem]
   >(createChecklistItem, {}, {immediate: false});
+  const put = useFetch<
+    ChecklistItemReponseData,
+    [IChecklistItem]
+  >(updateChecklistItem, {}, { immediate: false });
   
   const [ list, setList ] = useState<(IChecklistItem & { pending: boolean })[]>([]);
   const [ newItem, setNewItem ] = useState("");
   const { id } = useToken();
 
+  // for get routes
   useEffect(() => {
     if (get.data.success && !get.loading) {
       const items = get.data?.items?.map(item => {
@@ -37,6 +42,7 @@ export const Checklist = (): React.ReactNode => {
     }
   }, [get.data]);
 
+  // for post routes
   useEffect(() => {
     if (post.data.success && !post.loading) {
       setList(prev => {
@@ -51,6 +57,22 @@ export const Checklist = (): React.ReactNode => {
     } 
   }, [post.data]);
 
+  // for put routes
+  useEffect(() => {
+    if (put.data.success && !put.loading) {
+      setList(prev => {
+        const updated = [...prev];
+        const index = prev.findIndex(item => item.title === put.data?.item?.title);
+        if (index === -1) return updated;
+
+        const updatedItem = { ...prev[index], pending: false, id: put.data?.item?.id };
+        updated[index] = updatedItem;
+        return updated;
+      });
+    } 
+  }, [put.data]);
+
+  // For delete routes
   useEffect(() => {
     if (deleteItem.data.success && !deleteItem.loading) {
       get.refetch();
@@ -77,6 +99,7 @@ export const Checklist = (): React.ReactNode => {
         complete: !prev[itemIndex].complete,
       };
       updated[itemIndex] = updatedItem;
+      put.refetch(updatedItem);
       return updated;
     });
   }

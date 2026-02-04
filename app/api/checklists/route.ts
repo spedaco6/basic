@@ -1,6 +1,6 @@
 import { IChecklistItem } from "@/components/checklist/Checklist";
 import { FetchResponseData } from "@/hooks/useFetch";
-import { createChecklistItem, deleteChecklistItem } from "@/lib/server/api/checklists";
+import { createChecklistItem, deleteChecklistItem, updateChecklistItem } from "@/lib/server/api/checklists";
 import { getAllChecklistItems } from "@/lib/server/api/checklists";
 import { HTTPError } from "@/lib/server/errors";
 import { getTokenFromAuthHeader } from "@/lib/server/tokens";
@@ -60,12 +60,17 @@ export async function PUT(req: Request) {
     // get token from auth header
     const token = getTokenFromAuthHeader(req);
 
+    // get body
+    const body = await req.json();
+
     // complete action
+    const updatedItem = await updateChecklistItem(body, token);
 
     // send response
     return NextResponse.json({ 
       success: true, 
-      message: "Successfully updated checklist item" 
+      message: "Successfully updated checklist item",
+      item: updatedItem,
     }, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Something went wrong";

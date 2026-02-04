@@ -179,21 +179,27 @@ export class SQLite extends Database {
       if (!id) throw new Error("No id provided in the object");
       const originalRecord = this.find(tableName, { id });
       if (!originalRecord) throw new Error(`Could not find a record with id ${id}`);
-
+      
       // Filter out fields that cannot be edited
       const editableFields = Object.entries(data)
-        .filter(([key]) => key !== "id" && key !== "secureKey");
+      .filter(([key]) => key !== "id" && key !== "secureKey");
       const editableData = editableFields
-        .map(([key, val]) => val);
-
+      .map(([key, val]) => {
+        if (typeof val !== "boolean") return val;
+        if (val) return 1;
+        return 0;
+      });
+      
       // Create strings that set updated values
       const fieldStr = editableFields.map(([key]) => `${key} = ?`).join(", "); // todo check key against tableschema column names
-
+      
       const sql = `UPDATE ${tableName}
-        SET ${fieldStr}, updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-        RETURNING *;
+      SET ${fieldStr}, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+      RETURNING *;
       `;
+      console.log("HERE");
+      console.log(editableData);
       updated = this.db.prepare(sql).get([...editableData, id]) as any;
     } catch (err) {
       console.error(err);
