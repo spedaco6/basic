@@ -7,8 +7,8 @@ import { LoadingProfileCard } from "./LoadingProfileCard";
 import { ProfileData } from "@/lib/server/api/profile";
 import { useInput } from "@/hooks/useInput";
 import { putProfile, getProfile } from "@/lib/client/api/profile";
-import { Input } from "../inputs/Input";
-import { Button } from "../buttons/Button";
+import { Input } from "@/components/inputs/Input";
+import { Button } from "@/components/buttons/Button";
 
 export const EditableProfileCard = (): React.ReactElement => {
   const { data: { profile }, error: errorGET, loading, refetch } = useFetch<ProfileResponseData>(getProfile);

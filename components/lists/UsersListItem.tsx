@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react";
-import { Button } from "../buttons/Button";
+import { Button } from "@/components/buttons/Button";
 import { useFetch } from "@/hooks/useFetch";
 import { revokePermissions, updatePermissions } from "@/lib/client/api/profile";
 import { ROLES } from "@/lib/server/const";
