@@ -10,7 +10,7 @@ export interface IChecklistItem {
   id?: number,
   title: string,
   complete: boolean,
-  creatorId?: number,
+  creatorId: number,
 }
 
 export const Checklist = (): React.ReactNode => {

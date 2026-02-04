@@ -14,7 +14,7 @@ export const useToken = () => {
     }
   }, []);
   return {
-    role: payload.userRole,
-    id: payload.userId,
+    role: payload.userRole ?? 50,
+    id: payload.userId ?? 0,
   }; 
 }
