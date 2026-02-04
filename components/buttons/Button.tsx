@@ -23,7 +23,7 @@ export const Button = ({ children, btnStyle="default", className="", ...props }:
 
 
   return <button
-    className={`${className} ${styles[btnStyle]} cursor-pointer py-2 px-3 min-w-fit rounded-md hover:shadow-sm`}
+    className={`${className} ${styles[btnStyle]} cursor-pointer py-2 px-3 justify-center flex min-w-fit rounded-md hover:shadow-sm`}
     { ...props }>
       { children }
   </button>
