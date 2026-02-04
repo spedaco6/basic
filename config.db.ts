@@ -3,7 +3,7 @@ import { ISQLiteConfig } from "./lib/server/database/SQLite";
 // SQLite configuration
 export const dbConfig: ISQLiteConfig = {
   type: "sqlite",
-  path: process.env.DB_PATH ?? "",
+  path: "./data/sqlite.db",
 }
 
 
