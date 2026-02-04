@@ -30,11 +30,11 @@ export class ChecklistItem extends Model {
     }
   ];
   
-  constructor(props: Omit<IChecklistItem, "complete">) {
+  constructor(props: IChecklistItem) {
     super();
     Object.assign(this, props);
     this.title = props.title;
-    this.complete = false;
+    this.complete = props.complete;
     this.creatorId = props.creatorId;
   }
 }

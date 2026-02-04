@@ -1,18 +1,61 @@
 "use client"
 
+import { ChecklistItemReponseData } from "@/app/api/checklists/route";
+import { FetchResponseData, useFetch } from "@/hooks/useFetch";
 import { useToken } from "@/hooks/useToken";
-import React, { ChangeEventHandler, FormEventHandler, useState } from "react";
+import { createChecklistItem, deleteChecklistItem, getAllChecklistItems } from "@/lib/client/api/checklists";
+import React, { ChangeEventHandler, FormEventHandler, useEffect, useState } from "react";
 
 export interface IChecklistItem {
+  id?: number,
   title: string,
   complete: boolean,
   creatorId: number,
 }
 
 export const Checklist = (): React.ReactNode => {
-  const [ list, setList ] = useState<IChecklistItem[]>([]);
+  const get = useFetch<ChecklistItemReponseData>(getAllChecklistItems);
+  const deleteItem = useFetch<
+    FetchResponseData, 
+    [number | undefined]
+  >(deleteChecklistItem, {} , {immediate: false});
+  const post = useFetch<
+    ChecklistItemReponseData, 
+    [IChecklistItem]
+  >(createChecklistItem, {}, {immediate: false});
+  
+  const [ list, setList ] = useState<(IChecklistItem & { pending: boolean })[]>([]);
   const [ newItem, setNewItem ] = useState("");
   const { id } = useToken();
+
+  useEffect(() => {
+    if (get.data.success && !get.loading) {
+      const items = get.data?.items?.map(item => {
+        return { ...item, pending: false };
+      }) ?? [];
+      setList(items);
+    }
+  }, [get.data]);
+
+  useEffect(() => {
+    if (post.data.success && !post.loading) {
+      setList(prev => {
+        const updated = [...prev];
+        const index = prev.findIndex(item => item.title === post.data?.item?.title);
+        if (index === -1) return updated;
+
+        const updatedItem = { ...prev[index], pending: false, id: post.data?.item?.id };
+        updated[index] = updatedItem;
+        return updated;
+      });
+    } 
+  }, [post.data]);
+
+  useEffect(() => {
+    if (deleteItem.data.success && !deleteItem.loading) {
+      get.refetch();
+    }
+  }, [deleteItem.data]);
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e): void => {
     const { value } = e.target;
@@ -30,9 +73,8 @@ export const Checklist = (): React.ReactNode => {
       const itemIndex = prev.findIndex(item => item.title === title);
       if (itemIndex === -1) return updated;
       const updatedItem = {
-        title,
+        ...prev[itemIndex],
         complete: !prev[itemIndex].complete,
-        creatorId: id,
       };
       updated[itemIndex] = updatedItem;
       return updated;
@@ -41,24 +83,30 @@ export const Checklist = (): React.ReactNode => {
 
   const handleBlur = (): void => {
     if (newItem) {
+      const item = { 
+        title: newItem,
+        complete: false,
+        creatorId: id,
+      };
       setList(prev => {
         const updated = [
           ...prev,
-          { title: newItem, complete: false, creatorId: id }
+          { ...item, pending: true },
         ];
         return updated;
       });
       setNewItem("");
+      post.refetch(item);
     }
   }
 
-  const handleDelete = (title: string): void => {
+  const handleDelete = (id?: number): void => {
     setList(prev => {
-      const updated = prev.filter(item => item.title !== title);
+      const updated = prev.filter(item => item.id !== id);
       return updated;
     });
+    deleteItem.refetch(id);
   }  
-
 
   return <div className="mt-8 w-1/2">
     <h1 className="mb-4 font-bold">CHECKLIST COMPONENT</h1>
@@ -68,9 +116,9 @@ export const Checklist = (): React.ReactNode => {
         onClick={() => handleClick(item.title)}
         className="flex justify-between p-1"
       >
-        <span className={`${item.complete ? "line-through" : "" } cursor-pointer`}>{ item.title }</span>
+        <span className={`${item.complete ? "line-through" : "" } cursor-pointer`}>{ item.title } { item.pending ? "Saving..." : "" }</span>
         <div className="flex gap-2">
-          <button onClick={() => handleDelete(item.title)} className="cursor-pointer"><i className="bi bi-trash hover:text-red-500" /></button>
+          <button onClick={() => handleDelete(item.id)} className="cursor-pointer"><i className="bi bi-trash hover:text-red-500" /></button>
         </div>
       </li>) }
       <form onSubmit={handleSubmit}>

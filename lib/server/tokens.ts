@@ -1,6 +1,7 @@
 import { jwtVerify, SignJWT } from "jose";
 import "server-only";
 import { TokenPayload } from "../client/tokens";
+import { HTTPError } from "./errors";
 
 export interface RefreshTokenPayload extends TokenPayload {
   jti: string,
@@ -60,3 +61,10 @@ export async function verifyRefreshToken(refreshToken: string): Promise<RefreshT
   return verified.payload ?? null;
 }
 
+// Get token from Authorization header
+export function getTokenFromAuthHeader(req: Request): string {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) throw new HTTPError("No authorization token provided", 401);
+  const token = authHeader.split(" ")[1];
+  return token;
+}
