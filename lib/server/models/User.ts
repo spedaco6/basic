@@ -16,7 +16,7 @@ interface IUser {
 
 export class User extends Model implements IUser {
   public static tableName = "users";
-  protected static schema: TableSchema = [
+  public static schema: TableSchema = [
     {
       name: 'email',
       type: 'TEXT',
