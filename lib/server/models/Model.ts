@@ -11,7 +11,7 @@ type ModelClass<T extends Model> = {
 }
 
 export abstract class Model {
-  protected static schema: Readonly<TableSchema> = [
+  protected static schema: TableSchema = [
     { name: "id", type: "int", primaryKey: true },
     { name: "secureKey", type: "text", required: true, unique: true },
     { name: "created_at", type: "timestamp_create" },
@@ -100,7 +100,7 @@ export abstract class Model {
     const dbFields = schema.map(col => col.name);
     return dbFields;
   }
-
+  // todo find a way to introduce this method back in
   // Merges child and parent schemas in one array
   protected static getSchema(this: typeof Model): TableSchema {
     const parent = Object.getPrototypeOf(this);
@@ -131,7 +131,9 @@ export abstract class Model {
     this.db = db;
 
     // Create table in database using table schema
-    await this.db.createTable(this.tableName, this.schema);
+    // todo refactor this into a static method
+    const parent = Object.getPrototypeOf(this);
+    await this.db.createTable(this.tableName, { ...parent.schema, ...this.schema });
   
     console.log(`${name} table created!`);
     return true;
