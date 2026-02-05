@@ -15,6 +15,7 @@ interface IUser {
 }
 
 export class User extends Model implements IUser {
+  private static tableName = "users";
   protected static schema: TableSchema = [
     {
       name: 'email',
@@ -55,7 +56,7 @@ export class User extends Model implements IUser {
   public jti?: string;
   public resetToken?: string;
 
-  constructor(props: Record<string, any>) {
+  constructor(props: IUser) {
     super();
     Object.assign(this, props);
   }

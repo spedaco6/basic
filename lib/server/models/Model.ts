@@ -3,6 +3,13 @@ import { nanoid } from "nanoid";
 import { getDb } from "../database/db";
 import "server-only";
 
+type ModelClass<T extends Model> = {
+  new (...args: any[]): T;
+  db: Database;
+  tableName: string;
+  schema: TableSchema;
+}
+
 export abstract class Model {
   protected static schema: Readonly<TableSchema> = [
     { name: "id", type: "int", primaryKey: true },
@@ -22,16 +29,12 @@ export abstract class Model {
 
   // find records by criteria
   static async find<T extends Model>(
-    this: {
-      new (...args: any[]): T,
-      db: Database;
-      getTableName(): string;
-    },
+    this: ModelClass<T>,
     filters: Record<string, any>,
     options: Partial<QueryOptions> ={},
     ...returnFields: string[]
   ): Promise<T[] | null> {
-    const models = await this.db.find<T>(this.getTableName(), filters, options, ...returnFields);
+    const models = await this.db.find<T>(this.tableName, filters, options, ...returnFields);
     return models;
   }
 
@@ -39,16 +42,12 @@ export abstract class Model {
   static async findById<T extends Model>(
     // This is defined as a class that creates an instance of Model
     // and contains a db property and getTableName() method
-    this: { 
-      new (...args: any[]): T; // makes this a constructor and not an instance
-      db: Database;
-      getTableName(): string;
-    }, 
+    this: ModelClass<T>,
     id?: number | null,
     ...returnFields: string[]
   ): Promise<InstanceType<typeof this> | null | Record<string, any>> { // typeof this because this is a constructor
     if (!id) throw new Error("No id provided");
-    const data = await this.db.find(this.getTableName(), { id }, {}, ...returnFields);
+    const data = await this.db.find(this.tableName, { id }, {}, ...returnFields);
     const model = data.length ? data[0] : null;
     // If specific fields are requested, return a plain object of requested fields
     if (returnFields.length) return model;
@@ -57,15 +56,11 @@ export abstract class Model {
   }
 
   static async findOne<T extends Model>(
-    this: {
-      new (...args: any[]): T;
-      db: Database;
-      getTableName(): string;
-    },
+    this: ModelClass<T>,
     filters: Record<string, any>,
     ...returnFields: string[]
   ): Promise<InstanceType<typeof this> | null | Record<string, any>> {
-    const data = await this.db.find(this.getTableName(), filters, { limit: 1 }, ...returnFields);
+    const data = await this.db.find(this.tableName, filters, { limit: 1 }, ...returnFields);
     const model = data.length ? data[0] : null;
     if (returnFields.length) return model as Record<string, any>;
     return model ? new this(model) : model;
@@ -120,23 +115,15 @@ export abstract class Model {
   
   // Make static tableName property available to class instances
   protected get tableName(): string {
-    return (this.constructor as typeof Model).getTableName();
-  }
-  
-  // Create a plural, lowercase table name based on class name
-  public static getTableName(): string {
-    let tableName = this.name.toLowerCase();
-    tableName += tableName.endsWith("s") ? "" : "s";
-    return tableName;
+    return (this.constructor as typeof Model & { tableName: string }).tableName;
   }
 
   // Create the table in the database
-  static async init(db: Database): Promise<boolean> {
-    // Ensure that init is not called on the parent Model class
-    if (this === Model) throw new Error("Cannot initialize Model class directly");
-
-    const name = this.getTableName();
-    
+  static async init<T extends Model>(
+    this: ModelClass<T>,
+    db: Database
+  ): Promise<boolean> {
+    const name = this.tableName;
     console.log(`Initializing ${name} table...`);
 
     // Throw error if database is not defined
@@ -144,7 +131,7 @@ export abstract class Model {
     this.db = db;
 
     // Create table in database using table schema
-    await this.db.createTable(this.getTableName(), this.getSchema());
+    await this.db.createTable(this.tableName, this.schema);
   
     console.log(`${name} table created!`);
     return true;
