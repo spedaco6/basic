@@ -6,6 +6,7 @@ export const POST = async (req: Request): Promise<Response> => {
   try {
     const body = await req.json();
     
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     await forgotPassword(body.email);
     
     return NextResponse.json({ success: true, message: "Email send with reset link" });

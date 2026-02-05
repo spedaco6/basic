@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   let message = "Logged out successfully";
+  if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
   // Delete user jti to invalidate tokens
   try {
     const cookieStore = await cookies();

@@ -13,6 +13,7 @@ export async function POST(request: Request): Promise<Response> {
     const body = await request.json();
     
     // Authenticate user and get new token package
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     const { refreshToken, accessToken } = await login(body.email, body.password);
       
     // Return response with token and cookie

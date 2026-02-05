@@ -15,6 +15,7 @@ export async function GET() {
     if (!currentRefreshToken) return NextResponse.redirect("/login");
     const currentRefreshTokenValue = currentRefreshToken.value;
 
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     const { refreshToken, accessToken } = await refreshTokens(currentRefreshTokenValue);
     
     const response = NextResponse.json({ success: true, token: accessToken, message: "Token refreshed" });

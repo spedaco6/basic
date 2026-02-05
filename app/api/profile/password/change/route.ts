@@ -15,6 +15,7 @@ export const PUT = async (req: Request): Promise<Response> => {
     const token = header.split(" ")[1];
 
     // Change password
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     await changePassword(body.currentPassword, body.newPassword, body.confirmPassword, token);
 
     // Send response

@@ -12,6 +12,7 @@ export const PATCH  = async (req: Request): Promise<Response> => {
     const token = authHeader.split(" ")[1];
 
     // complete action
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     await resetPassword(body.newPassword, body.confirmPassword, token);
 
     // return response

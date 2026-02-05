@@ -14,6 +14,7 @@ export async function GET(req: Request): Promise<Response> {
     const token = authHeader.split(' ')[1];
 
     // Complete action
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     const users = await getAuthorizedProfiles(token);
     
     // Send response

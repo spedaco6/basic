@@ -10,6 +10,7 @@ export async function POST(req: Request) {
     const token = authHeader.split(" ")[1];
 
     // Complete action
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     await createTestUsers(token);
 
     return NextResponse.json({ success: true, message: "Test users created"}, { status: 201 });
@@ -27,6 +28,7 @@ export async function DELETE(req: Request) {
     const token = authHeader.split(" ")[1];
 
     // Complete action
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     await deleteTestUsers(token);
 
     return NextResponse.json({ success: true, message: "Test users deleted"}, { status: 201 });

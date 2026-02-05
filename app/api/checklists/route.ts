@@ -16,7 +16,8 @@ export async function GET(req: Request) {
     // get token from auth header
     const token = getTokenFromAuthHeader(req);
 
-    // complete action
+    // complete action 
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     const items = await getAllChecklistItems(token);
 
     // send response
@@ -38,6 +39,7 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     // complete action
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     const item = await createChecklistItem(body, token);
     
     // send response
@@ -63,6 +65,7 @@ export async function PUT(req: Request) {
     const body = await req.json();
 
     // complete action
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     const updatedItem = await updateChecklistItem(body, token);
 
     // send response
@@ -87,6 +90,7 @@ export async function DELETE(req: Request) {
     const body = await req.json();
 
     // complete action
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     await deleteChecklistItem(body.id, token);
     
     // send response

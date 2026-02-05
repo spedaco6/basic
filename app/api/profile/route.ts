@@ -21,7 +21,9 @@ export async function GET(req: Request): Promise<Response> {
     
     // Get access token
     const accessToken = authHeader.split(' ')[1];
+
     // Get profile
+    if (process.env.NODE_ENV !== "production") await new Promise(res => setTimeout(res, 2000));
     const userProfile = await getProfile(accessToken);
 
     // Return profile
