@@ -287,17 +287,35 @@ export class SQLite extends Database {
     if (!colSchema.type) throw new Error('Invalid column type');
   
     // Map column name and type
-    const colType = this._mapColumnType(colSchema.type);
+    let colType = this._mapColumnType(colSchema.type);
+    const isBoolean = colType === "BOOLEAN";
+    colType = isBoolean ? "INTEGER" : colType;
 
     // Construct SQL string
     let sql: string = `${colSchema.name} ${colType}`;
     if (!colType.includes("TIMESTAMP")) {
       if (colSchema.primaryKey) sql += " PRIMARY KEY";
-      if (colSchema.required) sql += " NOT NULL"; 
+      if (colSchema.required || isBoolean) sql += " NOT NULL"; 
       if (colSchema.unique) sql += " UNIQUE";
-      if (colSchema.default) sql += ` DEFAULT ${colSchema.default}`;
+      if (isBoolean) sql += ` CHECK (${colSchema.name} IN (0,1))`;
+      if (colSchema.default !== undefined) {
+        // if boolean, map default value to 0 or 1
+        if (!isBoolean) {
+          // if string, wrap default value in single quotes
+          if (colType === "TEXT") {
+            sql += ` DEFAULT '${colSchema.default}'`;
+          } else {
+            sql += ` DEFAULT ${colSchema.default}`;
+          }
+        } else {
+          const value = typeof colSchema.default === "string" ? 
+            colSchema.default.toLowerCase() : colSchema.default;
+          const defaultBool = value === "true" || 
+            value === true || value === 1;
+          sql += ` DEFAULT ${defaultBool ? 1 : 0}`;
+        }
+      }
     }
-
     return sql;
   }
 
@@ -310,12 +328,13 @@ export class SQLite extends Database {
         columnType = "TEXT";
         break;
       case "int":
+      case "integer":
       case "number":
         columnType = "INTEGER";
         break;
       case "bool":
       case "boolean":
-        columnType = "BOOLEAN"; // todo make INTEGER NOT NULL CHECK (col IN (0,1))???
+        columnType = "BOOLEAN";
         break;
       case "timestamp_create":
         columnType = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
