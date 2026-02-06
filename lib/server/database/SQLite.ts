@@ -54,8 +54,16 @@ export class SQLite extends Database {
     const values: any[] = [];
     if (Array.isArray(data)) return data;
     Object.values(data).forEach(val => {
-      if (typeof val !== "object") values.push(val);
-      else values.push(...this._getValues(val));
+      if (typeof val !== "object") {
+        if (typeof val === "boolean") {
+          const boolVal = val ? 1 : 0;
+          values.push(boolVal);
+        } else {
+          values.push(val);
+        }
+      } else {
+        values.push(...this._getValues(val));
+      }
     });
     return values;
   }
@@ -88,14 +96,14 @@ export class SQLite extends Database {
 
       // Get ORDER BY ASC|DESC condition
       const order = `ORDER BY ${queryOptions.order}`; // todo check that this is safe
-      const sort = queryOptions.sort.toLowerCase() === "asc" ? "ASC" : "DESC";
+      const sort = queryOptions.sort.toLowerCase() === "asc" ? " ASC" : " DESC";
 
       // Get LIMIT condition
       let limit = "";
       if (!queryOptions?.limit && queryOptions?.skip) throw new Error("skip option must be used with limit option");
 
       if (queryOptions?.limit) {
-        limit = `LIMIT ?`;
+        limit = ` LIMIT ?`;
         values.push(queryOptions.limit);
         // Get OFFSET condition
         if (queryOptions?.skip) {
@@ -107,7 +115,7 @@ export class SQLite extends Database {
       // Construct SQL
       const sql = `SELECT ${select} FROM ${tableName}
         ${ where }
-        ${ order } ${ sort }
+        ${ order }${ sort }
         ${ limit };
       `;
 
