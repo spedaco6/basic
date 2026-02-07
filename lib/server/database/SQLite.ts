@@ -29,8 +29,8 @@ export class SQLite extends Database {
   private _getOrSQL(filters: Record<string, any>): string {
     if (!Object.keys(filters).length) return "";
     const where = "(" + Object.entries(filters).map(([filter, val]) => {
-      if (filter === "or") return this._getOrSQL(filters.or);
-      if (filter === "and") return this._getAndSQL(filters.and);
+      if (filter === "or") return this._getOrSQL(val);
+      if (filter === "and") return this._getAndSQL(val, true);
       const equalsValue = this._getInSQL(val);
       return `${filter} ${equalsValue}`; // todo check filter against table schema columns
     }).join(" OR ") + ")";
@@ -39,14 +39,14 @@ export class SQLite extends Database {
   
   // Returns sql AND statement   (field = ? AND field2 = ?)
   // Works with nested and properties
-  private _getAndSQL(filters: Record<string, any>): string {
+  private _getAndSQL(filters: Record<string, any>, nested: boolean = false): string {
     if (!Object.keys(filters).length) return "";
-    const where = "(" + Object.entries(filters).map(([filter, val]) => {
-      if (filter === "or") return this._getOrSQL(filters.or);
-      if (filter === "and") return this._getAndSQL(filters.and);
+    const where = (nested ? "(" : "") + Object.entries(filters).map(([filter, val]) => {
+      if (filter === "or") return this._getOrSQL(val);
+      if (filter === "and") return this._getAndSQL(val, true);
       const equalsValue = this._getInSQL(val);
       return `${filter} ${equalsValue}`; // todo check filter against table schema columns
-    }).join(" AND ") + ")";
+    }).join(" AND ") + (nested ? ")" : "");
     return where;
   }
 
@@ -91,7 +91,7 @@ export class SQLite extends Database {
         "*";
 
       // Get WHERE conditions
-      const where = Object.keys(filters).length ? `WHERE ${this._getAndSQL(filters)}` : "";
+      const where = Object.keys(filters).length ? `WHERE (${this._getAndSQL(filters)})` : "";
       const values = this._getValues(filters);
 
       // Get ORDER BY ASC|DESC condition
@@ -115,8 +115,7 @@ export class SQLite extends Database {
       // Construct SQL
       const sql = `SELECT ${select} FROM ${tableName}
         ${ where }
-        ${ order }${ sort }
-        ${ limit };
+        ${ order }${ sort }${ limit };
       `;
 
       // Run query
