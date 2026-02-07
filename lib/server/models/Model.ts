@@ -129,3 +129,7 @@ export abstract class Model {
     return true;
   }
 }
+
+// Ensure child models have access to the database
+const db = getDb();
+Model.db = db;

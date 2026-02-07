@@ -1,6 +1,6 @@
 import { SQLite } from "./SQLite";
 import { Database } from "./Database";
-import { dbConfig } from "@/config.db";
+import { dbConfig } from "../../../config.db";
 import "server-only";
 
 let db: Database;

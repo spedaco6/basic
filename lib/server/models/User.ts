@@ -64,5 +64,5 @@ export class User extends Model implements IUser {
 }
 
 // Ensure User.db is set
-const db = getDb();
-User.db = db;
+/* const db = getDb();
+User.db = db; */

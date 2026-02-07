@@ -14,7 +14,7 @@ export class ChecklistItem extends Model {
   public complete: boolean;
   public creatorId: number;
 
-  public static tableName = "checklistitems";
+  public static tableName = "checklist_items";
   public static schema: TableSchema = [
     ...Model.schema,
     {
