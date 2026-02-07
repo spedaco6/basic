@@ -201,7 +201,7 @@ export class SQLite extends Database {
       const fieldStr = editableFields.map(([key]) => `${key} = ?`).join(", "); // todo check key against tableschema column names
       
       const sql = `UPDATE ${tableName}
-      SET ${fieldStr}, updated_at = CURRENT_TIMESTAMP
+      SET ${fieldStr}
       WHERE id = ?
       RETURNING *;
       `;
