@@ -101,7 +101,7 @@ export abstract class Model {
 
   // Make static db property available to class instances
   protected get db(): Database {
-    return getDb();
+    return (this.constructor as typeof Model).db;
   }
   
   // Make static tableName property available to class instances
