@@ -1,6 +1,5 @@
 import "server-only";
 import { TableSchema } from "../database/Database";
-import { getDb } from "../database/db";
 import { Model } from "./Model";
 
 interface IChecklistItem {
@@ -40,7 +39,3 @@ export class ChecklistItem extends Model {
     this.creatorId = props.creatorId;
   }
 }
-
-// Ensure db is set
-const db = getDb();
-ChecklistItem.db = db;

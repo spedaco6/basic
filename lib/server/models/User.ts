@@ -1,6 +1,5 @@
 import { Model } from "./Model";
 import type { TableSchema } from "../database/Database";
-import { getDb } from "../database/db";
 import "server-only";
 
 interface IUser {
@@ -62,7 +61,3 @@ export class User extends Model implements IUser {
     Object.assign(this, props);
   }
 }
-
-// Ensure User.db is set
-/* const db = getDb();
-User.db = db; */
