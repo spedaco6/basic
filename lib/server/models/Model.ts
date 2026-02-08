@@ -79,7 +79,6 @@ export abstract class Model {
     } else {
       saved = await this.db.updateOne(this.tableName, this);
     }
-
     if (!saved) throw new Error("Could not save model");
 
     // Update local model
@@ -131,5 +130,7 @@ export abstract class Model {
 }
 
 // Ensure child models have access to the database
-const db = getDb();
-Model.db = db;
+if (!Model.db) {
+  const db = getDb();
+  Model.db = db;
+}
