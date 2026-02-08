@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/buttons/Button";
 import { useFetch } from "@/hooks/useFetch";
 import { revokePermissions, updatePermissions } from "@/lib/client/api/profile";
-import { ROLES } from "@/lib/server/const";
+import { ROLES } from "@/lib/client/const";
 import { ProfileData } from "@/lib/server/api/profile";
 import { useInput } from "@/hooks/useInput";
 import { ProfileResponseData } from "@/app/api/profile/route";

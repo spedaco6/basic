@@ -2,7 +2,7 @@
 
 import { useInput } from "@/hooks/useInput"
 import { Input } from "@/components/inputs/Input";
-import { ROLES } from "@/lib/server/const";
+import { ROLES } from "@/lib/client/const";
 import { useToken } from "@/hooks/useToken";
 import { Button } from "@/components/buttons/Button";
 import React, { useEffect } from "react";
