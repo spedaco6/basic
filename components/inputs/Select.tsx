@@ -17,7 +17,6 @@ export const Select = ({
   name,
   value,
   label,
-  placeholder="",
   id,
   options = [],
   className="",
@@ -33,9 +32,10 @@ export const Select = ({
   const devValue = value ?? hook?.value;
   const devOnChange = onChange ?? hook?.onChange;
   const devId = (label && !id) ? devName : undefined;
+  const displayLabel = label ? label + (devRequired ? "*" : "") : "";
 
   return <div className="flex flex-col">
-    { label && <label className="uppercase text-xs p-1" htmlFor={devId}>{`${label}${devRequired ? "*" : ""}`}</label> }
+    { displayLabel && <label className="uppercase text-xs p-1" htmlFor={devId}>{ displayLabel }</label> }
     <select 
       className={`rounded-sm p-1 ${className}`} 
       name={devName} 

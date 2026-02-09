@@ -29,9 +29,11 @@ export const Input = ({
   const devOnChange = onChange ?? hook?.onChange;
   const devOnBlur = onBlur ?? hook?.onBlur;
   const devId = (label && !id) ? devName : undefined;
+  const displayLabel = label ? label + (devRequired ? "*" : "") : "";
+  const displayPlaceholder = placeholder ? placeholder + (devRequired ? "*" : "") : "";
 
   return <div className="flex flex-col flex-1">
-    { label && <label title={title} className="uppercase text-xs p-1" htmlFor={devId}>{`${label}${devRequired ? "*" : ""}`}</label> }
+    { displayLabel && <label title={title} className="uppercase text-xs p-1" htmlFor={devId}>{ displayLabel }</label> }
     <input 
       className={`rounded-sm p-1 ${className}`} 
       type={type} name={devName} 
@@ -42,7 +44,7 @@ export const Input = ({
       onBlur={devOnBlur}
       required={devRequired}
       disabled={disabled}
-      placeholder={`${placeholder}${devRequired && placeholder ? "*" : ""}`}
+      placeholder={displayPlaceholder}
       { ...props } 
     />
   </div>
