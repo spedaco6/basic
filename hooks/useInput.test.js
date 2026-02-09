@@ -2,8 +2,7 @@
 
 import { describe, test, expect, beforeEach, afterAll, vi } from "vitest";
 import { useInput } from "./useInput";
-import { renderHook } from "@testing-library/react";
-import { act } from "react";
+import { renderHook, act } from "@testing-library/react";
 
 describe("useInput", () => {
   beforeEach(() => vi.clearAllMocks());
