@@ -33,7 +33,7 @@ export const useFetch = <
       const response = await fetchFn(...(args as Args));
       const result: Partial<Data> = await response.json();
       setData(result); // todo this might need to be after the reponse.ok check but when it is no validationErrors populate      
-      if (!response.ok) throw new Error(result.message ?? "There was a problem logging in");
+      if (!response.ok) throw new Error(result.message ?? "There was a problem");
     } catch (err) {
       if (err instanceof Error) setError(err.message);
       else setError("Something went wrong");
@@ -47,6 +47,7 @@ export const useFetch = <
     setError("");
     setLoading(false);
   }, []);
+
   const clearError = useCallback(() => {
     setError("");
   }, []);

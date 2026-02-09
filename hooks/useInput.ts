@@ -7,14 +7,13 @@ export interface IUseInput {
   value: any;
   required: boolean;
   onChange: (e: ChangeEvent<HTMLInputElement> & ChangeEvent<HTMLSelectElement>) => void;
+  onBlur: () => void;
   setValue: (value: any) => void;
 }
 
 interface InputCondition {
   touched: boolean,
   blurred: boolean,
-  saved: boolean,
-  pending: boolean,
 }
 
 export function useInput<T>(name: string, initValue: T) {
@@ -22,8 +21,6 @@ export function useInput<T>(name: string, initValue: T) {
   const [ condition, setCondition ] = useState<InputCondition>({
     touched: false, // has been changed
     blurred: false, // has lost focus at least once
-    saved: true, // has been saved
-    pending: false, // is being updated remotely
   });
   
   const matches = name.match(/^(?<name>.+)\*$/);
@@ -38,10 +35,18 @@ export function useInput<T>(name: string, initValue: T) {
     setCondition(prev => {
       return {
         ...prev,
-        updated: val !== initValue,
-        saved: false,
+        touched: true,
       }
     });
+  }
+
+  const onBlur = () => {
+    if (condition.touched) {
+      setCondition(prev => ({
+        ...prev,
+        blurred: true,
+      }));
+    }
   }
 
   return {
@@ -49,6 +54,7 @@ export function useInput<T>(name: string, initValue: T) {
     value,
     required,
     onChange,
+    onBlur,
     setValue,
     condition,
   }

@@ -19,6 +19,7 @@ export const Input = ({
   required,
   disabled,
   onChange,
+  onBlur,
   ...props
 }: InputProps ): React.ReactElement => {
 
@@ -26,6 +27,7 @@ export const Input = ({
   const devName = (name ?? hook?.name);
   const devValue = value ?? hook?.value;
   const devOnChange = onChange ?? hook?.onChange;
+  const devOnBlur = onBlur ?? hook?.onBlur;
   const devId = (label && !id) ? devName : undefined;
 
   return <div className="flex flex-col flex-1">
@@ -37,6 +39,7 @@ export const Input = ({
       title={title}
       value={devValue} 
       onChange={devOnChange}
+      onBlur={devOnBlur}
       required={devRequired}
       disabled={disabled}
       placeholder={`${placeholder}${devRequired && placeholder ? "*" : ""}`}
