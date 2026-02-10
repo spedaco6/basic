@@ -12,11 +12,11 @@ interface UsersResponseData extends FetchResponseData {
 }
 
 export const UsersList = () => {
-  const { refresh, cancelRefresh } = useRefreshContext();
+  const { isFresh, refresh } = useRefreshContext();
   return <GetList<UsersResponseData> 
     fetch={getAuthorizedProfiles}
-    fresh={!refresh}
-    refresh={cancelRefresh}
+    fresh={isFresh}
+    refresh={refresh}
   >
     {(data) => {
       return <ul className="mt-6">

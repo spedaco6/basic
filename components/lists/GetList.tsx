@@ -19,7 +19,7 @@ export function GetList<T extends FetchResponseData>({ children, fetch, fresh=tr
       refresh();
       refetch();
     }
-  }, [refresh]);
+  }, [refresh, fresh]);
 
   return <div>
     <p>Eventual Search Bar...</p>

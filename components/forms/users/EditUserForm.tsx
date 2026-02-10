@@ -19,7 +19,7 @@ export const EditUserForm = (): React.ReactNode => {
     refetch: patchFetch 
   } = useFetch<ProfileResponseData, [Partial<ProfileData>]>(updatePermissions, {}, { immediate: false });
   
-  const { callRefresh } = useRefreshContext();
+  const { makeStale } = useRefreshContext();
   
   const email = useInput("email*", "");
   const password = useInput("password", "");
@@ -27,7 +27,7 @@ export const EditUserForm = (): React.ReactNode => {
 
   // Send signal to context that refresh is required
   useEffect(() => {
-    callRefresh();
+    makeStale();
   }, [patchData]);
 
   const { role } = useToken();

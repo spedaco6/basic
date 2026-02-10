@@ -18,19 +18,19 @@ export const UsersListItem = ({ user, className="", ...props }: { user: Partial<
   const [ edit, setEdit ] = useState(false);
   const role = useInput("role", user.role);
   const { role: userRole } = useToken();
-  const { callRefresh } = useRefreshContext();
+  const { makeStale } = useRefreshContext();
 
   // Runs each time permissions are revoked
   useEffect(() => {
     if (data.profile) {
       role.setValue(data.profile.userRole);
     }
-    if (data && data.success) callRefresh();
+    if (data && data.success) makeStale();
   }, [data]);
 
   // Runs each time permissions are updated
   useEffect(() => {
-    if (update.data && update.data.success) callRefresh();
+    if (update.data && update.data.success) makeStale();
   }, [update.data]);
 
   const roleInfo = ROLES.find(r => r.permissions === role.value);
