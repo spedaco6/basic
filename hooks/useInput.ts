@@ -9,6 +9,7 @@ export interface IUseInput {
   onChange: (e: ChangeEvent<HTMLInputElement> & ChangeEvent<HTMLSelectElement>) => void;
   onBlur: () => void;
   setValue: (value: any) => void;
+  error: string;
 }
 
 interface InputCondition {
@@ -53,9 +54,10 @@ export function useInput<T>(name: string, initValue: T) {
     name: inputName,
     value,
     required,
+    error: "",
+    condition,
     onChange,
     onBlur,
     setValue,
-    condition,
   }
 }
