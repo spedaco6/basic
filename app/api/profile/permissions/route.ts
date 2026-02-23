@@ -28,6 +28,7 @@ export async function GET(req: Request): Promise<Response> {
 
 // Update permissions (and create bare profile if necessary)
 export async function PATCH(req: Request): Promise<Response> {
+  let accountCreated = false;
   const body = await req.json();
   try {
     // Get Authorization header
@@ -42,14 +43,17 @@ export async function PATCH(req: Request): Promise<Response> {
 
     // Complete action
     // Create profile if one does not exist
-    if (!user) await createProfile(body, token);
+    if (!user) {
+      await createProfile(body, token);
+      accountCreated = true;
+    }
     // Update permissions
     const updatedProfile = await updatePermissions(body, token);
 
     // Send response
     return NextResponse.json({ 
       success: true, 
-      message: "Account created", 
+      message: accountCreated ? "Account created with requested permissions" : "Permissions updated", 
       profile: updatedProfile 
     }, { status: 201 });
   } catch (err) {
