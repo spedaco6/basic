@@ -31,13 +31,6 @@ export const refreshTokens = async (oldToken?: string): Promise<TokenPackage> =>
     const jti = v4();
     user.jti = jti;
     await user.save();
-
-
-    /* // TESTING todo
-    const updatedUser = await User.findById(user.id);
-    if (updatedUser) console.log("user jti: ", updatedUser.jti);
-    console.log("new jti: ", jti); */
-
     
     // Create refresh token with new jti
     const newRefreshToken = await createRefreshToken({ ...payload, jti });
