@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "lib/server/models/Model.test.js"  ],
+, "lib/server/models/Model.test.js", "lib/server/api/profile.test.js"  ],
   "exclude": ["node_modules"]
 }
