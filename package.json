@@ -1,0 +1,20 @@
+{
+  "name": "@spedaco/basic",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/spedaco6/basic#readme",
+  "bugs": {
+    "url": "https://github.com/spedaco6/basic/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spedaco6/basic.git"
+  },
+  "license": "ISC",
+  "author": "Spencer Dane",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
