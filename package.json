@@ -1,7 +1,7 @@
 {
   "name": "@spedaco/basic",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Custom React components package built with Vite",
   "homepage": "https://github.com/spedaco6/basic#readme",
   "bugs": {
     "url": "https://github.com/spedaco6/basic/issues"
@@ -13,8 +13,28 @@
   "license": "ISC",
   "author": "Spencer Dane",
   "type": "module",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "vite build"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@vitejs/plugin-react": "^6.0.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.5",
+    "vite-plugin-dts": "^5.0.3"
   }
 }
