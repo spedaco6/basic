@@ -1,6 +1,7 @@
 import React, { cloneElement, useId } from "react";
 import type { UseInputResult } from "@/hooks/useInput";
 import { checkRequirement } from "@/lib/client/utils";
+import "@/styles/input.css";
 
 export type InputProps = React.ComponentProps<"input"> & {
   errors?: string | string[] | null;
