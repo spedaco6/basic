@@ -1,6 +1,6 @@
 export type ValidatorFn = (val: Validator) => void;
 
-export class Validator {
+export default class Validator {
   public value;
   public name?: string;
   public errors: string[] = [];
