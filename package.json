@@ -1,40 +1,48 @@
 {
   "name": "@spedaco/basic",
-  "version": "1.0.1",
-  "description": "Custom React components package built with Vite",
+  "version": "1.0.2",
+  "description": "Custom React components",
+  "keywords": [
+    "react"
+  ],
   "homepage": "https://github.com/spedaco6/basic#readme",
   "bugs": {
     "url": "https://github.com/spedaco6/basic/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/spedaco6/basic.git"
+    "url": "git+ssh://git@github.com/spedaco6/basic.git"
   },
   "license": "ISC",
   "author": "Spencer Dane",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "vite build"
+    "test": "vitest",
+    "build": "vite build && tsc",
+    "dev": "vite"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
+    "react-dom": ">=18.0.0"  
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
+    "jsdom": "^29.1.1",
     "typescript": "^7.0.2",
     "vite": "^8.1.5",
-    "vite-plugin-dts": "^5.0.3"
+    "vitest": "^4.1.10"
   }
 }
