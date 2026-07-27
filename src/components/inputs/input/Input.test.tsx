@@ -10,7 +10,6 @@ function getTestId() {
   return "Sample" + num;
 }
 describe("Input element", () => {
- 
   test("id generated automatically", () => {
     const name = getTestId();
     render(<Input 

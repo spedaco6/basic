@@ -1,21 +1,29 @@
 import { vi } from "vitest";
 
-const createMockInstance = () => ({
+export const mockValidationInstance = {
+  value: "",
+  name: undefined,
+  errors: [] as string[],
   getErrors: vi.fn().mockReturnValue(null),
-  validateByCode: vi.fn(),
-  require: vi.fn(),
-  email: vi.fn(),
+  require: vi.fn().mockReturnThis(),
+  email: vi.fn().mockReturnThis(),
+  min: vi.fn().mockReturnThis(),
+  max: vi.fn().mockReturnThis(),
+  equals: vi.fn().mockReturnThis(),
+};
+
+const mockValidatorConstructor = vi.fn().mockImplementation(function (val: any, name?: string) {
+  mockValidationInstance.value = val;
+  mockValidationInstance.name = name as any;
+  return mockValidationInstance;
 });
 
-export const mockValidationInstance = createMockInstance();
-const mockValidator = vi.fn().mockImplementation(() => mockValidationInstance);
-(mockValidator as any).REQUIRE = vi.fn();
-(mockValidator as any).EMAIL = vi.fn();
-(mockValidator as any).MIN = vi.fn();
-(mockValidator as any).MAX = vi.fn();
-(mockValidator as any).EQUALS = vi.fn();
-
+(mockValidatorConstructor as any).REQUIRE = vi.fn();
+(mockValidatorConstructor as any).EMAIL = vi.fn();
+(mockValidatorConstructor as any).MIN = vi.fn();
+(mockValidatorConstructor as any).MAX = vi.fn();
+(mockValidatorConstructor as any).EQUALS = vi.fn();
 
 vi.mock("./validation.ts", () => ({
-  Validator: mockValidator
+  Validator: mockValidatorConstructor,
 }));

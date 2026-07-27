@@ -3,7 +3,7 @@ import Input from "../src/components/inputs/input/Input";
 
 const App = () => (
   <div>
-    <Input label="This" type="checkbox" checkboxStyle='positive'/>
+    <Input label="This"/>
   </div>
 );
 
