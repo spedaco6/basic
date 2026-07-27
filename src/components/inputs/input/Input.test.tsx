@@ -312,6 +312,34 @@ describe("Input element", () => {
     });
   });
 
+  describe("checkbox", () => {
+    test("label displays after input element by default", () => {
+      const name = getTestId();
+      render(<Input 
+        data-testid={name}
+        type="checkbox"
+        label={name}
+      />);
+      let input = screen.getByTestId(name);
+      let label = screen.getByText(name);
+      expect(label.compareDocumentPosition(input)).toBe(Node.DOCUMENT_POSITION_PRECEDING);
+    });
+    test("checkboxStyle attribute added to input container as a class", () => {
+      const name = getTestId();
+      const { container } = render(<Input 
+        checkboxStyle="sampleStyle"
+        data-testid={name}
+        type="checkbox"
+        label={name}
+      />);
+      const inputContainer = container.querySelector(".checkbox.sampleStyle");
+      const input = container.querySelector("input");
+      const label = container.querySelector("label");
+      expect(inputContainer).toContainElement(input);
+      expect(inputContainer).toContainElement(label);
+    });
+  });
+
   describe("hook behavior", () => {
     test("hook sets id, name, value, onChange, onBlur, required, errors, and onReset", () => {
       const changeSpy = vi.fn();

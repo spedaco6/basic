@@ -10,7 +10,7 @@ export type InputProps = React.ComponentProps<"input"> & {
   labelPosition?: "top" | "bottom" | "right" | "left";
   hideAsterisk?: boolean;
   hook?: UseInputResult;
-  checkboxStyle?: "confirm" | "danger";
+  checkboxStyle?: string;
 };
 
 export default function Input({ 
@@ -96,7 +96,7 @@ export default function Input({
   }
 
   // display related conditions
-  const checkboxStyles = `checkbox ${checkboxStyle ? "checkbox-" + checkboxStyle : ""}`;
+  const checkboxStyles = `checkbox ${checkboxStyle ? checkboxStyle : ""}`;
   const inputHideAsterisk = typeof hideAsterisk === "undefined"
     ? isCheckbox 
     : hideAsterisk;
