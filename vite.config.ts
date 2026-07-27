@@ -6,6 +6,11 @@ export default defineConfig(({ command }) => {
   // 1. Shared rules for all workflows
   const config: any = {
     plugins: [react()],
+    resolve: {
+      alias: {
+        "@": resolve(__dirname, "src")
+      }
+    },
     test: {
       globals: true,
       environment: 'jsdom',
