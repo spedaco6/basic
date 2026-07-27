@@ -5,7 +5,7 @@ import { useInput } from "./useInput";
 import { act } from "react";
 import type { ChangeEvent, FocusEvent } from "react";
 import { beforeEach } from "vitest";
-import { Validator } from "../lib/client/validation";
+import Validator from "../lib/client/validation";
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
