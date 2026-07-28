@@ -339,6 +339,19 @@ describe("Input element", () => {
     });
   });
 
+  describe("textarea", () => {
+    test("includes a textarea element", () => {
+      const name = getTestId();
+      render(<Input 
+        data-testid={name}
+        type="textarea"
+        label={name}
+      />);
+      let input = screen.getByTestId(name);
+      expect(input.tagName).toBe("TEXTAREA")
+    });
+  });
+
   describe("hook behavior", () => {
     test("hook sets id, name, value, onChange, onBlur, required, errors, and onReset", () => {
       const changeSpy = vi.fn();
