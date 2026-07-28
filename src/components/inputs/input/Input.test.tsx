@@ -351,13 +351,56 @@ describe("Input element", () => {
       expect(input.tagName).toBe("TEXTAREA")
     });
     test("has textarea class", () => {
-      const name = getTestId();
       const { container } = render(<Input 
-        data-testid={name}
         type="textarea"
-        label={name}
       />);
       let input = container.querySelector(".input.textarea");
+      expect(input).toBeInTheDocument();
+    });
+  });
+
+  describe("select", () => {
+    test("includes a select element", () => {
+      const name = getTestId();
+      render(<Input 
+        data-testid={name}
+        type="select"
+        label={name}
+        options={["this", "that"]}
+      />);
+      let input = screen.getByTestId(name);
+      expect(input.tagName).toBe("SELECT")
+    });
+    test("maps options to option elements", () => {
+      const { container } = render(<Input 
+        type="select"
+        options={["this", "that"]}
+      />);
+      let options = container.querySelectorAll("option");
+      expect(options).toHaveLength(2);
+    });
+    test("allowEmpty adds blank option to list", () => {
+      const { container } = render(<Input 
+        type="select"
+        allowEmpty
+        options={["this", "that"]}
+      />);
+      let options = container.querySelectorAll("option");
+      expect(options).toHaveLength(3);
+    });
+    test("filters blank options by default", () => {
+      const { container } = render(<Input 
+        type="select"
+        options={["this", "that", ""]}
+      />);
+      let options = container.querySelectorAll("option");
+      expect(options).toHaveLength(2);
+    });
+    test("has select class", () => {
+      const { container } = render(<Input 
+        type="select"
+      />);
+      let input = container.querySelector(".input.select");
       expect(input).toBeInTheDocument();
     });
   });

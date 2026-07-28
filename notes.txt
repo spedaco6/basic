@@ -1,0 +1,2 @@
+Confirm that all inputs work with FormData by default (without hook)
+Add an HTML editor (probably separate from useInput)
