@@ -7,7 +7,8 @@ import { useCallback, useEffect, useId, useState } from "react"
 
 type InputTypes = 
   | HTMLInputElement
-  | HTMLTextAreaElement;
+  | HTMLTextAreaElement
+  | HTMLSelectElement;
 
 export type UseInputResult<T extends InputTypes> = {
   id: string;

@@ -23,6 +23,10 @@ export type InputProps =
   | React.ComponentPropsWithoutRef<"textarea"> & BaseInputProps & { 
     type: "textarea";
     hook?: UseInputResult<HTMLTextAreaElement>;
+  }
+  | React.ComponentPropsWithoutRef<"select"> & BaseInputProps & { 
+    type: "select";
+    hook?: UseInputResult<HTMLSelectElement>;
   };
 
 export function Input({ 
@@ -43,10 +47,17 @@ export function Input({
   hook, 
   ...props 
 }: InputProps): React.ReactNode {
-  const isCheckbox = type === "checkbox";
-  const checkboxStyle = "checkboxStyle" in props ? props.checkboxStyle : "";
   const labelPositions = ["top", "bottom", "right", "left"];
   const hasLabel = !!label;
+  const isCheckbox = type === "checkbox";
+
+  let checkboxStyle = "";
+  let cleanProps = props;
+  if (isCheckbox && "checkboxStyle" in props) {
+    const { checkboxStyle: cStyle, ...nativeProps } = props;
+    checkboxStyle = cStyle ?? "";
+    cleanProps = nativeProps;
+  }
 
   let inputName;
   let inputValue;
@@ -112,7 +123,9 @@ export function Input({
     ? `checkbox ${checkboxStyle ? checkboxStyle : ""}` 
     : type === "textarea" 
       ? "textarea"
-      : "";
+      : type === "select"
+        ? "select"
+        : "";
 
   const inputHideAsterisk = typeof hideAsterisk === "undefined"
     ? isCheckbox 
@@ -137,10 +150,10 @@ export function Input({
 
   const renderInput = () => {
     if (type === "textarea") {
-      return <textarea {...sharedProps} {...(props as React.ComponentPropsWithoutRef<"textarea">)} />
+      return <textarea {...sharedProps} {...(cleanProps as React.ComponentPropsWithoutRef<"textarea">)} />
     }
-    if (isCheckbox) return <input {...sharedProps} type="checkbox" checked={inputChecked} {...(props as React.ComponentPropsWithoutRef<"input">)} />
-    return <input {...sharedProps} type={type} {...(props as React.ComponentPropsWithoutRef<"input">)} />
+    if (isCheckbox) return <input {...sharedProps} type="checkbox" checked={inputChecked} {...(cleanProps as React.ComponentPropsWithoutRef<"input">)} />
+    return <input {...sharedProps} type={type} {...(cleanProps as React.ComponentPropsWithoutRef<"input">)} />
   }
 
   return <div className={`

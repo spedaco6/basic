@@ -323,7 +323,7 @@ describe("Input element", () => {
       let label = screen.getByText(name);
       expect(label.compareDocumentPosition(input)).toBe(Node.DOCUMENT_POSITION_PRECEDING);
     });
-    test("checkboxStyle attribute added to input container as a class", () => {
+    test.only("checkboxStyle attribute added to input container as a class", () => {
       const name = getTestId();
       const { container } = render(<Input 
         checkboxStyle="sampleStyle"
@@ -349,6 +349,16 @@ describe("Input element", () => {
       />);
       let input = screen.getByTestId(name);
       expect(input.tagName).toBe("TEXTAREA")
+    });
+    test("has textarea class", () => {
+      const name = getTestId();
+      const { container } = render(<Input 
+        data-testid={name}
+        type="textarea"
+        label={name}
+      />);
+      let input = container.querySelector(".input.textarea");
+      expect(input).toBeInTheDocument();
     });
   });
 
