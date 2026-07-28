@@ -337,6 +337,14 @@ describe("Input element", () => {
       expect(inputContainer).toContainElement(input);
       expect(inputContainer).toContainElement(label);
     });
+    test("label is not all uppercase", () => {
+      render(<Input 
+        type="checkbox"
+        label="This label should not be uppercase."
+      />);
+      const input = screen.getByLabelText("THIS LABEL SHOULD NOT BE UPPERCASE.");
+      expect(input).toBeDefined();
+    })
   });
 
   describe("hook behavior", () => {

@@ -140,7 +140,7 @@ export function Input({
     </div>
     <ul>
       { hasErrors && inputErrors?.map((err) => <li key={err}>
-        <p className={disabled ? "text-err-disabled-text dark:text-err-disabled-dark-text" : "text-error"}>{ err }</p>
+        <p className="error">{ err }</p>
       </li>) }
     </ul>
   </div>

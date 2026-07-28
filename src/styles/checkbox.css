@@ -1,0 +1,66 @@
+.input {
+  &.checkbox > div {
+    @apply justify-start items-baseline; 
+  }
+  
+  &.checkbox label {
+    @apply text-[1rem] normal-case select-none cursor-pointer;
+  }
+
+  &.checkbox input[type="checkbox"] {
+    @apply border-2 w-5 h-5 transition-all duration-100 ease-in-out 
+    flex outline-none justify-center items-center cursor-pointer appearance-none; 
+  }
+
+  &.checkbox input[type="checkbox"]:focus-visible {
+    @apply outline-2 outline-solid outline-blue-300 outline-offset-1;
+  }
+
+  &.checkbox input[type="checkbox"]::before {
+    @apply w-1.75 h-2.75 mb-0.5 border-b-2 border-r-2 rounded-br-sm content-['']
+    rotate-45 origin-center scale-0 transform transition-transform duration-300 ease-in-out;
+  }
+
+  &.checkbox input[type="checkbox"]:checked::before {
+    @apply transform rotate-45 scale-100
+  }
+
+  /* Default style */
+  &.checkbox input[type="checkbox"],
+  &.checkbox.error input[type="checkbox"] {
+    @apply border-2 
+    hover:bg-blue-bg hover:border-blue-border checked:bg-blue-checked
+    dark:hover:bg-blue-dark-bg dark:hover:border-blue-dark-border dark:checked:bg-blue-dark-checked dark:checked:hover:bg-blue-dark-checked;
+  }
+  
+  /* Positive confirmation style */
+  &.checkbox.confirm input,
+  &.checkbox.confirm.error input {
+    @apply border-2 hover:bg-green-bg hover:border-green-border checked:bg-green-checked
+    dark:hover:bg-green-dark-bg dark:hover:border-green-dark-border dark:checked:bg-green-dark-checked dark:checked:hover:bg-green-dark-checked;
+  }
+
+  /* Danger styles */
+  &.checkbox.danger input,
+  &.checkbox.danger.error input {
+    @apply border-2 hover:bg-red-bg hover:border-red-border checked:bg-red-checked
+    dark:hover:bg-red-dark-bg dark:hover:border-red-dark-border dark:checked:bg-red-dark-checked dark:checked:hover:bg-red-dark-checked;
+  }
+  
+  &.checkbox.disabled input,
+  &.checkbox.disabled input:hover {
+    @apply border-2 cursor-not-allowed
+    border-disabled-border bg-disabled-bg hover:border-disabled-border hover:bg-disabled-bg checked:border-disabled-border checked:bg-disabled-bg checked:hover:border-disabled-border checked:hover:bg-disabled-bg
+    dark:border-disabled-dark-border dark:bg-disabled-dark-bg dark:hover:border-disabled-dark-border dark:hover:bg-disabled-dark-bg dark:checked:border-disabled-dark-border dark:checked:bg-disabled-dark-bg dark:checked:hover:border-disabled-dark-border dark:checked:hover:bg-disabled-dark-bg
+  }
+
+  &.checkbox.disabled label {
+    @apply cursor-not-allowed;
+  }
+
+   &.checkbox.error input[type="checkbox"] {
+    @apply border-2 
+    bg-input-bg border-input-border
+    dark:bg-input-dark-bg dark:border-input-dark-border dark:text-body-dark-text;
+  }
+}

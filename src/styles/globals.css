@@ -1,4 +1,7 @@
 @theme {
+  --color-success: rgb(34 197 94);
+  --color-dark-success: rgb(34 197 94);
+  
   /* Body Variables */
   --color-body-bg: rgb(248 250 252);
   --color-body-text: rgb(15 23 42);
@@ -13,7 +16,7 @@
 
   /* Error Variables */
   --color-error: rgb(220 38 38);
-  --color-error-text: rgb(220 38 38);
+  --color-error-dark: rgb(241, 76, 76);
   --color-error-bg: rgb(252 241 241);
   --color-error-dark-border: rgb(248 113 113);
   --color-error-dark-bg: rgb(69 25 25);
@@ -41,6 +44,87 @@
   --color-blue-dark-bg: rgb(23 37 84);
   --color-blue-dark-border: rgb(96 165 250);
   --color-blue-dark-checked: rgb(59 130 246);
+
+  /* Positive checkbox colors */
+  --color-green-bg: rgb(240 253 244);
+  --color-green-border: rgb(22 163 74);
+  --color-green-checked: rgb(22 163 74);
+  --color-green-dark-bg: rgb(20 48 31);
+  --color-green-dark-border: rgb(74 222 128);
+  --color-green-dark-checked: rgb(34 197 94);
+
+  /* Warning checkbox colors  */
+  --color-red-bg: rgb(254 242 242);
+  --color-red-border: rgb(220 38 38);
+  --color-red-checked: rgb(220 38 38);
+  --color-red-dark-bg: rgb(69 25 25);
+  --color-red-dark-border: rgb(248 113 113);
+  --color-red-dark-checked: rgb(239 68 68);
+
+    /* Default / Primary Button */
+  --color-btn-primary-bg: rgb(37 99 235);
+  --color-btn-primary-text: rgb(255 255 255);
+  --color-btn-primary-hover: rgb(29 78 216);
+  --color-btn-primary-active: rgb(30 58 138);
+
+  --color-btn-primary-dark-bg: rgb(59 130 246);
+  --color-btn-primary-dark-text: rgb(9 15 29);
+  --color-btn-primary-dark-hover: rgb(96 165 250);
+  --color-btn-primary-dark-active: rgb(147 197 253);
+
+    /* Secondary / Neutral Button */
+  --color-btn-secondary-bg: rgb(241 245 249);
+  --color-btn-secondary-text: rgb(15 23 42);
+  --color-btn-secondary-hover: rgb(226 232 240);
+  --color-btn-secondary-active: rgb(203 213 225);
+
+  --color-btn-secondary-dark-bg: rgb(30 41 59);
+  --color-btn-secondary-dark-text: rgb(241 245 249);
+  --color-btn-secondary-dark-hover: rgb(51 65 85);
+  --color-btn-secondary-dark-active: rgb(71 85 105);
+
+  /* Positive / Success Button */
+  --color-btn-success-bg: rgb(22 163 74);
+  --color-btn-success-text: rgb(255 255 255);
+  --color-btn-success-hover: rgb(21 128 61);
+  --color-btn-success-active: rgb(20 83 45);
+
+  --color-btn-success-dark-bg: rgb(34 197 94);
+  --color-btn-success-dark-text: rgb(9 15 29);
+  --color-btn-success-dark-hover: rgb(74 222 128);
+  --color-btn-success-dark-active: rgb(134 239 172);
+
+  /* Danger / Destructive Button */
+  --color-btn-danger-bg: rgb(220 38 38);
+  --color-btn-danger-text: rgb(255 255 255);
+  --color-btn-danger-hover: rgb(185 28 28);
+  --color-btn-danger-active: rgb(153 27 27);
+
+  --color-btn-danger-dark-bg: rgb(239 68 68);
+  --color-btn-danger-dark-text: rgb(255 255 255);
+  --color-btn-danger-dark-hover: rgb(248 113 113);
+  --color-btn-danger-dark-active: rgb(252 165 165);
+
+    /* Disabled Button Variables */
+  --color-btn-disabled-bg: rgb(243 243 243);
+  --color-btn-disabled-text: rgb(161 161 170);
+  --color-btn-disabled-border: rgb(228 228 231);
+
+  --color-btn-disabled-dark-bg: rgb(30 30 32);
+  --color-btn-disabled-dark-text: rgb(113 113 122);
+  --color-btn-disabled-dark-border: rgb(63 63 70);
+
+  --animate-icon-grow: icon-grow 0.5s ease-in-out forwards;
+  @keyframes icon-grow {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
 }
 
 html,
@@ -66,8 +150,21 @@ body {
     background-color: var(--color-body-dark-bg);
     color: var(--color-body-dark-text);
   }
+}
 
-  .error {
-    color: var(--color-error-text);
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: none;
   }
+  p.error {
+    @apply text-error dark:text-error-dark;
+  }
+  .disabled p.error {
+    @apply text-err-disabled-text dark:text-err-disabled-dark-text;
+  }
+}
+
+* {
+  box-sizing: border-box;
 }
