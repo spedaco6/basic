@@ -30,11 +30,20 @@ export default defineConfig(({ command }) => {
       lib: {
         entry: resolve(__dirname, 'src/index.ts'),
         name: 'Basic',
-        fileName: (format: string) => `index.${format}.js`
+        // FIX: Match exact file names mapped in package.json exports block
+        fileName: (format: string) => `index.${format === 'es' ? 'js' : 'cjs'}`,
+        formats: ['es', 'cjs'] // Explicitly force both module formats
       },
       rollupOptions: {
-        external: ['react', 'react-dom'],
-        output: { globals: { react: 'React', 'react-dom': 'ReactDOM' } }
+        // FIX: Add 'react/jsx-runtime' to prevent compiling duplicate React code
+        external: ['react', 'react-dom', 'react/jsx-runtime'],
+        output: { 
+          globals: { 
+            react: 'React', 
+            'react-dom': 'ReactDOM',
+            'react/jsx-runtime': 'JSX'
+          } 
+        }
       }
     };
   }
