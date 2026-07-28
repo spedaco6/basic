@@ -21,7 +21,6 @@ export default defineConfig(({ command }) => {
   if (command === 'serve' && !process.env.VITEST) {
     config.root = 'dev'; // Mounts local browser playground
   } else {
-    // ... inside your vite.config.ts
     config.build = {
       lib: {
         entry: resolve(__dirname, 'src/index.ts'),
@@ -30,20 +29,21 @@ export default defineConfig(({ command }) => {
         formats: ['es', 'cjs']
       },
       rollupOptions: {
-        // FIX: Explicitly externalize tailwindcss so its require statements aren't compiled into your package
         external: [
           'react', 
           'react-dom', 
           'react/jsx-runtime', 
-          'tailwindcss', 
-          '@tailwindcss/vite'
+          // 'tailwindcss', 
+          // '@tailwindcss/vite',
+          'lucide-react'
         ],
         output: {
           globals: {
             react: 'React',
             'react-dom': 'ReactDOM',
             'react/jsx-runtime': 'JSX',
-            'tailwindcss': 'Tailwind'
+            // 'tailwindcss': 'Tailwind',
+            'lucide-react': 'LucideReact'
           }
         }
       }

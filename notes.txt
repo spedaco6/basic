@@ -1,2 +1,7 @@
+Required disallows allowEmpty on Select inputs
+Add radio buttons to inputs
+Add Validation to other things
+Check validation on Select and TextArea
+
 Confirm that all inputs work with FormData by default (without hook)
 Add an HTML editor (probably separate from useInput)

@@ -1,0 +1,55 @@
+.button {
+  @apply cursor-pointer py-1 px-2 rounded-sm border;
+
+  &.loading {
+    @apply cursor-not-allowed;
+  }
+  
+  &.icon {
+    @apply flex justify-center items-center gap-2;
+  }
+
+  /* Primary / Default Button */
+  &.primary,
+  &.primary.loading,
+  a&.primary,
+  a&.primary.loading {
+    @apply border-0 bg-btn-primary-bg text-btn-primary-text hover:bg-btn-primary-hover active:bg-btn-primary-active
+    dark:bg-btn-primary-dark-bg dark:text-btn-primary-dark-text dark:hover:bg-btn-primary-dark-hover dark:active:bg-btn-primary-dark-active;
+  }
+
+  /* Secondary / Neutral Button */
+  &.secondary,
+  &.secondary.loading,
+  a&.secondary,
+  a&.secondary.loading {
+    @apply border-0 bg-btn-secondary-bg text-btn-secondary-text hover:bg-btn-secondary-hover active:bg-btn-secondary-active
+    dark:bg-btn-secondary-dark-bg dark:text-btn-secondary-dark-text dark:hover:bg-btn-secondary-dark-hover dark:active:bg-btn-secondary-dark-active;
+  }
+
+  /* Success / Positive Button */
+  &.success,
+  &.success.loading,
+  a&.success,
+  a&.success.loading {
+    @apply border-0 bg-btn-success-bg text-btn-success-text hover:bg-btn-success-hover active:bg-btn-success-active
+    dark:bg-btn-success-dark-bg dark:text-btn-success-dark-text dark:hover:bg-btn-success-dark-hover dark:active:bg-btn-success-dark-active;
+  }
+
+  /* Danger / Destructive Button */
+  &.danger,
+  &.danger.loading,
+  a&.danger,
+  a&.danger.loading {
+    @apply border-0 bg-btn-danger-bg text-btn-danger-text hover:bg-btn-danger-hover active:bg-btn-danger-active
+    dark:bg-btn-danger-dark-bg dark:text-btn-danger-dark-text dark:hover:bg-btn-danger-dark-hover dark:active:bg-btn-danger-dark-active;
+  }
+
+  /* Disabled State Rules for All Button Types */
+  &.disabled,
+  a&.disabled {
+    @apply cursor-not-allowed pointer-events-none shadow-none opacity-80
+    bg-btn-disabled-bg! text-btn-disabled-text! hover:bg-btn-disabled-bg! hover:text-btn-disabled-text! active:bg-btn-disabled-bg! active:text-btn-disabled-text!
+    dark:bg-btn-disabled-dark-bg! dark:text-btn-disabled-dark-text! dark:hover:bg-btn-disabled-dark-bg! dark:hover:text-btn-disabled-dark-text! dark:active:bg-btn-disabled-dark-bg! dark:active:text-btn-disabled-dark-text!;
+  }
+}
