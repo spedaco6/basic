@@ -9,8 +9,9 @@
     @apply flex-col gap-0 items-stretch;
   }
 
-  & input {
-    @apply p-1 rounded-sm 
+  & input,
+  & textarea {
+    @apply p-1 rounded-sm
     bg-input-bg border border-input-border 
     dark:bg-input-dark-bg dark:border-input-dark-border dark:text-body-dark-text;
   }
@@ -21,18 +22,21 @@
   }
 
   /* ERROR STYLES */
-  &.error input {
+  &.error input,
+  &.error textarea {
     @apply border border-error bg-error-bg 
     dark:border-error-dark-border dark:bg-error-dark-bg;
   }
 
-  &.error.disabled input {
+  &.error.disabled input,
+  &.error.disabled textarea {
     @apply border border-err-disabled-border bg-err-disabled-bg text-err-disabled-text 
     dark:border-err-disabled-dark-border dark:bg-err-disabled-dark-bg dark:text-err-disabled-dark-text;
   }
   
   /* DISABLED STYLES */
-  &.disabled input {
+  &.disabled input,
+  &.disabled textarea {
     @apply cursor-not-allowed
     bg-disabled-bg border-disabled-border text-disabled-text
     dark:bg-disabled-dark-bg dark:border-disabled-dark-border dark:text-disabled-dark-text;

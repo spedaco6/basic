@@ -8,13 +8,17 @@ type BaseInputProps = {
   label?: string;
   labelPosition?: "top" | "bottom" | "right" | "left";
   hideAsterisk?: boolean;
-  checkboxStyle?: string;
 }
 
 export type InputProps = 
   | React.ComponentPropsWithoutRef<"input"> & BaseInputProps & { 
-    type?: Exclude<React.HTMLInputTypeAttribute, "textarea" | "select">;
+    type?: Exclude<React.HTMLInputTypeAttribute, "checkbox" | "textarea" | "select">;
     hook?: UseInputResult<HTMLInputElement>
+  }
+  | React.ComponentPropsWithoutRef<"input"> & BaseInputProps & { 
+    type: "checkbox";
+    hook?: UseInputResult<HTMLInputElement>;
+    checkboxStyle?: string;
   }
   | React.ComponentPropsWithoutRef<"textarea"> & BaseInputProps & { 
     type: "textarea";
@@ -29,7 +33,6 @@ export function Input({
   label,
   labelPosition, 
   errors,
-  checkboxStyle,
   type, 
   disabled=false,
   required=false,
@@ -41,6 +44,7 @@ export function Input({
   ...props 
 }: InputProps): React.ReactNode {
   const isCheckbox = type === "checkbox";
+  const checkboxStyle = "checkboxStyle" in props ? props.checkboxStyle : "";
   const labelPositions = ["top", "bottom", "right", "left"];
   const hasLabel = !!label;
 
@@ -104,7 +108,12 @@ export function Input({
   }
 
   // display related conditions
-  const checkboxStyles = `checkbox ${checkboxStyle ? checkboxStyle : ""}`;
+  const inputStyles = isCheckbox 
+    ? `checkbox ${checkboxStyle ? checkboxStyle : ""}` 
+    : type === "textarea" 
+      ? "textarea"
+      : "";
+
   const inputHideAsterisk = typeof hideAsterisk === "undefined"
     ? isCheckbox 
     : hideAsterisk;
@@ -136,7 +145,7 @@ export function Input({
 
   return <div className={`
     input
-    ${isCheckbox ? checkboxStyles : ""}
+    ${ inputStyles }
     ${disabled ? "disabled" : ""}
     ${hasErrors ? "error" : ""} 
     ${className}
