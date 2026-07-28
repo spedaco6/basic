@@ -1,16 +1,25 @@
-import React, { cloneElement, useId } from "react";
+import React, { useId } from "react";
 import type { UseInputResult } from "../../../hooks/useInput";
 import { checkRequirement } from "../../../lib/client/utils";
 
-export type InputProps = React.ComponentProps<"input"> & {
+type BaseInputProps = {
   errors?: string | string[] | null;
   classNameInput?: string;
   label?: string;
   labelPosition?: "top" | "bottom" | "right" | "left";
   hideAsterisk?: boolean;
-  hook?: UseInputResult;
   checkboxStyle?: string;
-};
+}
+
+export type InputProps = 
+  | React.ComponentPropsWithoutRef<"input"> & BaseInputProps & { 
+    type?: Exclude<React.HTMLInputTypeAttribute, "textarea" | "select">;
+    hook?: UseInputResult<HTMLInputElement>
+  }
+  | React.ComponentPropsWithoutRef<"textarea"> & BaseInputProps & { 
+    type: "textarea";
+    hook?: UseInputResult<HTMLTextAreaElement>;
+  };
 
 export function Input({ 
   className="",
@@ -45,7 +54,7 @@ export function Input({
   let inputOnBlur;
   let baseName;
   let inputLabelPosition = isCheckbox ? "right" : "top";
-  let inputChecked;
+  let inputChecked: boolean;
 
   if (name) {
     const [nameWithoutAsterisk, isRequiredByName] = checkRequirement(name);
@@ -106,23 +115,24 @@ export function Input({
   const labelBefore = validLabelPosition === "top" || validLabelPosition === "left";
   const verticalLayout = validLabelPosition === "top" || validLabelPosition === "bottom";
 
-  const input = <input
-    className={classNameInput}
-    id={inputId}
-    name={inputName}
-    type={type}
-    disabled={disabled}
-    required={isRequired}
-    value={inputValue}
-    onChange={inputOnChange}
-    onBlur={inputOnBlur}
-    {...props}
-  />
+  const sharedProps = {
+    className: classNameInput,
+    id: inputId,
+    name: inputName,
+    disabled,
+    required: isRequired,
+    value: inputValue,
+    onChange: inputOnChange as (e: React.ChangeEvent<any>) => void,
+    onBlur: inputOnBlur as (e: React.FocusEvent<any>) => void,
+  }
 
-  const checkbox = cloneElement(input, {
-    type: "checkbox",
-    checked: inputChecked,
-  });
+  const renderInput = () => {
+    if (type === "textarea") {
+      return <textarea {...sharedProps} {...(props as React.ComponentPropsWithoutRef<"textarea">)} />
+    }
+    if (isCheckbox) return <input {...sharedProps} type="checkbox" checked={inputChecked} {...(props as React.ComponentPropsWithoutRef<"input">)} />
+    return <input {...sharedProps} type={type} {...(props as React.ComponentPropsWithoutRef<"input">)} />
+  }
 
   return <div className={`
     input
@@ -135,7 +145,7 @@ export function Input({
       ${verticalLayout ? "vertical" : ""} 
     `}>
       { hasLabel && labelBefore && <label htmlFor={ inputId }>{ label + (showAsterisk ? "*" : "") }</label> }
-      { isCheckbox ? checkbox : input }
+      { renderInput() }
       { hasLabel && !labelBefore && <label htmlFor={ inputId }>{ label + (showAsterisk ? "*" : "") }</label> }
     </div>
     <ul>

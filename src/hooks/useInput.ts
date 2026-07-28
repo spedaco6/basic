@@ -5,22 +5,19 @@ import { Validator } from "../lib/client/validation";
 import type { ValidatorFn } from "../lib/client/validation";
 import { useCallback, useEffect, useId, useState } from "react"
 
-export type InputTypes = 
-  | HTMLInputElement 
-  | HTMLSelectElement
+type InputTypes = 
+  | HTMLInputElement
   | HTMLTextAreaElement;
 
-export type UseInputResult<
-  T extends InputTypes = HTMLInputElement
-> = {
+export type UseInputResult<T extends InputTypes> = {
   id: string;
   name: string;
   value: any;
   required: boolean;
   touched: boolean;
   errors: string | string[] | null;
-  onChange: React.ChangeEventHandler<T>;
-  onBlur: React.FocusEventHandler<T>;
+  onChange: (e: React.ChangeEvent<T>) => void;
+  onBlur: (e: React.FocusEvent<T>) => void;
   onReset: () => void;
 }
 
@@ -57,8 +54,8 @@ export const useInput = <
     }
   }, [allValidation]);
 
-  const onChange: React.ChangeEventHandler<T> = useCallback((e) => {
-    const target = e.target as T;
+  const onChange = useCallback((e: React.ChangeEvent<T>) => {
+    const target = e.target;
     const isCheckbox = 'checked' in target && target.type === "checkbox";
     const newValue = isCheckbox ? target.checked : target.value;
 
