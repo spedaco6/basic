@@ -323,7 +323,7 @@ describe("Input element", () => {
       let label = screen.getByText(name);
       expect(label.compareDocumentPosition(input)).toBe(Node.DOCUMENT_POSITION_PRECEDING);
     });
-    test.only("checkboxStyle attribute added to input container as a class", () => {
+    test("checkboxStyle attribute added to input container as a class", () => {
       const name = getTestId();
       const { container } = render(<Input 
         checkboxStyle="sampleStyle"
