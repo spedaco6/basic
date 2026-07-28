@@ -1,24 +1,25 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
+    "rootDir": "./",
     "outDir": "./dist",
     "module": "esnext",
     "moduleResolution": "bundler",
     "target": "esnext",
     "sourceMap": true,
     "declaration": true,
+    "noEmit": true,
     "emitDeclarationOnly": true,
     "strict": true,
     "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
-    "skipLibCheck": true,
+    "skipLibCheck": true, 
     "types": ["vitest/globals"],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "dev/**/*", "global.d.ts"],
   "exclude": [
     "src/**/*.test.ts", 
     "src/**/*.test.tsx", 

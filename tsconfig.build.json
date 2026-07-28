@@ -1,0 +1,20 @@
+// tsconfig.build.json
+{
+  "extends": "./tsconfig.json", // Inherits all your strict rules, target, paths, etc.
+  "compilerOptions": {
+    "rootDir": "./src",        // FORCES the compiler to treat "src" as the baseline root
+    "outDir": "./dist",   
+    "noEmit": false,     
+  },
+  "include": [
+    "src/**/*",                // ONLY compile production components
+    "global.d.ts"              // Include types so compilation doesn't crash on CSS side-effects
+  ],
+  "exclude": [
+    "dev/**/*",                // Explicitly ban your local dev playground from the build
+    "src/**/*.test.ts", 
+    "src/**/*.test.tsx", 
+    "src/**/*.mock.ts", 
+    "src/**/*.mock.tsx"
+  ]
+}

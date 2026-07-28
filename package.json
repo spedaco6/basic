@@ -1,6 +1,6 @@
 {
   "name": "@spedaco/basic",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Custom React components",
   "keywords": [
     "react"
@@ -16,8 +16,8 @@
   "license": "ISC",
   "author": "Spencer Dane",
   "type": "module",
-  "main": "./dist/index.umd.js",
-  "module": "./dist/index.es.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
@@ -31,7 +31,7 @@
   ],
   "scripts": {
     "test": "vitest",
-    "build": "vite build && tsc",
+    "build": "vite build && tsc --project tsconfig.build.json",
     "dev": "vite"
   },
   "peerDependencies": {

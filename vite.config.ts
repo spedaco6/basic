@@ -26,23 +26,30 @@ export default defineConfig(({ command }) => {
   if (command === 'serve' && !process.env.VITEST) {
     config.root = 'dev'; // Mounts local browser playground
   } else {
+    // ... inside your vite.config.ts
     config.build = {
       lib: {
         entry: resolve(__dirname, 'src/index.ts'),
         name: 'Basic',
-        // FIX: Match exact file names mapped in package.json exports block
         fileName: (format: string) => `index.${format === 'es' ? 'js' : 'cjs'}`,
-        formats: ['es', 'cjs'] // Explicitly force both module formats
+        formats: ['es', 'cjs']
       },
       rollupOptions: {
-        // FIX: Add 'react/jsx-runtime' to prevent compiling duplicate React code
-        external: ['react', 'react-dom', 'react/jsx-runtime'],
-        output: { 
-          globals: { 
-            react: 'React', 
+        // FIX: Explicitly externalize tailwindcss so its require statements aren't compiled into your package
+        external: [
+          'react', 
+          'react-dom', 
+          'react/jsx-runtime', 
+          'tailwindcss', 
+          '@tailwindcss/vite'
+        ],
+        output: {
+          globals: {
+            react: 'React',
             'react-dom': 'ReactDOM',
-            'react/jsx-runtime': 'JSX'
-          } 
+            'react/jsx-runtime': 'JSX',
+            'tailwindcss': 'Tailwind'
+          }
         }
       }
     };
