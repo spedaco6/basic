@@ -16,15 +16,16 @@
   "license": "ISC",
   "author": "Spencer Dane",
   "type": "module",
+  "types": "./dist/index.d.ts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js",
       "require": "./dist/index.umd.js"
-    }
+    },
+    "./dist/basic.css": "./dist/basic.css"
   },
   "files": [
     "dist"

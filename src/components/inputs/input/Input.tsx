@@ -1,6 +1,6 @@
 import React, { cloneElement, useId } from "react";
-import type { UseInputResult } from "@/hooks/useInput";
-import { checkRequirement } from "@/lib/client/utils";
+import type { UseInputResult } from "../../../hooks/useInput";
+import { checkRequirement } from "../../../lib/client/utils";
 
 export type InputProps = React.ComponentProps<"input"> & {
   errors?: string | string[] | null;
@@ -12,7 +12,7 @@ export type InputProps = React.ComponentProps<"input"> & {
   checkboxStyle?: string;
 };
 
-export default function Input({ 
+export function Input({ 
   className="",
   classNameInput="",
   id,

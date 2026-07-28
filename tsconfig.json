@@ -15,9 +15,6 @@
     "isolatedModules": true,
     "skipLibCheck": true, 
     "types": ["vitest/globals"],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
   },
   "include": ["src/**/*", "dev/**/*", "global.d.ts"],
   "exclude": [

@@ -1,7 +1,7 @@
 "use client"
 
 import { checkRequirement } from "../lib/client/utils";
-import Validator from "../lib/client/validation";
+import { Validator } from "../lib/client/validation";
 import type { ValidatorFn } from "../lib/client/validation";
 import { useCallback, useEffect, useId, useState } from "react"
 

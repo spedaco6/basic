@@ -10,11 +10,6 @@ export default defineConfig(({ command }) => {
       react(),
       tailwind(),
     ],
-    resolve: {
-      alias: {
-        "@": resolve(__dirname, "src")
-      }
-    },
     test: {
       globals: true,
       environment: 'jsdom',
