@@ -33,8 +33,8 @@ export default defineConfig(({ command }) => {
           'react', 
           'react-dom', 
           'react/jsx-runtime', 
-          // 'tailwindcss', 
-          // '@tailwindcss/vite',
+          'next',
+          /^next\/.*/,
           'lucide-react'
         ],
         output: {
@@ -42,8 +42,9 @@ export default defineConfig(({ command }) => {
             react: 'React',
             'react-dom': 'ReactDOM',
             'react/jsx-runtime': 'JSX',
-            // 'tailwindcss': 'Tailwind',
-            'lucide-react': 'LucideReact'
+            'lucide-react': 'LucideReact',
+            'next': "Next",
+            'next/navigation': "NextNavigation"
           }
         }
       }

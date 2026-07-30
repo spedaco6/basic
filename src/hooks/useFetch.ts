@@ -1,7 +1,6 @@
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { ValidationErrors } from "../lib/client/errors";
-import { Pagination } from "./usePagination";
+import type { ValidationErrors } from "../lib/client/errors";
+import type { Pagination } from "./usePagination";
 
 type MethodTypes = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 type FetchBody = Record<string, unknown> | string;
@@ -28,7 +27,6 @@ export type FetchResponseData<T extends Record<string, any> = Record<string, any
   success: boolean,
   message?: string,
   validationErrors?: ValidationErrors,
-  redirect?: string,
   data?: T | T[],
   pagination?: ResultPagination
 };
@@ -48,8 +46,6 @@ export function useFetch<
   const [ data, setData ] = useState<FetchResponseData<T> | null>(null);
   const [ loading, setLoading ] = useState(!!callImmediately);
   const [ error, setError ] = useState<string | null>(null);
-
-  const router = useRouter();
 
   const refetch: RefetchFunction = useCallback(async (
     arg1?: FetchBody, 
@@ -86,8 +82,6 @@ export function useFetch<
       const response = await fetch(fullUrl, fetchOptions);
       const resData = await response.json() as FetchResponseData<T>;
 
-      // if a redirect is provided, redirect
-      if (resData?.redirect && resData?.redirect.startsWith("/")) router.push(resData.redirect);
       if (!resData.success) throw new Error(resData.message);
       setData(resData);
     } catch (err) {
