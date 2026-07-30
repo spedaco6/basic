@@ -35,13 +35,15 @@ export type FetchResponseData<T extends Record<string, any> = Record<string, any
  * Manages fetch state.
  * @param url Relative url for api call.
  * @param callImmediately Defines initial loading state and fetch call. Prevent flash of default state by setting this param to "loadingOnly".
+ * @param initHeaders Optional initial headers to include with every request (e.g., Auth tokens).
  * @returns 
  */
 export function useFetch<
   T extends Record<string, any>
 >(
   url: string,
-  callImmediately: boolean | "loadingOnly" = false
+  callImmediately: boolean | "loadingOnly" = false,
+  initHeaders?: HeadersInit
 ) {
   const [ data, setData ] = useState<FetchResponseData<T> | null>(null);
   const [ loading, setLoading ] = useState(!!callImmediately);
@@ -54,9 +56,9 @@ export function useFetch<
   ): Promise<void> => {
     setLoading(true);
     setError(null);
-    if (abortCtrl.current) {
-      abortCtrl.current.abort();
-    }
+    
+    // abort previous call if necessary
+    if (abortCtrl.current) abortCtrl.current.abort();
     abortCtrl.current = new AbortController();
 
     let method: MethodTypes = "GET";
@@ -76,8 +78,10 @@ export function useFetch<
     }
   
     // Set headers
-    const headers: HeadersInit = {};
-    if (body) headers["Content-Type"] = "application/json";
+    const headers: HeadersInit = {
+      ...initHeaders,
+      ...(body ? { "Content-Type": "application/json" } : {})
+    };
     let activeAbortSignal;
     try {
       // body assembly
@@ -107,7 +111,7 @@ export function useFetch<
         setLoading(false);
       }
     }
-  }, [url]);
+  }, [url, initHeaders]);
 
   const reset = () => {
     if (abortCtrl.current) abortCtrl.current.abort();

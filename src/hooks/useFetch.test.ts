@@ -163,4 +163,49 @@ describe("useFetch", () => {
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
   });
+    test("should pass custom headers provided during initialization", async () => {
+    mockFetchResponse(200, { success: true });
+    
+    const customHeaders = { "Authorization": "Bearer token123", "X-Custom-Client": "SpedacoBasic" };
+    
+    // Instantiate hook with custom configurations
+    const { result } = renderHook(() => useFetch("/api/secure", false, customHeaders));
+
+    await act(async () => {
+      await result.current.refetch();
+    });
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "/api/secure",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          "Authorization": "Bearer token123",
+          "X-Custom-Client": "SpedacoBasic"
+        })
+      })
+    );
+  });
+
+  test("should merge initialization headers with automatic JSON content-type during POST payloads", async () => {
+    mockFetchResponse(200, { success: true });
+    
+    const customHeaders = { "Authorization": "Bearer token123" };
+    const { result } = renderHook(() => useFetch("/api/secure", false, customHeaders));
+
+    await act(async () => {
+      await result.current.refetch({ data: "payload" });
+    });
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "/api/secure",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          "Authorization": "Bearer token123",
+          "Content-Type": "application/json" // Checked that merging occurs smoothly
+        })
+      })
+    );
+  });
+
 });
