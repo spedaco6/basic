@@ -10,7 +10,7 @@ type InputTypes =
   | HTMLTextAreaElement
   | HTMLSelectElement;
 
-export type UseInputResult<T extends InputTypes> = {
+export type UseInputResult<T extends InputTypes = HTMLInputElement> = {
   id: string;
   name: string;
   value: any;

@@ -1,7 +1,6 @@
-import type { ButtonHTMLAttributes } from "react"
 import { LoaderCircle } from "lucide-react";
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ButtonProps = React.ComponentPropsWithRef<"button"> & {
   style?: string;
   icon?: boolean;
   showLoading?: boolean;

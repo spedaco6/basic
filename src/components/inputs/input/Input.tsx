@@ -11,22 +11,22 @@ type BaseInputProps = {
 }
 
 export type InputProps = 
-  | React.ComponentPropsWithoutRef<"input"> & BaseInputProps & { 
+  | React.ComponentPropsWithRef<"input"> & BaseInputProps & { 
     type?: Exclude<React.HTMLInputTypeAttribute, "checkbox" | "textarea" | "select">;
     hook?: UseInputResult<HTMLInputElement>
   }
-  | React.ComponentPropsWithoutRef<"input"> & BaseInputProps & { 
+  | React.ComponentPropsWithRef<"input"> & BaseInputProps & { 
     type: "checkbox";
     hook?: UseInputResult<HTMLInputElement>;
     checkboxStyle?: string;
   }
-  | React.ComponentPropsWithoutRef<"textarea"> & BaseInputProps & { 
+  | React.ComponentPropsWithRef<"textarea"> & BaseInputProps & { 
     type: "textarea";
     hook?: UseInputResult<HTMLTextAreaElement>;
   }
-  | React.ComponentPropsWithoutRef<"select"> & BaseInputProps & { 
+  | React.ComponentPropsWithRef<"select"> & BaseInputProps & { 
     type: "select";
-    options: string[];
+    options: (string | number)[];
     allowEmpty?: boolean;
     hook?: UseInputResult<HTMLSelectElement>;
   };
@@ -126,7 +126,7 @@ export function Input({
 
   // select inputs
   let selectAllowEmpty = false;
-  let selectOptions: string[] = [];
+  let selectOptions: (string | number)[] = [];
   if (isSelect) {
     if ("allowEmpty" in cleanProps) {
       const { allowEmpty, ...sProps } = cleanProps;
