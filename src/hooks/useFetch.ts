@@ -82,6 +82,7 @@ export function useFetch<
       ...initHeaders,
       ...(body ? { "Content-Type": "application/json" } : {})
     };
+    
     let activeAbortSignal;
     try {
       // body assembly
