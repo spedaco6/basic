@@ -1,4 +1,3 @@
-Required disallows allowEmpty on Select inputs
 Add radio buttons to inputs
 Add Validation to other things
 Check validation on Select and TextArea

@@ -396,6 +396,16 @@ describe("Input element", () => {
       let options = container.querySelectorAll("option");
       expect(options).toHaveLength(2);
     });
+    test("required inputs will not allowEmpty", () => {
+      const { container } = render(<Input 
+        type="select"
+        required
+        allowEmpty
+        options={["this", "that", ""]}
+      />);
+      let options = container.querySelectorAll("option");
+      expect(options).toHaveLength(2);
+    });
     test("has select class", () => {
       const { container } = render(<Input 
         type="select"

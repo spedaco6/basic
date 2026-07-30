@@ -54,37 +54,6 @@ export function Input({
   const isCheckbox = type === "checkbox";
   const isSelect = type === "select";
 
-  let checkboxStyle = "";
-  let cleanProps: Partial<InputProps> = props;
-  if (isCheckbox && "checkboxStyle" in props) {
-    const { checkboxStyle: cStyle, ...nativeProps } = props;
-    checkboxStyle = cStyle ?? "";
-    cleanProps = nativeProps;
-  }
-
-  let selectAllowEmpty = false;
-  let selectOptions: string[] = [];
-  if (isSelect) {
-    if ("allowEmpty" in cleanProps) {
-      const { allowEmpty, ...sProps } = cleanProps;
-      selectAllowEmpty = typeof allowEmpty === "boolean" ? allowEmpty : false;
-      cleanProps = sProps;
-    }
-    if ("options" in cleanProps) {
-      const { options, ...sProps } = cleanProps;
-      selectOptions = options ?? [];
-      if (!selectAllowEmpty) {
-        const updated = selectOptions.filter(opt => opt !== "");
-        selectOptions = updated;
-      }
-      if (selectAllowEmpty && selectOptions.every(opt => opt !== "")) {
-        const updated = ["", ...selectOptions];
-        selectOptions = updated;
-      }
-      cleanProps = sProps; 
-    }
-  }
-
   let inputName;
   let inputValue;
   let allErrors;
@@ -145,6 +114,40 @@ export function Input({
   }
 
   // display related conditions
+
+  // checkboxes
+  let checkboxStyle = "";
+  let cleanProps: Partial<InputProps> = props;
+  if (isCheckbox && "checkboxStyle" in props) {
+    const { checkboxStyle: cStyle, ...nativeProps } = props;
+    checkboxStyle = cStyle ?? "";
+    cleanProps = nativeProps;
+  }
+
+  // select inputs
+  let selectAllowEmpty = false;
+  let selectOptions: string[] = [];
+  if (isSelect) {
+    if ("allowEmpty" in cleanProps) {
+      const { allowEmpty, ...sProps } = cleanProps;
+      selectAllowEmpty = typeof allowEmpty === "boolean" ? allowEmpty : false;
+      cleanProps = sProps;
+    }
+    if ("options" in cleanProps) {
+      const { options, ...sProps } = cleanProps;
+      selectOptions = options ?? [];
+      if (!selectAllowEmpty || isRequired) {
+        const updated = selectOptions.filter(opt => opt !== "");
+        selectOptions = updated;
+      }
+      if (!isRequired && selectAllowEmpty && selectOptions.every(opt => opt !== "")) {
+        const updated = ["", ...selectOptions];
+        selectOptions = updated;
+      }
+      cleanProps = sProps; 
+    }
+  }
+
   const inputStyles = isCheckbox 
     ? `checkbox ${checkboxStyle ? checkboxStyle : ""}` 
     : type === "textarea" 
