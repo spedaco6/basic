@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ValidationErrors } from "../lib/client/errors";
 import type { Pagination } from "./usePagination";
 
@@ -46,6 +46,7 @@ export function useFetch<
   const [ data, setData ] = useState<FetchResponseData<T> | null>(null);
   const [ loading, setLoading ] = useState(!!callImmediately);
   const [ error, setError ] = useState<string | null>(null);
+  const abortCtrl = useRef<AbortController | null>(null);
 
   const refetch: RefetchFunction = useCallback(async (
     arg1?: FetchBody, 
@@ -53,6 +54,11 @@ export function useFetch<
   ): Promise<void> => {
     setLoading(true);
     setError(null);
+    if (abortCtrl.current) {
+      abortCtrl.current.abort();
+    }
+    abortCtrl.current = new AbortController();
+
     let method: MethodTypes = "GET";
     let body: Record<string, unknown> | undefined;
 
@@ -72,27 +78,39 @@ export function useFetch<
     // Set headers
     const headers: HeadersInit = {};
     if (body) headers["Content-Type"] = "application/json";
+    let activeAbortSignal;
     try {
+      // body assembly
+      activeAbortSignal = abortCtrl.current.signal;
       const fetchOptions: RequestInit = {
         method,
         headers,
         body: body ? JSON.stringify(body) : undefined,
+        signal: activeAbortSignal,
       }
+
+      // construct full fetch url
       const fullUrl = method === "GET" && arg1 ? url + arg1 : url;
+
+      // fetch data
       const response = await fetch(fullUrl, fetchOptions);
       const resData = await response.json() as FetchResponseData<T>;
 
       if (!resData.success) throw new Error(resData.message);
       setData(resData);
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") return;
       const message = err instanceof Error ? err.message : "Something went wrong";
       setError(message);
     } finally {
-      setLoading(false);
+      if (abortCtrl?.current?.signal === activeAbortSignal) {
+        setLoading(false);
+      }
     }
   }, [url]);
 
   const reset = () => {
+    if (abortCtrl.current) abortCtrl.current.abort();
     setError(null);
     setLoading(false);
     setData(null);
