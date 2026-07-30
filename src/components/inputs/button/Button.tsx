@@ -4,12 +4,12 @@ import { LoaderCircle } from "lucide-react";
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   style?: "primary" | "secondary" | "danger" | "success";
   icon?: boolean;
-  showLoadingSpinner?: boolean;
+  showLoading?: boolean;
   loading?: boolean;
 };
 
-export default function Button({
-  showLoadingSpinner=false, 
+export function Button({
+  showLoading=false, 
   children,
   style="primary",
   icon=false,
@@ -18,9 +18,10 @@ export default function Button({
   disabled=false,
   className="",
   ...props
-}: ButtonProps) {
-  const displayLoadingSpinner = showLoadingSpinner && loading;
+}: ButtonProps): React.ReactNode {
+  const displayLoadingSpinner = showLoading && loading;
   const buttonDisabled = disabled || loading;
+  
   return <button 
     className={`
       button
@@ -35,6 +36,6 @@ export default function Button({
     {...props}
   >
     { displayLoadingSpinner && <div className="animate-spin"><LoaderCircle /></div> }
-    { (!showLoadingSpinner || (showLoadingSpinner && !loading)) && children }
+    { (!showLoading || (showLoading && !loading)) && children }
   </button>
 }
