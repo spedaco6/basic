@@ -1,5 +1,9 @@
 # Changelog
 
+## - 2026-07-30
+## Added
+- New `Button` elements available.
+
 ## - 2026-07-28
 ### Added
 - Added support for `type="textarea"` and `type="select"` variants to the `Input` component.

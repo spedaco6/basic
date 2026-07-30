@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes } from "react"
 import { LoaderCircle } from "lucide-react";
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  style?: "primary" | "secondary" | "danger" | "success";
+  style?: string;
   icon?: boolean;
   showLoading?: boolean;
   loading?: boolean;

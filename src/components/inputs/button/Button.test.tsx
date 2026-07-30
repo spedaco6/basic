@@ -1,14 +1,7 @@
 import "@testing-library/jest-dom";
 import { describe, expect, test } from "vitest";
 import { Button } from "./Button";
-import { render, screen } from "@testing-library/react";
-
-let counter = 0;
-function getTestId() {
-  const num = counter;
-  counter++;
-  return "Sample" + num;
-}
+import { render } from "@testing-library/react";
 
 describe("Button element", () => {
   test("defaults to a button element with type 'button' and classes 'button' & 'primary'", () => {
@@ -25,6 +18,13 @@ describe("Button element", () => {
     expect(button).toBeInTheDocument();
     expect(button.disabled).toBe(true);
     expect(button!.tagName).toBe("BUTTON");
+  });
+  test("custom style added as css class", () => {
+    const { container } = render(<Button style="custom">Click Me!</Button>);
+    const button = container.querySelector(".button.custom") as HTMLButtonElement;
+    const button2 = container.querySelector(".button.primary") as HTMLButtonElement;
+    expect(button).toBeInTheDocument();
+    expect(button2).not.toBeInTheDocument();
   });
   test("loading state does not show loading spinner by default", () => {
     const { container } = render(<Button loading>Click Me!</Button>);
