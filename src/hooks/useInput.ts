@@ -5,7 +5,7 @@ import { Validator } from "../lib/client/validation";
 import type { ValidatorFn } from "../lib/client/validation";
 import { useCallback, useEffect, useId, useState } from "react"
 
-type InputTypes = 
+export type InputTypes = 
   | HTMLInputElement
   | HTMLTextAreaElement
   | HTMLSelectElement;

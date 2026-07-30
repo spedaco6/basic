@@ -1,0 +1,118 @@
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { ValidationErrors } from "../lib/client/errors";
+import { Pagination } from "./usePagination";
+
+type MethodTypes = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+type FetchBody = Record<string, unknown> | string;
+export type ResultPagination = Pagination & {
+  totalItems: number;
+}
+
+export type RefetchFunction = {
+  // DELETE signatures
+  (method: "DELETE" | "delete"): Promise<void>;
+  
+  // GET signatures
+  (): Promise<void>;
+  (searchParams: string): Promise<void>;
+  
+  // GET or POST signature
+  (body: Record<string, unknown>): Promise<void>;
+  
+  // PUT or PATCH signature
+  (body: Record<string, unknown>, method: MethodTypes): Promise<void>;
+}
+
+export type FetchResponseData<T extends Record<string, any> = Record<string, any>> = {
+  success: boolean,
+  message?: string,
+  validationErrors?: ValidationErrors,
+  redirect?: string,
+  data?: T | T[],
+  pagination?: ResultPagination
+};
+
+/**
+ * Manages fetch state.
+ * @param url Relative url for api call.
+ * @param callImmediately Defines initial loading state and fetch call. Prevent flash of default state by setting this param to "loadingOnly".
+ * @returns 
+ */
+export function useFetch<
+  T extends Record<string, any>
+>(
+  url: string,
+  callImmediately: boolean | "loadingOnly" = false
+) {
+  const [ data, setData ] = useState<FetchResponseData<T> | null>(null);
+  const [ loading, setLoading ] = useState(!!callImmediately);
+  const [ error, setError ] = useState<string | null>(null);
+
+  const router = useRouter();
+
+  const refetch: RefetchFunction = useCallback(async (
+    arg1?: FetchBody, 
+    arg2?: MethodTypes,
+  ): Promise<void> => {
+    setLoading(true);
+    setError(null);
+    let method: MethodTypes = "GET";
+    let body: Record<string, unknown> | undefined;
+
+    // Determine body for DELETE requests
+    if (typeof arg1 === "string" && arg1.toLowerCase() === "delete") {
+      method = "DELETE";
+
+    // Determine body for POST, PUT, PATCH requests
+    } else if (typeof arg1 === "object") {
+      method = "POST";
+      body = arg1;
+      if (typeof arg2 === "string") {
+        method = arg2;
+      }
+    }
+  
+    // Set headers
+    const headers: HeadersInit = {};
+    if (body) headers["Content-Type"] = "application/json";
+    try {
+      const fetchOptions: RequestInit = {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+      }
+      const fullUrl = method === "GET" && arg1 ? url + arg1 : url;
+      const response = await fetch(fullUrl, fetchOptions);
+      const resData = await response.json() as FetchResponseData<T>;
+
+      // if a redirect is provided, redirect
+      if (resData?.redirect && resData?.redirect.startsWith("/")) router.push(resData.redirect);
+      if (!resData.success) throw new Error(resData.message);
+      setData(resData);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [url]);
+
+  const reset = () => {
+    setError(null);
+    setLoading(false);
+    setData(null);
+  };
+
+  useEffect(() => {
+    if (callImmediately && typeof callImmediately === "boolean") refetch();
+  }, [callImmediately, refetch]);
+
+  return {
+    data,
+    loading,
+    error,
+    refetch,
+    reset,
+  }
+}

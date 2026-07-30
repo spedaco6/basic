@@ -2,13 +2,16 @@
 
 ## - 2026-07-30
 
+## Added
+- New `Form` element available.
+
 ### Fixed
 - `type="select"` inputs accept (string | number)[] for options attr.
 - `UseInputResult` defaults to `HTMLInputElement`.
 - `Input` components accept React refs.
 
 ## Added
-- New `Button` elements available.
+- New `Button` element available.
 
 ## - 2026-07-28
 ### Added
