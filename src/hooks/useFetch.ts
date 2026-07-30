@@ -23,6 +23,14 @@ export type RefetchFunction = {
   (body: Record<string, unknown>, method: MethodTypes): Promise<void>;
 }
 
+export type UseFetchResult = {
+  data: FetchResponseData | null;
+  loading: boolean;
+  error: string | null;
+  refetch: RefetchFunction;
+  reset: () => void;
+}
+
 export type FetchResponseData<T extends Record<string, any> = Record<string, any>> = {
   success: boolean,
   message?: string,
@@ -44,7 +52,7 @@ export function useFetch<
   url: string,
   callImmediately: boolean | "loadingOnly" = false,
   initHeaders?: HeadersInit
-) {
+): UseFetchResult {
   const [ data, setData ] = useState<FetchResponseData<T> | null>(null);
   const [ loading, setLoading ] = useState(!!callImmediately);
   const [ error, setError ] = useState<string | null>(null);
@@ -82,7 +90,7 @@ export function useFetch<
       ...initHeaders,
       ...(body ? { "Content-Type": "application/json" } : {})
     };
-    
+
     let activeAbortSignal;
     try {
       // body assembly
