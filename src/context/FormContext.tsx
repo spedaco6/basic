@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useId, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useId, useState } from "react";
 import type { UseInputResult } from "../hooks/useInput";
 import { useFetch } from "../hooks/useFetch";
 
@@ -60,7 +60,7 @@ export const FormContextProvider = ({
   const formFilled = inputHooks.every(i => !i.required || i.touched);
   const formValid = inputHooks.every(i => i.errors === null);
 
-  const submit = (submitAction: string, body?: any) => {
+  const submit = (submitAction: string = "", body?: any) => {
     setAction(submitAction);
     refetch(body);
   }

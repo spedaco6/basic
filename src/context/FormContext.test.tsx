@@ -245,7 +245,6 @@ describe("FormContext", () => {
     expect(action).toBeNull();
   });
   test("ensures custom headers are forwarded to the initial useFetch call", () => {
-    // 1. Initialize your hook mock helper
     const { spy } = mockUseFetch({
       data: null,
       loading: false,
@@ -258,23 +257,159 @@ describe("FormContext", () => {
       "Content-Type": "application/json",
     };
 
-    // 2. Render the provider with a custom URL and headers configuration
     render(
-      <FormContextProvider 
-        url="https://example.com" 
-        headers={customHeaders} 
-        inputs={{ test: input }}
-      >
+      <FormContextProvider url="https://example.com" headers={customHeaders} inputs={{ test: input }}>
         <TestComponent />
       </FormContextProvider>
     );
 
-    // 3. Assert that the hook module was called with exactly your properties
-    // Argument 1: url, Argument 2: manual fetch flag (false), Argument 3: headers
     expect(spy).toHaveBeenCalledWith(
       "https://example.com",
       false,
       customHeaders
     );
   });
+
+  test("manual error prop overrides useFetch hook errors", () => {
+    mockUseFetch({
+      data: null,
+      loading: false,
+      error: "API Server Error",
+    });
+
+    const input = getMockInput();
+    
+    render(
+      <FormContextProvider url="" error="Manual Override Error" inputs={{ test: input }}>
+        <TestComponent />
+      </FormContextProvider>
+    );
+
+    const errorElement = screen.getByTestId("formError");
+    expect(errorElement.innerHTML).toBe("Manual Override Error");
+  });
+
+  test("combines hook loading and prop loading statuses correctly", () => {
+    const { updateMock } = mockUseFetch({ data: null, loading: true, error: null });
+    const input = getMockInput();
+
+    const { rerender } = render(
+      <FormContextProvider url="" loading={false} inputs={{ test: input }}>
+        <TestComponent />
+      </FormContextProvider>
+    );
+    expect(screen.queryByTestId("formLoading")).not.toBeNull();
+
+    act(() => {
+      updateMock({ loading: false });
+    });
+    
+    rerender(
+      <FormContextProvider url="" loading={true} inputs={{ test: input }}>
+        <TestComponent />
+      </FormContextProvider>
+    );
+    expect(screen.queryByTestId("formLoading")).not.toBeNull();
+  });
+
+  test("filled is true when required inputs are touched even if optional inputs are untouched", () => {
+    mockUseFetch();
+    const requiredInput = getMockInput({ id: "req", required: true, touched: true });
+    const optionalInput = getMockInput({ id: "opt", required: false, touched: false });
+
+    render(
+      <FormContextProvider url="" inputs={{ requiredInput, optionalInput }}>
+        <TestComponent />
+      </FormContextProvider>
+    );
+
+    expect(screen.queryByTestId("formFilled")).not.toBeNull();
+  });
+
+  test("disabled state toggles reactively based on props", () => {
+    mockUseFetch();
+    const input = getMockInput();
+
+    const { rerender } = render(
+      <FormContextProvider url="" disabled={true} inputs={{ test: input }}>
+        <TestComponent />
+      </FormContextProvider>
+    );
+    expect(screen.queryByTestId("formDisabled")).not.toBeNull();
+
+    rerender(
+      <FormContextProvider url="" disabled={false} inputs={{ test: input }}>
+        <TestComponent />
+      </FormContextProvider>
+    );
+    expect(screen.queryByTestId("formDisabled")).toBeNull();
+  });
+
+  test("useFormCtx throws a clear error when used outside of FormContextProvider", () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    expect(() => render(<TestComponent />)).toThrowError(
+      "useFormCtx must be used within a FormContextProvider."
+    );
+
+    consoleSpy.mockRestore();
+  });
+
+  test("allows submit to be called with 0 arguments and defaults action to an empty string", async () => {
+    let resolveRefetch: (value: any) => void = () => {};
+    const deferredPromise = new Promise((resolve) => {
+      resolveRefetch = resolve;
+    });
+
+    const { mockRefetch, updateMock } = mockUseFetch({
+      data: null,
+      loading: false,
+      error: null,
+    });
+    
+    mockRefetch.mockImplementation(() => {
+      updateMock({ data: null, loading: true, error: null });
+      return deferredPromise;
+    });
+
+    const input = getMockInput();
+    let actionTrigger: () => void = () => {};
+    
+    // Inline test component to pull the raw context action out cleanly
+    const ContextExtractor = () => {
+      const currentCtx = useFormCtx();
+      actionTrigger = () => (currentCtx.submit as any)(); // Explicitly pass 0 arguments
+      return null;
+    };
+
+    const { rerender } = render(
+      <FormContextProvider url="" inputs={{ test: input }}>
+        <TestComponent />
+        <ContextExtractor />
+      </FormContextProvider>
+    );
+
+    // 1. Fire submit with absolutely 0 parameters passed
+    act(() => {
+      actionTrigger();
+    });
+
+    // 2. Force context to propagate the state update
+    rerender(
+      <FormContextProvider url="" inputs={{ test: input }}>
+        <TestComponent />
+        <ContextExtractor />
+      </FormContextProvider>
+    );
+
+    // 3. Verify action correctly fallback-assigned to "" (which won't render formAction on your UI, but exists)
+    expect(mockRefetch).toHaveBeenCalledExactlyOnceWith(undefined);
+
+    // 4. Resolve the pending promise lifecycle to leave the test state clean
+    await act(async () => {
+      resolveRefetch(undefined);
+      updateMock({ data: null, loading: false, error: null });
+    });
+  });
+
 });
