@@ -1,4 +1,4 @@
-.button {
+button.button {
   @apply cursor-pointer py-1 px-2 rounded-sm border;
 
   &.loading {
@@ -7,6 +7,10 @@
   
   &.icon {
     @apply flex justify-center items-center gap-2;
+  }
+
+  & .spin {
+    @apply animate-spin;
   }
 
   /* Primary / Default Button */
