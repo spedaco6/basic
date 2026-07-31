@@ -163,6 +163,9 @@ body {
   .disabled p.error {
     @apply text-err-disabled-text dark:text-err-disabled-dark-text;
   }
+  button.button .spin {
+    @apply animate-spin;
+  }
 }
 
 * {

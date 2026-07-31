@@ -1,6 +1,9 @@
-Add radio buttons to inputs
-Add Validation to other things
-Check validation on Select and TextArea
+Ensure that inputs are styled so that they align to baseline. That way if 
+one has a label but not the other, they still line up.
 
 Confirm that all inputs work with FormData by default (without hook)
 Add an HTML editor (probably separate from useInput)
+
+Add radio buttons to inputs
+Add Validation to other things
+Check validation on Select and TextArea
