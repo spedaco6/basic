@@ -1,6 +1,8 @@
-import React, { useId } from "react";
+import React, { useId, useState } from "react";
 import type { UseInputResult } from "../../../hooks/useInput";
 import { checkRequirement } from "../../../lib/client/utils";
+import { Button } from "../button/Button";
+import { Eye, EyeClosed } from "lucide-react";
 
 type BaseInputProps = {
   errors?: string | string[] | null;
@@ -8,6 +10,7 @@ type BaseInputProps = {
   label?: string;
   labelPosition?: "top" | "bottom" | "right" | "left";
   hideAsterisk?: boolean;
+  allowShow?: boolean;
 }
 
 export type InputProps = 
@@ -42,6 +45,7 @@ export function Input({
   type, 
   disabled=false,
   required=false,
+  allowShow=false,
   hideAsterisk,
   value,
   onChange,
@@ -49,6 +53,7 @@ export function Input({
   hook, 
   ...props 
 }: InputProps): React.ReactNode {
+  const [show, setShow] = useState(false);
   const labelPositions = ["top", "bottom", "right", "left"];
   const hasLabel = !!label;
   const isCheckbox = type === "checkbox";
@@ -187,6 +192,21 @@ export function Input({
       </select>
     }
     if (isCheckbox) return <input {...sharedProps} type="checkbox" checked={inputChecked} {...(cleanProps as React.ComponentPropsWithoutRef<"input">)} />
+
+    if (allowShow && type === "password") {
+      const displayType = show ? "text" : type;
+      return <div className="reveal">
+        <input {...sharedProps} type={displayType} {...(cleanProps as React.ComponentPropsWithoutRef<"input">)} />
+        <Button 
+          onClick={() => setShow(prev => !prev)} 
+          icon
+          style="none"
+        >
+          { show ? <EyeClosed size={20} /> : <Eye size={20}/> }
+        </Button>
+      </div>
+    }
+
     return <input {...sharedProps} type={type} {...(cleanProps as React.ComponentPropsWithoutRef<"input">)} />
   }
 
@@ -201,7 +221,7 @@ export function Input({
       ${verticalLayout ? "vertical" : ""} 
     `}>
       { hasLabel && labelBefore && <label htmlFor={ inputId }>{ label + (showAsterisk ? "*" : "") }</label> }
-      { renderInput() }
+      { renderInput() }  
       { hasLabel && !labelBefore && <label htmlFor={ inputId }>{ label + (showAsterisk ? "*" : "") }</label> }
     </div>
     <ul>

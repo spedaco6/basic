@@ -34,7 +34,7 @@ export function Button({
     type={type}
     {...props}
   >
-    { displayLoadingSpinner && <div className="animate-spin"><LoaderCircle /></div> }
+    { displayLoadingSpinner && <div className="spin"><LoaderCircle /></div> }
     { (!showLoading || (showLoading && !loading)) && children }
   </button>
 }
