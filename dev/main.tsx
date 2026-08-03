@@ -19,7 +19,7 @@ const App = () => {
   return <Form url=""inputs={{
     one: useInput("one*", "")
   }} className="flex flex-col gap-4 p-8 w-90" loading={loading}>
-    <Form.Input name="one" label="Sample input" />
+    <Form.Input name="one" label="Sample input" type="password" allowShow />
     <Form.Input label="Sample text area" type="textarea" />
     <Form.Input hook={hook} label="Sample text area" type="select" required allowEmpty options={["this", "that", "another"]}/>
     <Form.Input label="This should not be uppercase" type="checkbox" />
