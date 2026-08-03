@@ -54,7 +54,7 @@ function Input({
   return <BaseInput
     name={name}
     disabled={inputDisabled}
-    { ...props } 
+    { ...props }
   />
 }
 
@@ -65,20 +65,24 @@ function Button({
   action,
   onClick,
   ...props
-}: ButtonProps & { action?: string }) {
+}: ButtonProps & { action?: string, onClick?: (body: Record<string, any>) => void }) {
   const formCtx = useFormCtx();
 
   const buttonLoading = loading || formCtx.loading;
-  const buttonDisabled = disabled || formCtx.disabled;
+  const buttonDisabled = disabled || formCtx.disabled || (buttonLoading && action !== formCtx.action);
   
-  const buttonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const buttonClick = () => {
     if (action) formCtx.setAction(action);
-    if (onClick) onClick(e);
+    const body: Record<string, any> = {};
+    for (const k in formCtx.inputs) {
+      body[k] = formCtx.inputs[k].value;
+    }
+    if (onClick) onClick(body);
   }
-  console.log(formCtx.action);
 
   return <BaseButton
-    showLoading
+    form={formCtx.id}
+    showLoading={action === formCtx.action}
     disabled={buttonDisabled}
     loading={buttonLoading}
     onClick={buttonClick}
