@@ -27,8 +27,8 @@ const TestComponent = () => {
       { ctx.valid && <li data-testid="formValid"></li> }
       { ctx.action && <li data-testid="formAction">{ ctx.action }</li> }
       
-      <button type="button" data-testid="cancelBtn" onClick={() => ctx.submit("cancel")}>Cancel</button>
-      <button type="button" data-testid="submitBtn" onClick={() => ctx.submit("submit", { payload: "payload" })}>Submit</button>
+      <button type="button" data-testid="cancelBtn">Cancel</button>
+      <button type="button" data-testid="submitBtn">Submit</button>
     </ul>
   );
 };
@@ -137,113 +137,6 @@ describe("FormContext", () => {
     expect(screen.queryByTestId("formValid")).not.toBeNull();
   });
 
-  test("submit sets action and automatically resets after fetch finishes", async () => {
-    // 1. Create a controlled promise to handle the fetch resolution manually
-    let resolveRefetch: (value: any) => void = () => {};
-    const deferredPromise = new Promise((resolve) => {
-      resolveRefetch = resolve;
-    });
-
-    // 2. Initialize your mock with a pending state configuration
-    const { mockRefetch, updateMock } = mockUseFetch({
-      data: null,
-      loading: false,
-      error: null,
-    });
-    
-    // Intercept the call to return our custom promise and toggle loading to true
-    mockRefetch.mockImplementation(() => {
-      updateMock({ data: null, loading: true, error: null });
-      return deferredPromise;
-    });
-
-    const input = getMockInput();
-    const { rerender } = render(
-      <FormContextProvider url="" inputs={{ test: input }}>
-        <TestComponent />
-      </FormContextProvider>
-    );
-    expect(screen.queryByTestId("formAction")).toBeNull();
-    
-    const cancel = screen.getByTestId("cancelBtn");
-    act(() => fireEvent.click(cancel));
-
-    let action = screen.queryByTestId("formAction");
-    expect(action).not.toBeNull();
-    expect(action!.innerHTML).toBe("cancel");
-    expect(mockRefetch).toHaveBeenCalledExactlyOnceWith(undefined);
-
-    await act(async () => {
-      resolveRefetch(undefined);
-      updateMock({ data: null, loading: false, error: null });
-    });
-    rerender(
-      <FormContextProvider url="" inputs={{ test: input }}>
-        <TestComponent />
-      </FormContextProvider>
-    );
-
-    action = screen.queryByTestId("formAction");
-    expect(action).toBeNull();
-  });
-
-  test("submit sets action to 'submit' and automatically resets after fetch finishes with payload", async () => {
-    // 1. Create a controlled promise to handle the fetch resolution manually
-    let resolveRefetch: (value: any) => void = () => {};
-    const deferredPromise = new Promise((resolve) => {
-      resolveRefetch = resolve;
-    });
-
-    // 2. Initialize your mock with a pending state configuration
-    const { mockRefetch, updateMock } = mockUseFetch({
-      data: null,
-      loading: false,
-      error: null,
-    });
-    
-    // Intercept the call to return our custom promise and toggle loading to true
-    mockRefetch.mockImplementation(() => {
-      updateMock({ data: null, loading: true, error: null });
-      return deferredPromise;
-    });
-
-    const input = getMockInput();
-    const { rerender } = render(
-      <FormContextProvider url="" inputs={{ test: input }}>
-        <TestComponent />
-      </FormContextProvider>
-    );
-    expect(screen.queryByTestId("formAction")).toBeNull();
-    
-    // 3. Select and click the submit button instead of cancel
-    const submitBtn = screen.getByTestId("submitBtn");
-    act(() => fireEvent.click(submitBtn));
-
-    // 4. Verify the active state has transitioned to "submit"
-    let action = screen.queryByTestId("formAction");
-    expect(action).not.toBeNull();
-    expect(action!.innerHTML).toBe("submit");
-    
-    // 5. Verify the refetch mock was called exactly with your expected custom payload
-    expect(mockRefetch).toHaveBeenCalledExactlyOnceWith({ payload: "payload" });
-
-    // 6. Resolve the pending network request
-    await act(async () => {
-      resolveRefetch(undefined);
-      updateMock({ data: null, loading: false, error: null });
-    });
-    
-    // 7. Force context re-render to propagate the hook state updates
-    rerender(
-      <FormContextProvider url="" inputs={{ test: input }}>
-        <TestComponent />
-      </FormContextProvider>
-    );
-
-    // 8. Assert everything successfully reverted back to null
-    action = screen.queryByTestId("formAction");
-    expect(action).toBeNull();
-  });
   test("ensures custom headers are forwarded to the initial useFetch call", () => {
     const { spy } = mockUseFetch({
       data: null,
@@ -353,63 +246,6 @@ describe("FormContext", () => {
     );
 
     consoleSpy.mockRestore();
-  });
-
-  test("allows submit to be called with 0 arguments and defaults action to an empty string", async () => {
-    let resolveRefetch: (value: any) => void = () => {};
-    const deferredPromise = new Promise((resolve) => {
-      resolveRefetch = resolve;
-    });
-
-    const { mockRefetch, updateMock } = mockUseFetch({
-      data: null,
-      loading: false,
-      error: null,
-    });
-    
-    mockRefetch.mockImplementation(() => {
-      updateMock({ data: null, loading: true, error: null });
-      return deferredPromise;
-    });
-
-    const input = getMockInput();
-    let actionTrigger: () => void = () => {};
-    
-    // Inline test component to pull the raw context action out cleanly
-    const ContextExtractor = () => {
-      const currentCtx = useFormCtx();
-      actionTrigger = () => (currentCtx.submit as any)(); // Explicitly pass 0 arguments
-      return null;
-    };
-
-    const { rerender } = render(
-      <FormContextProvider url="" inputs={{ test: input }}>
-        <TestComponent />
-        <ContextExtractor />
-      </FormContextProvider>
-    );
-
-    // 1. Fire submit with absolutely 0 parameters passed
-    act(() => {
-      actionTrigger();
-    });
-
-    // 2. Force context to propagate the state update
-    rerender(
-      <FormContextProvider url="" inputs={{ test: input }}>
-        <TestComponent />
-        <ContextExtractor />
-      </FormContextProvider>
-    );
-
-    // 3. Verify action correctly fallback-assigned to "" (which won't render formAction on your UI, but exists)
-    expect(mockRefetch).toHaveBeenCalledExactlyOnceWith(undefined);
-
-    // 4. Resolve the pending promise lifecycle to leave the test state clean
-    await act(async () => {
-      resolveRefetch(undefined);
-      updateMock({ data: null, loading: false, error: null });
-    });
   });
 
 });

@@ -10,7 +10,8 @@ type FormContextResult = {
   disabled: boolean;
   valid: boolean;
   filled: boolean;
-  submit: (action: string, body?: any) => void;
+  setAction: (action: string | null) => void;
+  inputs: Record<string, UseInputResult>;
 }
 
 type FormContextProviderProps = React.PropsWithChildren & {
@@ -73,7 +74,8 @@ export const FormContextProvider = ({
     action,
     valid: formValid,
     filled: formFilled,
-    submit,
+    inputs,
+    setAction,
   };
 
   return <FormContext.Provider value={value}>
