@@ -71,7 +71,7 @@ export function useFetch<
 
     let method: MethodTypes = "GET";
     let body: Record<string, unknown> | undefined;
-
+    await new Promise(res => setTimeout(res, 2000)); // todo
     // Determine body for DELETE requests
     if (typeof arg1 === "string" && arg1.toLowerCase() === "delete") {
       method = "DELETE";

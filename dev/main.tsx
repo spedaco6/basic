@@ -7,11 +7,6 @@ import "../src/styles/main.css";
 
 const App = () => {
   const [loading, setLoading] = useState(false);
-  const onClick = async () => {
-    setLoading(true);
-    await new Promise(res => setTimeout(res, 2000));
-    setLoading(false);
-  }
 
   return <Form url=""inputs={{
     one: useInput("one*", ""),
@@ -23,8 +18,10 @@ const App = () => {
     <Form.Input name="two" label="Sample text area" type="textarea" />
     <Form.Input name="three" label="Sample text area" type="select" required allowEmpty options={["this", "that", "another"]}/>
     <Form.Input name="four" label="This should not be uppercase" type="checkbox" />
-    <Form.Button action="cancel" onClick={(data) => console.log(data)}>Cancel</Form.Button>
-    <Form.Button action="submit" onClick={onClick}>Submit</Form.Button>
+
+    <Form.Button.Submit />
+    <Form.Button action="cancel">Cancel</Form.Button>
+    <Form.Button.Delete />
   </Form>
 };
 

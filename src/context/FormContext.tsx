@@ -1,27 +1,28 @@
 import { createContext, useContext, useEffect, useId, useState } from "react";
 import type { UseInputResult } from "../hooks/useInput";
-import { useFetch } from "../hooks/useFetch";
+import { type RefetchFunction, type UseFetchResult } from "../hooks/useFetch";
 
 type FormContextResult = {
   id: string;
   loading: boolean;
-  action: string | null;
   error: string | null;
   disabled: boolean;
   valid: boolean;
   filled: boolean;
-  setAction: (action: string | null) => void;
   inputs: Record<string, UseInputResult>;
+  refetch: RefetchFunction;
+  setAction: (action: string) => void;
+  action: string;
+  success: boolean;
 }
 
 type FormContextProviderProps = React.PropsWithChildren & {
-  url: string;
-  headers?: HeadersInit;
   inputs: Record<string, UseInputResult>;
   id?: string;
   loading?: boolean;
   disabled?: boolean;
   error?: string | null;
+  fetch: UseFetchResult; 
 }
 
 const FormContext = createContext<FormContextResult | undefined>(undefined);
@@ -36,46 +37,41 @@ export const FormContextProvider = ({
   children, 
   inputs, 
   id, 
-  url,
-  headers,
   disabled=false, 
   loading=false, 
   error=null,
+  fetch,
 }: FormContextProviderProps) => {
-  const { refetch, loading: fLoading, error: fError } = useFetch(url, false, headers);
-  const [action, setAction] = useState<string | null>(null);
-
+  const [action, setAction] = useState<string>("");
+  
   useEffect(() => {
-    if (!fLoading) setAction(null);
-  }, [fLoading]);
+    if (!fetch.loading) setAction("");
+  }, [fetch.loading]);
 
   let formId = id
   if (!formId) formId = useId(); 
 
-  let formError = fError;
+  let formError = fetch.error;
   if (error) formError = error;
 
-  let formLoading = fLoading || loading;
+  let formLoading = fetch.loading || loading || !!action;
 
   const inputHooks = Object.values(inputs);
   const formFilled = inputHooks.every(i => !i.required || i.touched);
   const formValid = inputHooks.every(i => i.errors === null);
 
-  const submit = (submitAction: string = "", body?: any) => {
-    setAction(submitAction);
-    refetch(body);
-  }
-
-  const value = {
+  const value: FormContextResult = {
     id: formId,
     error: formError,
     loading: formLoading,
     disabled,
-    action,
     valid: formValid,
     filled: formFilled,
     inputs,
+    refetch: fetch.refetch,
+    action,
     setAction,
+    success: (!!fetch.data?.success || !!formError) && !formLoading,
   };
 
   return <FormContext.Provider value={value}>
