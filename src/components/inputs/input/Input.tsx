@@ -225,7 +225,7 @@ export function Input({
         <Button 
           onClick={() => setShow(prev => !prev)} 
           icon
-          style="none"
+          variant="none"
         >
           { show ? <EyeClosed size={20} /> : <Eye size={20}/> }
         </Button>

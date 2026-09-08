@@ -1,7 +1,7 @@
 import { LoaderCircle } from "lucide-react";
 
 export type ButtonProps = React.ComponentPropsWithRef<"button"> & {
-  style?: string;
+  variant?: "primary" | "secondary" | "danger" | "success" | "none";
   icon?: boolean;
   showLoading?: boolean;
   loading?: boolean;
@@ -10,7 +10,7 @@ export type ButtonProps = React.ComponentPropsWithRef<"button"> & {
 export function Button({
   showLoading=false, 
   children,
-  style="primary",
+  variant="primary",
   icon=false,
   type="button",
   loading=false,
@@ -27,7 +27,7 @@ export function Button({
       ${loading ? "loading" : ""}
       ${disabled ? "disabled" : ""}
       ${icon || displayLoadingSpinner ? "icon" : ""}
-      ${style} 
+      ${variant} 
       ${className}
     `}
     disabled={buttonDisabled}
@@ -35,6 +35,6 @@ export function Button({
     {...props}
   >
     { displayLoadingSpinner && <div className="spin"><LoaderCircle /></div> }
-    { (!showLoading || (showLoading && !loading)) && children }
+    { !displayLoadingSpinner && children }
   </button>
 }

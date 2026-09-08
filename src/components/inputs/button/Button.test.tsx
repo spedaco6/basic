@@ -19,9 +19,9 @@ describe("Button element", () => {
     expect(button.disabled).toBe(true);
     expect(button!.tagName).toBe("BUTTON");
   });
-  test("custom style added as css class", () => {
-    const { container } = render(<Button style="custom">Click Me!</Button>);
-    const button = container.querySelector(".button.custom") as HTMLButtonElement;
+  test("custom variant added as css class", () => {
+    const { container } = render(<Button variant="secondary">Click Me!</Button>);
+    const button = container.querySelector(".button.secondary") as HTMLButtonElement;
     const button2 = container.querySelector(".button.primary") as HTMLButtonElement;
     expect(button).toBeInTheDocument();
     expect(button2).not.toBeInTheDocument();
