@@ -337,6 +337,74 @@ describe("Input element", () => {
       expect(inputContainer).toContainElement(input);
       expect(inputContainer).toContainElement(label);
     });
+
+    describe("controlled vs. uncontrolled state", () => {
+      test("stays uncontrolled (no checked attribute forced) with no hook, value, or onChange", () => {
+        const name = getTestId();
+        render(<Input 
+          data-testid={name}
+          type="checkbox"
+        />);
+        const input = screen.getByTestId(name) as HTMLInputElement;
+
+        // Uncontrolled checkboxes must still be freely toggleable by the user.
+        expect(input.checked).toBe(false);
+        fireEvent.click(input);
+        expect(input.checked).toBe(true);
+      });
+
+      test("is controlled and reflects the value prop when value is provided", () => {
+        const name = getTestId();
+        render(<Input 
+          data-testid={name}
+          type="checkbox"
+          value={true}
+          onChange={() => {}}
+        />);
+        const input = screen.getByTestId(name) as HTMLInputElement;
+        expect(input.checked).toBe(true);
+      });
+
+      test("is controlled and reflects hook.value when a hook is provided", () => {
+        const name = getTestId();
+        const mockHook = {
+          id: "hookId",
+          name: "hookName",
+          value: true,
+          required: false,
+          errors: null,
+          onChange: () => {},
+          onBlur: () => {},
+          onReset: () => {},
+          touched: false,
+        };
+        render(<Input 
+          data-testid={name}
+          type="checkbox"
+          hook={mockHook}
+        />);
+        const input = screen.getByTestId(name) as HTMLInputElement;
+        expect(input.checked).toBe(true);
+      });
+
+      test("is controlled and defaults to unchecked when only onChange is provided (no hook, no value)", () => {
+        const changeSpy = vi.fn();
+        const name = getTestId();
+        render(<Input 
+          data-testid={name}
+          type="checkbox"
+          onChange={changeSpy}
+        />);
+        const input = screen.getByTestId(name) as HTMLInputElement;
+
+        expect(input.checked).toBe(false);
+        // Controlled: clicking fires the caller's handler but does not
+        // toggle the DOM state itself — that's the caller's responsibility.
+        fireEvent.click(input);
+        expect(changeSpy).toHaveBeenCalled();
+        expect(input.checked).toBe(false);
+      });
+    });
   });
 
   describe("textarea", () => {

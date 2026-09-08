@@ -1,211 +1,248 @@
 import { act, renderHook } from "@testing-library/react";
-import { afterEach, afterAll, describe, expect, test, vi } from "vitest";
-import { useFetch } from "./useFetch";
+import { describe, expect, test } from "vitest";
+import { useInput } from "./useInput";
+import { Validator } from "../lib/client/validation";
 
-describe("useFetch", () => {
-  afterEach(() => {
-    // Completely clear all global overrides and mocks between tests
-    vi.unstubAllGlobals();
-    vi.clearAllMocks();
-  });
+// Minimal fake DOM events — useInput only reads e.target.value / e.target.checked / e.target.type
+function changeEvent(value: string) {
+  return { target: { value } } as any;
+}
+function checkboxEvent(checked: boolean) {
+  return { target: { type: "checkbox", checked } } as any;
+}
+const blurEvent = {} as any;
 
-  afterAll(() => {
-    vi.restoreAllMocks();
-  });
+describe("useInput", () => {
+  describe("initial state", () => {
+    test("returns initialValue, and starts untouched/unblurred with no errors", () => {
+      const { result } = renderHook(() => useInput("name", "Alice"));
 
-  function mockFetchResponse(status: number, data: object) {
-    const mockResponse = {
-      status,
-      json: async () => data,
-    };
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockResponse));
-  }
-
-  function mockFetchFailure(errorMessage: string) {
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error(errorMessage)));
-  }
-
-  test("should not fire immediately if callImmediately is false", () => {
-    const fetchSpy = vi.fn();
-    vi.stubGlobal("fetch", fetchSpy);
-
-    const { result } = renderHook(() => useFetch("/api/users", false));
-
-    expect(result.current.data).toBeNull();
-    expect(result.current.loading).toBe(false);
-    expect(fetchSpy).not.toHaveBeenCalled();
-  });
-
-  test("should fire instantly if callImmediately is true", async () => {
-    const mockData = { success: true, data: { id: 1, name: "Alice" } };
-    mockFetchResponse(200, mockData);
-
-    const { result } = renderHook(() => useFetch("/api/users", true));
-
-    expect(result.current.loading).toBe(true);
-
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(result.current.value).toBe("Alice");
+      expect(result.current.touched).toBe(false);
+      expect(result.current.errors).toBeNull();
+      expect(result.current.required).toBe(false);
     });
 
-    expect(result.current.loading).toBe(false);
-    expect(result.current.data).toEqual(mockData);
-    expect(result.current.error).toBeNull();
-  });
-
-  test("should correctly execute a GET request with query params via refetch", async () => {
-    const mockData = { success: true, data: [] };
-    mockFetchResponse(200, mockData);
-
-    const { result } = renderHook(() => useFetch("/api/users"));
-
-    await act(async () => {
-      await result.current.refetch("?page=2&limit=10");
+    test("id is derived from the field name", () => {
+      const { result } = renderHook(() => useInput("email"));
+      expect(result.current.id).toContain("email_");
     });
 
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      "/api/users?page=2&limit=10",
-      expect.objectContaining({ method: "GET" })
-    );
-    expect(result.current.data).toEqual(mockData);
-  });
-
-  test("should execute a POST request when an object body is sent", async () => {
-    mockFetchResponse(200, { success: true });
-    const { result } = renderHook(() => useFetch("/api/users"));
-
-    const payload = { name: "Bob" };
-    await act(async () => {
-      await result.current.refetch(payload);
+    test("strips a trailing asterisk from name and marks the field required", () => {
+      const { result } = renderHook(() => useInput("email*"));
+      expect(result.current.name).toBe("email");
+      expect(result.current.required).toBe(true);
     });
 
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      "/api/users",
-      expect.objectContaining({
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "application/json" },
-      })
-    );
-  });
-
-  test("should support overriding method types (e.g., PUT)", async () => {
-    mockFetchResponse(200, { success: true });
-    const { result } = renderHook(() => useFetch("/api/users/1"));
-
-    const payload = { name: "Charlie" };
-    await act(async () => {
-      await result.current.refetch(payload, "PUT");
+    test("does not mark the field required when name has no asterisk", () => {
+      const { result } = renderHook(() => useInput("email"));
+      expect(result.current.name).toBe("email");
+      expect(result.current.required).toBe(false);
     });
-
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      "/api/users/1",
-      expect.objectContaining({ method: "PUT" })
-    );
   });
 
-  test("should trigger a DELETE method block safely", async () => {
-    mockFetchResponse(200, { success: true });
-    const { result } = renderHook(() => useFetch("/api/users/1"));
+  describe("onChange", () => {
+    test("updates value and sets touched to true", () => {
+      const { result } = renderHook(() => useInput("name", ""));
 
-    await act(async () => {
-      await result.current.refetch("DELETE");
-    });
-
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      "/api/users/1",
-      expect.objectContaining({ method: "DELETE", body: undefined })
-    );
-  });
-
-  test("should abort previous running request when a new refetch occurs", async () => {
-    const signalTracker: AbortSignal[] = [];
-
-    const fetchSpy = vi.fn().mockImplementation((_url, options) => {
-      if (options?.signal) signalTracker.push(options.signal);
-      
-      return new Promise((resolve, reject) => {
-        // If it's already aborted or gets aborted, trigger the rejection immediately
-        if (options?.signal?.aborted) {
-          const abortError = new Error("The user aborted a request.");
-          abortError.name = "AbortError";
-          return reject(abortError);
-        }
-        
-        options?.signal?.addEventListener("abort", () => {
-          const abortError = new Error("The user aborted a request.");
-          abortError.name = "AbortError";
-          reject(abortError);
-        });
-
-        // FIX 1: Immediately resolve the SECOND request so the test loop can finish safely
-        if (signalTracker.length === 2) {
-          resolve({
-            status: 200,
-            json: async () => ({ success: true, data: "latest-data" })
-          });
-        }
+      act(() => {
+        result.current.onChange(changeEvent("Bob"));
       });
-    });
-    vi.stubGlobal("fetch", fetchSpy);
 
-    const { result } = renderHook(() => useFetch("/api/users"));
-
-    // Call first time (will hang until aborted)
-    act(() => {
-      result.current.refetch();
+      expect(result.current.value).toBe("Bob");
+      expect(result.current.touched).toBe(true);
     });
 
-    // Call second time (forces the abort on the first, and resolves immediately)
-    await act(async () => {
-      await result.current.refetch();
+    test("does not validate on change before the field has been blurred", () => {
+      // Required + empty would normally produce an error, but nothing has
+      // triggered `blurred` yet, so validation should not have run.
+      const { result } = renderHook(() => useInput("name*", ""));
+
+      act(() => {
+        result.current.onChange(changeEvent(""));
+      });
+
+      expect(result.current.errors).toBeNull();
     });
 
-    expect(signalTracker.length).toBe(2);
-    expect(signalTracker[0].aborted).toBe(true);
-    expect(signalTracker[1].aborted).toBe(false);
-    expect(result.current.error).toBeNull();
+    test("validates on every change once the field has been blurred", () => {
+      const { result } = renderHook(() => useInput("name*", ""));
+
+      act(() => result.current.onChange(changeEvent("a")));
+      act(() => result.current.onBlur(blurEvent)); // establishes blurred=true
+
+      act(() => result.current.onChange(changeEvent("")));
+      expect(result.current.errors).not.toBeNull();
+
+      act(() => result.current.onChange(changeEvent("a")));
+      expect(result.current.errors).toBeNull();
+    });
   });
 
-  test("should set error state correctly when server success parameter evaluates false", async () => {
-    mockFetchResponse(200, { success: false, message: "Invalid parameters input" });
-    const { result } = renderHook(() => useFetch("/api/action"));
+  describe("onBlur", () => {
+    test("does nothing if the field has never been touched", () => {
+      const { result } = renderHook(() => useInput("name*", ""));
 
-    await act(async () => {
-      await result.current.refetch();
+      act(() => result.current.onBlur(blurEvent));
+
+      expect(result.current.touched).toBe(false);
+      expect(result.current.errors).toBeNull();
     });
 
-    expect(result.current.error).toBe("Invalid parameters input");
-    expect(result.current.data).toBeNull();
+    test("validates and marks the field as having been through a blur once touched", () => {
+      const { result } = renderHook(() => useInput("name*", ""));
+
+      act(() => result.current.onChange(changeEvent("")));
+      act(() => result.current.onBlur(blurEvent));
+
+      // Required field, blurred while empty -> should now show an error.
+      expect(result.current.errors).not.toBeNull();
+    });
   });
 
-  test("should fallback to generic runtime failure string during network drops", async () => {
-    mockFetchFailure("Connection Drop");
-    const { result } = renderHook(() => useFetch("/api/action"));
+  describe("checkbox handling", () => {
+    test("validates immediately on change, regardless of touched/blurred state", () => {
+      const { result } = renderHook(() => useInput("agree*", false));
 
-    await act(async () => {
-      await result.current.refetch();
+      act(() => {
+        result.current.onChange(checkboxEvent(false));
+      });
+
+      expect(result.current.value).toBe(false);
+      expect(result.current.touched).toBe(true);
+      // Required + unchecked -> error should appear right away, without a blur.
+      expect(result.current.errors).not.toBeNull();
     });
 
-    expect(result.current.error).toBe("Connection Drop");
+    test("clears the error once checked", () => {
+      const { result } = renderHook(() => useInput("agree*", false));
+
+      act(() => result.current.onChange(checkboxEvent(false)));
+      expect(result.current.errors).not.toBeNull();
+
+      act(() => result.current.onChange(checkboxEvent(true)));
+      expect(result.current.errors).toBeNull();
+    });
   });
 
-  test("should clear all state pipelines back to baseline when reset is explicitly invoked", async () => {
-    mockFetchResponse(200, { success: true, data: "test" });
-    const { result } = renderHook(() => useFetch("/api/reset-target"));
+  describe("onReset", () => {
+    test("restores value, touched, blurred, and errors back to their initial state", () => {
+      const { result } = renderHook(() => useInput("name*", "start"));
 
-    await act(async () => {
-      await result.current.refetch();
+      act(() => result.current.onChange(changeEvent("")));
+      act(() => result.current.onBlur(blurEvent));
+      expect(result.current.errors).not.toBeNull();
+      expect(result.current.touched).toBe(true);
+
+      act(() => result.current.onReset());
+
+      expect(result.current.value).toBe("start");
+      expect(result.current.touched).toBe(false);
+      expect(result.current.errors).toBeNull();
+    });
+  });
+
+  describe("deps", () => {
+    test("revalidates using an up-to-date validator closure when a dep changes", () => {
+      // Mirrors a "confirm password" field: its own value never changes, but
+      // it must re-check itself against the latest `password` from outside.
+      const { result, rerender } = renderHook(
+        ({ password }: { password: string }) =>
+          useInput("confirm", "secret1", [Validator.EQUALS(password)], [password]),
+        { initialProps: { password: "secret1" } }
+      );
+
+      act(() => result.current.onChange(changeEvent("secret1")));
+      act(() => result.current.onBlur(blurEvent));
+      expect(result.current.errors).toBeNull(); // matches current password
+
+      act(() => {
+        rerender({ password: "a-different-password" });
+      });
+
+      // Same field value as before, but it no longer matches the new password.
+      expect(result.current.errors).not.toBeNull();
     });
 
-    expect(result.current.data).not.toBeNull();
+    test("does not revalidate on a dep change if the field hasn't been touched/blurred", () => {
+      const { result, rerender } = renderHook(
+        ({ password }: { password: string }) =>
+          useInput("confirm", "secret1", [Validator.EQUALS(password)], [password]),
+        { initialProps: { password: "secret1" } }
+      );
 
-    act(() => {
-      result.current.reset();
+      act(() => {
+        rerender({ password: "a-different-password" });
+      });
+
+      expect(result.current.errors).toBeNull();
+    });
+  });
+
+  describe("handler reference stability", () => {
+    test("onChange keeps the same reference across re-renders when validators are passed inline with no deps", () => {
+      // Regression guard: `validation` is commonly passed as an inline array
+      // literal (a new reference every render). onChange should stay
+      // referentially stable across renders that don't change its own deps
+      // (`blurred`, `validate`), so consumers relying on it in their own
+      // memoization/dependency arrays aren't defeated silently.
+      // Note: this only holds for onChange. onBlur's deps include `touched`
+      // and `value`, which DO change as a direct result of calling onChange
+      // — so onBlur is expected to get a new reference at that point, and
+      // isn't asserted here (see the dedicated onBlur test below).
+      const { result } = renderHook(() => useInput("email", "", [Validator.EMAIL]));
+
+      const firstOnChange = result.current.onChange;
+
+      act(() => result.current.onChange(changeEvent("a")));
+
+      expect(result.current.onChange).toBe(firstOnChange);
     });
 
-    expect(result.current.data).toBeNull();
-    expect(result.current.loading).toBe(false);
-    expect(result.current.error).toBeNull();
+    test("onBlur keeps the same reference across a re-render where touched/value/validate are unchanged", () => {
+      // onBlur depends on [touched, value, validate], so it can only be
+      // expected to stay stable when none of those three have changed —
+      // e.g. a re-render triggered by something unrelated to this field.
+      const { result, rerender } = renderHook(
+        ({ label }: { label: string }) => useInput(label, ""),
+        { initialProps: { label: "email" } }
+      );
+
+      const firstOnBlur = result.current.onBlur;
+
+      act(() => {
+        rerender({ label: "email" }); // re-render with identical props, no interaction
+      });
+
+      expect(result.current.onBlur).toBe(firstOnBlur);
+    });
+
+    test("onBlur reference changes once touched/value change (e.g. after an onChange)", () => {
+      // The inverse of the test above: onBlur MUST pick up a new closure
+      // once touched/value change, or it would validate against a stale value.
+      const { result } = renderHook(() => useInput("email", ""));
+
+      const firstOnBlur = result.current.onBlur;
+
+      act(() => result.current.onChange(changeEvent("a")));
+
+      expect(result.current.onBlur).not.toBe(firstOnBlur);
+    });
+
+    test("onChange reference changes once a listed dep actually changes", () => {
+      const { result, rerender } = renderHook(
+        ({ password }: { password: string }) =>
+          useInput("confirm", "", [Validator.EQUALS(password)], [password]),
+        { initialProps: { password: "one" } }
+      );
+
+      const firstOnChange = result.current.onChange;
+
+      act(() => {
+        rerender({ password: "two" });
+      });
+
+      expect(result.current.onChange).not.toBe(firstOnChange);
+    });
   });
 });

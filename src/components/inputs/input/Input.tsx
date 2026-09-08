@@ -18,10 +18,15 @@ export type InputProps =
     type?: Exclude<React.HTMLInputTypeAttribute, "checkbox" | "textarea" | "select">;
     hook?: UseInputResult<HTMLInputElement>
   }
-  | React.ComponentPropsWithRef<"input"> & BaseInputProps & { 
+  | Omit<React.ComponentPropsWithRef<"input">, "value"> & BaseInputProps & { 
     type: "checkbox";
     hook?: UseInputResult<HTMLInputElement>;
     checkboxStyle?: string;
+    // Overrides the native `value` (string|number|readonly string[]) inherited
+    // above: for a checkbox, Input.tsx treats `value` as the source of truth
+    // for checked state (`!!value`), so it needs to accept a boolean here —
+    // not the native HTML `value` attribute's string type.
+    value?: boolean;
   }
   | React.ComponentPropsWithRef<"textarea"> & BaseInputProps & { 
     type: "textarea";
