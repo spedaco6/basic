@@ -69,7 +69,7 @@ export function Input({
   let inputOnBlur;
   let baseName;
   let inputLabelPosition = isCheckbox ? "right" : "top";
-  let inputChecked: boolean;
+  let inputChecked: boolean | undefined;
 
   if (name) {
     const [nameWithoutAsterisk, isRequiredByName] = checkRequirement(name);
@@ -103,6 +103,15 @@ export function Input({
 
   if (onChange) inputOnChange = onChange;
   if (onBlur) inputOnBlur = onBlur;
+
+  // A checkbox with a change handler but no hook/value is still meant to be
+  // controlled (the caller owns state elsewhere) — give it a starting boolean.
+  // If there's no hook, no value, AND no onChange, leave inputChecked as
+  // undefined so the checkbox stays genuinely uncontrolled and the browser
+  // manages its own checked state.
+  if (isCheckbox && typeof inputChecked === "undefined" && inputOnChange) {
+    inputChecked = false;
+  }
   
   // requirement based on all possible 'required' options 
   const isRequired = required || requiredByName || requiredByHook;
@@ -171,6 +180,17 @@ export function Input({
   const labelBefore = validLabelPosition === "top" || validLabelPosition === "left";
   const verticalLayout = validLabelPosition === "top" || validLabelPosition === "bottom";
 
+  // onChange/onBlur are cast away from their real type here on purpose.
+  // `hook` (and therefore `inputOnChange`/`inputOnBlur`) is typed as a union
+  // of UseInputResult<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  // because InputProps is a discriminated union but `hook` gets destructured
+  // generically above, before we've branched on `type`. TypeScript can't
+  // narrow a union of three incompatible function signatures down to "the
+  // one that matches whichever element renderInput() ends up returning" —
+  // that link is enforced by us branching on `type` correctly below, not by
+  // the type system. Do NOT replace `any` here with one specific element's
+  // event type (e.g. HTMLInputElement) — that would compile, but would be
+  // actively wrong for the textarea/select branches.
   const sharedProps = {
     className: classNameInput,
     id: inputId,
