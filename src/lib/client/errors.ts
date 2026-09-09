@@ -7,7 +7,7 @@ export class HTTPError extends Error {
   constructor(msg: string, status: number);
   constructor(status: number, msg: string);
   constructor(msgStatus: string | number, statusMsg?: string | number) {
-    let msg = "";
+    let msg = "HTTP Error";
     let status = 500;
     if (typeof msgStatus === "string") msg = msgStatus;
     if (typeof msgStatus === "number") status = msgStatus;
