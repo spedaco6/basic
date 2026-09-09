@@ -1,7 +1,12 @@
 import { LoaderCircle } from "lucide-react";
 
+export type ButtonVariant = "primary" | "secondary" | "success" | "danger" | "none";
+
 export type ButtonProps = React.ComponentPropsWithRef<"button"> & {
-  variant?: "primary" | "secondary" | "danger" | "success" | "none";
+  // Known variants get autocomplete; the `string & {}` branch still allows
+  // an arbitrary custom class name (e.g. one defined outside button.css)
+  // without collapsing the whole type down to a bare, unchecked `string`.
+  variant?: ButtonVariant | (string & {});
   icon?: boolean;
   showLoading?: boolean;
   loading?: boolean;

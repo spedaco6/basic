@@ -20,11 +20,23 @@ describe("Button element", () => {
     expect(button!.tagName).toBe("BUTTON");
   });
   test("custom variant added as css class", () => {
-    const { container } = render(<Button variant="secondary">Click Me!</Button>);
-    const button = container.querySelector(".button.secondary") as HTMLButtonElement;
+    const { container } = render(<Button variant="custom">Click Me!</Button>);
+    const button = container.querySelector(".button.custom") as HTMLButtonElement;
     const button2 = container.querySelector(".button.primary") as HTMLButtonElement;
     expect(button).toBeInTheDocument();
     expect(button2).not.toBeInTheDocument();
+  });
+  test("native inline style prop still works independently of variant", () => {
+    // Regression guard: `variant` (formerly named `style`) used to collide
+    // with React's native `style` prop, which made passing an actual
+    // CSSProperties object fail to type-check. Confirms both props now
+    // coexist correctly.
+    const { container } = render(
+      <Button variant="secondary" style={{ marginTop: "12px" }}>Click Me!</Button>
+    );
+    const button = container.querySelector(".button.secondary") as HTMLButtonElement;
+    expect(button).toBeInTheDocument();
+    expect(button.style.marginTop).toBe("12px");
   });
   test("loading state does not show loading spinner by default", () => {
     const { container } = render(<Button loading>Click Me!</Button>);
