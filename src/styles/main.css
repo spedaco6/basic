@@ -1,5 +1,8 @@
+@layer theme, base, components, utilities, state;
+
 @import "tailwindcss";
-@import "./globals.css";
-@import "./input.css";
-@import "./checkbox.css";
-@import "./button.css";
+@import "./globals.css" layer(theme);
+@import "./input.css" layer(components);
+@import "./checkbox.css" layer(components);
+@import "./button.css" layer(components);
+@import "./state.css" layer(state);

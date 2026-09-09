@@ -1,0 +1,69 @@
+/* 
+ * Shared disabled/error state styling for all components.
+ * Lives in its own cascade layer (see main.css), declared AFTER Tailwind's
+ * `utilities` layer. This means a consumer's inline utility class in a
+ * className prop (e.g. className="bg-red-500") cannot accidentally override
+ * disabled/error appearance. Only an unlayered stylesheet — a deliberate,
+ * full reskin by a future developer — can still override these rules.
+ */
+
+/* Button disabled state */
+button.button {
+  &.disabled,
+  a&.disabled {
+    @apply cursor-not-allowed pointer-events-none shadow-none opacity-80
+    bg-disabled-bg text-disabled-text hover:bg-disabled-bg hover:text-disabled-text active:bg-disabled-bg active:text-disabled-text
+    dark:bg-disabled-dark-bg dark:text-disabled-dark-text dark:hover:bg-disabled-dark-bg dark:hover:text-disabled-dark-text dark:active:bg-disabled-dark-bg dark:active:text-disabled-dark-text;
+  }
+}
+
+/* Input/textarea/select/checkbox disabled + error state */
+.input {
+  /* Error - resting state */
+  &.error input,
+  &.error textarea,
+  &.error select {
+    @apply border border-error bg-error-bg 
+    dark:border-error-dark-border dark:bg-error-dark-bg;
+  }
+
+  /* Error + disabled combined */
+  &.error.disabled input,
+  &.error.disabled textarea,
+  &.error.disabled select {
+    @apply border border-err-disabled-border bg-err-disabled-bg text-err-disabled-text 
+    dark:border-err-disabled-dark-border dark:bg-err-disabled-dark-bg dark:text-err-disabled-dark-text;
+  }
+
+  /* Disabled */
+  &.disabled input,
+  &.disabled textarea,
+  &.disabled select {
+    @apply cursor-not-allowed
+    bg-disabled-bg border-disabled-border text-disabled-text
+    dark:bg-disabled-dark-bg dark:border-disabled-dark-border dark:text-disabled-dark-text;
+  }
+  &.disabled label {
+    @apply cursor-not-allowed
+    text-disabled-text
+    dark:text-disabled-dark-text;
+  }
+
+  /* Checkbox - error resting state (reverts to plain input colors) */
+  &.checkbox.error input[type="checkbox"] {
+    @apply border-2 
+    bg-input-bg border-input-border
+    dark:bg-input-dark-bg dark:border-input-dark-border dark:text-body-dark-text;
+  }
+
+  /* Checkbox - disabled */
+  &.checkbox.disabled input,
+  &.checkbox.disabled input:hover {
+    @apply border-2 cursor-not-allowed
+    border-disabled-border bg-disabled-bg hover:border-disabled-border hover:bg-disabled-bg checked:border-disabled-border checked:bg-disabled-bg checked:hover:border-disabled-border checked:hover:bg-disabled-bg
+    dark:border-disabled-dark-border dark:bg-disabled-dark-bg dark:hover:border-disabled-dark-border dark:hover:bg-disabled-dark-bg dark:checked:border-disabled-dark-border dark:checked:bg-disabled-dark-bg dark:checked:hover:border-disabled-dark-border dark:checked:hover:bg-disabled-dark-bg;
+  }
+  &.checkbox.disabled label {
+    @apply cursor-not-allowed;
+  }
+}

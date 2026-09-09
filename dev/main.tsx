@@ -5,16 +5,16 @@ import "../src/styles/main.css";
 
 const App = () => {
   const password = useInput("password", "", [Validator.MIN(8)]);
-  const password2 = useInput("email", "", [Validator.EQUALS(password.value)], [password.value]);
+  const password2 = useInput("password2*", "", [Validator.EQUALS(password.value)], [password.value]);
 
   return <form className="flex flex-col gap-4 p-8 w-90">
     <Input label="Password" type="password" hook={password} allowShow />
     <Input label="Confirm Password" type="email" hook={password2} />
     <Input name="one" label="Sample input" type="password" allowShow />
     <Input name="two" label="Sample text area" type="textarea" />
-    <Input name="three" label="Sample text area" type="select" required allowEmpty options={["this", "that", "another"]}/>
-    <Input name="four" label="This should not be uppercase" type="checkbox" />
-    <Button>Cancel</Button>
+    <Input labelPosition="left" name="three" label="Sample select" type="select" required allowEmpty options={["this", "that", "another"]}/>
+    <Input disabled name="four" label="This should not be uppercase" type="checkbox" />
+    <Button disabled>Cancel</Button>
     <Button>Submit</Button>
   </form>
 };

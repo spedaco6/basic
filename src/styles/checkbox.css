@@ -19,48 +19,39 @@
   &.checkbox input[type="checkbox"]::before {
     @apply w-1.75 h-2.75 mb-0.5 border-b-2 border-r-2 rounded-br-sm content-['']
     rotate-45 origin-center scale-0 transform transition-transform duration-300 ease-in-out;
+    border-color: var(--checkbox-check-color, currentColor);
   }
 
   &.checkbox input[type="checkbox"]:checked::before {
     @apply transform rotate-45 scale-100
   }
 
-  /* Default style */
+  /* Primary style (default) */
   &.checkbox input[type="checkbox"],
   &.checkbox.error input[type="checkbox"] {
     @apply border-2 
-    hover:bg-blue-bg hover:border-blue-border checked:bg-blue-checked
-    dark:hover:bg-blue-dark-bg dark:hover:border-blue-dark-border dark:checked:bg-blue-dark-checked dark:checked:hover:bg-blue-dark-checked;
-  }
-  
-  /* Positive confirmation style */
-  &.checkbox.confirm input,
-  &.checkbox.confirm.error input {
-    @apply border-2 hover:bg-green-bg hover:border-green-border checked:bg-green-checked
-    dark:hover:bg-green-dark-bg dark:hover:border-green-dark-border dark:checked:bg-green-dark-checked dark:checked:hover:bg-green-dark-checked;
+    hover:bg-checkbox-primary-bg hover:border-checkbox-primary-border checked:bg-checkbox-primary-checked
+    dark:hover:bg-checkbox-primary-dark-bg dark:hover:border-checkbox-primary-dark-border dark:checked:bg-checkbox-primary-dark-checked dark:checked:hover:bg-checkbox-primary-dark-checked;
   }
 
-  /* Danger styles */
+  /* Secondary style */
+  &.checkbox.secondary input,
+  &.checkbox.secondary.error input {
+    @apply border-2 hover:bg-checkbox-secondary-bg hover:border-checkbox-secondary-border checked:bg-checkbox-secondary-checked
+    dark:hover:bg-checkbox-secondary-dark-bg dark:hover:border-checkbox-secondary-dark-border dark:checked:bg-checkbox-secondary-dark-checked dark:checked:hover:bg-checkbox-secondary-dark-checked;
+  }
+
+  /* Success style */
+  &.checkbox.success input,
+  &.checkbox.success.error input {
+    @apply border-2 hover:bg-checkbox-success-bg hover:border-checkbox-success-border checked:bg-checkbox-success-checked
+    dark:hover:bg-checkbox-success-dark-bg dark:hover:border-checkbox-success-dark-border dark:checked:bg-checkbox-success-dark-checked dark:checked:hover:bg-checkbox-success-dark-checked;
+  }
+
+  /* Danger style */
   &.checkbox.danger input,
   &.checkbox.danger.error input {
-    @apply border-2 hover:bg-red-bg hover:border-red-border checked:bg-red-checked
-    dark:hover:bg-red-dark-bg dark:hover:border-red-dark-border dark:checked:bg-red-dark-checked dark:checked:hover:bg-red-dark-checked;
-  }
-  
-  &.checkbox.disabled input,
-  &.checkbox.disabled input:hover {
-    @apply border-2 cursor-not-allowed
-    border-disabled-border bg-disabled-bg hover:border-disabled-border hover:bg-disabled-bg checked:border-disabled-border checked:bg-disabled-bg checked:hover:border-disabled-border checked:hover:bg-disabled-bg
-    dark:border-disabled-dark-border dark:bg-disabled-dark-bg dark:hover:border-disabled-dark-border dark:hover:bg-disabled-dark-bg dark:checked:border-disabled-dark-border dark:checked:bg-disabled-dark-bg dark:checked:hover:border-disabled-dark-border dark:checked:hover:bg-disabled-dark-bg
-  }
-
-  &.checkbox.disabled label {
-    @apply cursor-not-allowed;
-  }
-
-   &.checkbox.error input[type="checkbox"] {
-    @apply border-2 
-    bg-input-bg border-input-border
-    dark:bg-input-dark-bg dark:border-input-dark-border dark:text-body-dark-text;
+    @apply border-2 hover:bg-checkbox-danger-bg hover:border-checkbox-danger-border checked:bg-checkbox-danger-checked
+    dark:hover:bg-checkbox-danger-dark-bg dark:hover:border-checkbox-danger-dark-border dark:checked:bg-checkbox-danger-dark-checked dark:checked:hover:bg-checkbox-danger-dark-checked;
   }
 }

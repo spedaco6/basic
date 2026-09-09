@@ -1,6 +1,6 @@
 @theme {
   --color-success: rgb(34 197 94);
-  --color-dark-success: rgb(34 197 94);
+  --color-success-dark: rgb(34 197 94);
   
   /* Body Variables */
   --color-body-bg: rgb(248 250 252);
@@ -16,7 +16,7 @@
 
   /* Error Variables */
   --color-error: rgb(220 38 38);
-  --color-error-dark: rgb(241, 76, 76);
+  --color-error-dark-text: rgb(241, 76, 76);
   --color-error-bg: rgb(252 241 241);
   --color-error-dark-border: rgb(248 113 113);
   --color-error-dark-bg: rgb(69 25 25);
@@ -37,29 +37,37 @@
   --color-err-disabled-dark-border: rgb(138 90 90);
   --color-err-disabled-dark-text: rgb(185 145 145);
 
-  /* Default checkbox colors */
-  --color-blue-bg: rgb(239 246 255);
-  --color-blue-border: rgb(37 99 235);
-  --color-blue-checked: rgb(37 99 235);
-  --color-blue-dark-bg: rgb(23 37 84);
-  --color-blue-dark-border: rgb(96 165 250);
-  --color-blue-dark-checked: rgb(59 130 246);
+  /* Primary checkbox colors */
+  --color-checkbox-primary-bg: rgb(239 246 255);
+  --color-checkbox-primary-border: rgb(37 99 235);
+  --color-checkbox-primary-checked: rgb(37 99 235);
+  --color-checkbox-primary-dark-bg: rgb(23 37 84);
+  --color-checkbox-primary-dark-border: rgb(96 165 250);
+  --color-checkbox-primary-dark-checked: rgb(59 130 246);
 
-  /* Positive checkbox colors */
-  --color-green-bg: rgb(240 253 244);
-  --color-green-border: rgb(22 163 74);
-  --color-green-checked: rgb(22 163 74);
-  --color-green-dark-bg: rgb(20 48 31);
-  --color-green-dark-border: rgb(74 222 128);
-  --color-green-dark-checked: rgb(34 197 94);
+  /* Secondary checkbox colors */
+  --color-checkbox-secondary-bg: rgb(241 245 249);
+  --color-checkbox-secondary-border: rgb(71 85 105);
+  --color-checkbox-secondary-checked: rgb(71 85 105);
+  --color-checkbox-secondary-dark-bg: rgb(30 41 59);
+  --color-checkbox-secondary-dark-border: rgb(148 163 184);
+  --color-checkbox-secondary-dark-checked: rgb(100 116 139);
 
-  /* Warning checkbox colors  */
-  --color-red-bg: rgb(254 242 242);
-  --color-red-border: rgb(220 38 38);
-  --color-red-checked: rgb(220 38 38);
-  --color-red-dark-bg: rgb(69 25 25);
-  --color-red-dark-border: rgb(248 113 113);
-  --color-red-dark-checked: rgb(239 68 68);
+  /* Success checkbox colors */
+  --color-checkbox-success-bg: rgb(240 253 244);
+  --color-checkbox-success-border: rgb(22 163 74);
+  --color-checkbox-success-checked: rgb(22 163 74);
+  --color-checkbox-success-dark-bg: rgb(20 48 31);
+  --color-checkbox-success-dark-border: rgb(74 222 128);
+  --color-checkbox-success-dark-checked: rgb(34 197 94);
+
+  /* Danger checkbox colors */
+  --color-checkbox-danger-bg: rgb(254 242 242);
+  --color-checkbox-danger-border: rgb(220 38 38);
+  --color-checkbox-danger-checked: rgb(220 38 38);
+  --color-checkbox-danger-dark-bg: rgb(69 25 25);
+  --color-checkbox-danger-dark-border: rgb(248 113 113);
+  --color-checkbox-danger-dark-checked: rgb(239 68 68);
 
     /* Default / Primary Button */
   --color-btn-primary-bg: rgb(37 99 235);
@@ -105,15 +113,6 @@
   --color-btn-danger-dark-hover: rgb(248 113 113);
   --color-btn-danger-dark-active: rgb(252 165 165);
 
-    /* Disabled Button Variables */
-  --color-btn-disabled-bg: rgb(243 243 243);
-  --color-btn-disabled-text: rgb(161 161 170);
-  --color-btn-disabled-border: rgb(228 228 231);
-
-  --color-btn-disabled-dark-bg: rgb(30 30 32);
-  --color-btn-disabled-dark-text: rgb(113 113 122);
-  --color-btn-disabled-dark-border: rgb(63 63 70);
-
   --animate-icon-grow: icon-grow 0.5s ease-in-out forwards;
   @keyframes icon-grow {
     0% {
@@ -158,7 +157,7 @@ body {
     text-decoration: none;
   }
   p.error {
-    @apply text-error dark:text-error-dark;
+    @apply text-error dark:text-error-dark-text;
   }
   .disabled p.error {
     @apply text-err-disabled-text dark:text-err-disabled-dark-text;
