@@ -1,7 +1,7 @@
 export type ValidationErrors = Record<string, string[]>
 
 export class HTTPError extends Error {
-  public status;
+  public status: number;
   constructor(msg: string);
   constructor(status: number);
   constructor(msg: string, status: number);
@@ -11,7 +11,7 @@ export class HTTPError extends Error {
     let status = 500;
     if (typeof msgStatus === "string") msg = msgStatus;
     if (typeof msgStatus === "number") status = msgStatus;
-    if (statusMsg) {
+    if (typeof statusMsg !== "undefined") {
       if (typeof statusMsg === "string") msg = statusMsg;
       if (typeof statusMsg === "number") status = statusMsg;
     }
@@ -22,7 +22,7 @@ export class HTTPError extends Error {
 }
 
 export class ValidationError extends HTTPError {
-  public validation;
+  public validation: ValidationErrors;
   constructor(errors: ValidationErrors) {
     super(422, "Invalid user input");
     this.validation = errors;

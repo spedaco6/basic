@@ -1,8 +1,9 @@
 export function checkRequirement(value?: string): [revisedValue: string, isRequired: boolean] {
-  if (!value) return ["", false];
-  if (value.trim() === "*") return ["", true];
-  const matches = value?.match(/^(?<name>.+)\*$/);
+  const trimmedValue = value ? value.trim() : "";
+  if (!trimmedValue) return ["", false];
+  if (trimmedValue === "*") return ["", true];
+  const matches = trimmedValue.match(/^(?<name>.+)\*$/);
   const isRequired = !!matches;
-  const revisedValue = matches?.groups?.name ?? value;
+  const revisedValue = matches?.groups?.name.trim() ?? trimmedValue;
   return [revisedValue, isRequired];
 }
