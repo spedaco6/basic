@@ -1,7 +1,7 @@
 export type ValidatorFn = (val: Validator) => void;
 
 export class Validator {
-  public value;
+  public value: unknown;
   public name?: string;
   public errors: string[] = [];
 
@@ -14,7 +14,7 @@ export class Validator {
     }
   }
 
-  public getErrors = (): string[] | null => {
+  public getErrors(): string[] | null {
     const errors = this.errors;
     const blankAllowed = typeof this.value === "string" && !this.value && !this.requiredMsg;
     this.errors = [];
@@ -37,7 +37,7 @@ export class Validator {
 
     switch (typeof value) {
       case "number":
-        if (value === 0) hasError = true;
+        if (value === 0 || Number.isNaN(value)) hasError = true;
         break;
       default:
         if (!value) hasError = true;
@@ -61,10 +61,12 @@ export class Validator {
     const isValidator = val instanceof Validator;
     const err = isValidator && val.name ? val.name + " is an invalid email address" : "Email address is invalid";
     const value = isValidator ? val.value : val;
+    
     let hasError = false;
-    if (typeof value !== "string") hasError = true;
-    if (!hasError) {
-      const matches = value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
+    if (typeof value !== "string") {
+      hasError = true;
+    } else {
+      const matches = (value).match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
       if (!matches) hasError = true;
     }
 
@@ -139,8 +141,10 @@ export class Validator {
       case "object":
         if (Array.isArray(value)) {
           if (value.length < min) error = msg;
-          break;
+        } else {
+          error = "MIN can only receive a string, number, or array";
         }
+        break;
       default:
         error = "MIN can only receive a string, number, or array";
     }
@@ -182,8 +186,10 @@ export class Validator {
       case "object":
         if (Array.isArray(value)) {
           if (value.length > max) error = msg;
-          break;
+        } else {
+          error = "MAX can only receive a string, number, or array";
         }
+        break;
       default:
         error = "MAX can only receive a string, number, or array";
     }

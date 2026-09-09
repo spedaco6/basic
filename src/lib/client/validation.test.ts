@@ -79,12 +79,16 @@ describe("Validator", () => {
       
       const error2 = Validator.REQUIRE("");
       expect(error2).toBeTypeOf("string");
+
+      const error3 = Validator.REQUIRE(NaN);
+      expect(error3).toBeTypeOf("string");
     });
     test.each([
       ["string", "sample", true],
       ["string", "", false],
       ["number", 1, true],
       ["number", 0, false],
+      ["number", NaN, false],
       ["boolean", true, true],
       ["boolean", false, false],
       ["object", ["test"], true],
