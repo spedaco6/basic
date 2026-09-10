@@ -27,6 +27,19 @@ describe("useFetch", () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error(errorMessage)));
   }
 
+  // Headers instances don't expose their contents as plain enumerable
+  // properties, so expect.objectContaining/toEqual against a plain object
+  // won't work against them — pull out the actual Headers instance sent to
+  // fetch and inspect it via .get() instead.
+  function getLastFetchHeaders(): Headers {
+    const fetchMock = globalThis.fetch as unknown as ReturnType<typeof vi.fn>;
+    const lastCall = fetchMock.mock.calls[fetchMock.mock.calls.length - 1];
+    const options = lastCall[1] as RequestInit;
+    return options.headers instanceof Headers
+      ? options.headers
+      : new Headers(options.headers);
+  }
+
   test("should not fire immediately if callImmediately is false", () => {
     const fetchSpy = vi.fn();
     vi.stubGlobal("fetch", fetchSpy);
@@ -88,9 +101,9 @@ describe("useFetch", () => {
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify(payload),
-        headers: { "Content-Type": "application/json" },
       })
     );
+    expect(getLastFetchHeaders().get("Content-Type")).toBe("application/json");
   });
 
   test("should support overriding method types (e.g., PUT)", async () => {
@@ -177,13 +190,11 @@ describe("useFetch", () => {
 
     expect(globalThis.fetch).toHaveBeenCalledWith(
       "/api/secure",
-      expect.objectContaining({
-        headers: expect.objectContaining({
-          "Authorization": "Bearer token123",
-          "X-Custom-Client": "SpedacoBasic"
-        })
-      })
+      expect.objectContaining({})
     );
+    const headers = getLastFetchHeaders();
+    expect(headers.get("Authorization")).toBe("Bearer token123");
+    expect(headers.get("X-Custom-Client")).toBe("SpedacoBasic");
   });
 
   test("should merge initialization headers with automatic JSON content-type during POST payloads", async () => {
@@ -200,12 +211,106 @@ describe("useFetch", () => {
       "/api/secure",
       expect.objectContaining({
         method: "POST",
-        headers: expect.objectContaining({
-          "Authorization": "Bearer token123",
-          "Content-Type": "application/json" // Checked that merging occurs smoothly
-        })
       })
     );
+    const headers = getLastFetchHeaders();
+    expect(headers.get("Authorization")).toBe("Bearer token123");
+    expect(headers.get("Content-Type")).toBe("application/json"); // Checked that merging occurs smoothly
+  });
+
+  test("generic type parameter is threaded through to data's type (compile-time check)", async () => {
+    type User = { id: number; name: string };
+    mockFetchResponse(200, { success: true, data: { id: 1, name: "Alice" } });
+    const { result } = renderHook(() => useFetch<User>("/api/users", true));
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    // If UseFetchResult weren't generic, this line would fail to type-check
+    // (data?.data would still be Record<string, any>), failing the whole
+    // test file at compile time rather than at a runtime assertion.
+    const typedData: User | User[] | undefined = result.current.data?.data;
+    expect(typedData).toEqual({ id: 1, name: "Alice" });
+  });
+
+  test("accepts initHeaders as a Headers instance", async () => {
+    mockFetchResponse(200, { success: true });
+    const instanceHeaders = new Headers({ Authorization: "Bearer from-instance" });
+    const { result } = renderHook(() => useFetch("/api/secure", false, instanceHeaders));
+
+    await act(async () => {
+      await result.current.refetch();
+    });
+
+    expect(getLastFetchHeaders().get("Authorization")).toBe("Bearer from-instance");
+  });
+
+  test("accepts initHeaders as a [key, value][] tuple array", async () => {
+    mockFetchResponse(200, { success: true });
+    const tupleHeaders: [string, string][] = [["Authorization", "Bearer from-tuples"]];
+    const { result } = renderHook(() => useFetch("/api/secure", false, tupleHeaders));
+
+    await act(async () => {
+      await result.current.refetch();
+    });
+
+    expect(getLastFetchHeaders().get("Authorization")).toBe("Bearer from-tuples");
+  });
+
+  test("clears data immediately when a new refetch starts, before the response resolves", async () => {
+    mockFetchResponse(200, { success: true, data: "initial" });
+    const { result } = renderHook(() => useFetch("/api/action"));
+    await act(async () => {
+      await result.current.refetch();
+    });
+    expect(result.current.data).toEqual({ success: true, data: "initial" });
+
+    let resolveFetch: (value: any) => void = () => {};
+    const pending = new Promise((resolve) => { resolveFetch = resolve; });
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(pending));
+
+    act(() => {
+      result.current.refetch();
+    });
+
+    expect(result.current.data).toBeNull();
+
+    await act(async () => {
+      resolveFetch({ status: 200, json: async () => ({ success: true, data: "final" }) });
+      await pending;
+    });
+  });
+
+  test("does not leak Content-Type from a POST call into a later GET call", async () => {
+    mockFetchResponse(200, { success: true });
+    const { result } = renderHook(() => useFetch("/api/users"));
+
+    await act(async () => {
+      await result.current.refetch({ name: "Bob" });
+    });
+    expect(getLastFetchHeaders().get("Content-Type")).toBe("application/json");
+
+    await act(async () => {
+      await result.current.refetch();
+    });
+    expect(getLastFetchHeaders().get("Content-Type")).toBeNull();
+  });
+
+  test("refetch stays referentially stable across renders when initHeaders content is unchanged, even with a fresh object literal", () => {
+    const { result, rerender } = renderHook(
+      ({ headers }) => useFetch("/api/users", false, headers),
+      { initialProps: { headers: { Authorization: "Bearer abc" } } }
+    );
+    const firstRefetch = result.current.refetch;
+
+    // Fresh object literal, identical content — refetch should NOT change.
+    rerender({ headers: { Authorization: "Bearer abc" } });
+    expect(result.current.refetch).toBe(firstRefetch);
+
+    // Genuinely different content — refetch SHOULD change.
+    rerender({ headers: { Authorization: "Bearer different" } });
+    expect(result.current.refetch).not.toBe(firstRefetch);
   });
 
 });
