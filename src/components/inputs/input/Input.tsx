@@ -33,7 +33,7 @@ export type InputProps =
     hook?: UseInputResult<HTMLTextAreaElement>;
   }
   | React.ComponentPropsWithRef<"select"> & BaseInputProps & { 
-    type: "select";
+    type?: "select";
     options: (string | number)[];
     allowEmpty?: boolean;
     hook?: UseInputResult<HTMLSelectElement>;
@@ -62,8 +62,9 @@ export function Input({
   const labelPositions = ["top", "bottom", "right", "left"];
   const hasLabel = !!label;
   const isCheckbox = type === "checkbox";
-  const isSelect = type === "select";
+  const isSelect = type === "select" || (typeof type === "undefined" && "options" in props);
 
+  const inputType = isSelect ? "select" : type;
   let inputName;
   let inputValue;
   let allErrors;
@@ -169,9 +170,9 @@ export function Input({
 
   const inputStyles = isCheckbox 
     ? `checkbox ${checkboxStyle ? checkboxStyle : ""}` 
-    : type === "textarea" 
+    : inputType === "textarea" 
       ? "textarea"
-      : type === "select"
+      : inputType === "select"
         ? "select"
         : "";
 
@@ -208,18 +209,18 @@ export function Input({
   }
 
   const renderInput = () => {
-    if (type === "textarea") {
+    if (inputType === "textarea") {
       return <textarea {...sharedProps} {...(cleanProps as React.ComponentPropsWithoutRef<"textarea">)} />
     }
-    if (type === "select") {
+    if (inputType === "select") {
       return <select {...sharedProps} {...(cleanProps as React.ComponentPropsWithoutRef<"select">)}>
         { selectOptions.map(opt => <option key={opt}>{ opt }</option>) }
       </select>
     }
     if (isCheckbox) return <input {...sharedProps} type="checkbox" checked={inputChecked} {...(cleanProps as React.ComponentPropsWithoutRef<"input">)} />
 
-    if (allowShow && type === "password") {
-      const displayType = show ? "text" : type;
+    if (allowShow && inputType === "password") {
+      const displayType = show ? "text" : inputType;
       return <div className="reveal">
         <input {...sharedProps} type={displayType} {...(cleanProps as React.ComponentPropsWithoutRef<"input">)} />
         <Button 
@@ -232,7 +233,7 @@ export function Input({
       </div>
     }
 
-    return <input {...sharedProps} type={type} {...(cleanProps as React.ComponentPropsWithoutRef<"input">)} />
+    return <input {...sharedProps} type={inputType} {...(cleanProps as React.ComponentPropsWithoutRef<"input">)} />
   }
 
   return <div className={`

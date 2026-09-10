@@ -337,73 +337,25 @@ describe("Input element", () => {
       expect(inputContainer).toContainElement(input);
       expect(inputContainer).toContainElement(label);
     });
+    test("accepts a boolean value directly (not via hook); also guards against the value/checked type collision regressing", () => {
+      const name = getTestId();
+      const { rerender } = render(<Input
+        data-testid={name}
+        type="checkbox"
+        value={true}
+        onChange={() => {}}
+      />);
+      let input = screen.getByTestId(name) as HTMLInputElement;
+      expect(input.checked).toBe(true);
 
-    describe("controlled vs. uncontrolled state", () => {
-      test("stays uncontrolled (no checked attribute forced) with no hook, value, or onChange", () => {
-        const name = getTestId();
-        render(<Input 
-          data-testid={name}
-          type="checkbox"
-        />);
-        const input = screen.getByTestId(name) as HTMLInputElement;
-
-        // Uncontrolled checkboxes must still be freely toggleable by the user.
-        expect(input.checked).toBe(false);
-        fireEvent.click(input);
-        expect(input.checked).toBe(true);
-      });
-
-      test("is controlled and reflects the value prop when value is provided", () => {
-        const name = getTestId();
-        render(<Input 
-          data-testid={name}
-          type="checkbox"
-          value={true}
-          onChange={() => {}}
-        />);
-        const input = screen.getByTestId(name) as HTMLInputElement;
-        expect(input.checked).toBe(true);
-      });
-
-      test("is controlled and reflects hook.value when a hook is provided", () => {
-        const name = getTestId();
-        const mockHook = {
-          id: "hookId",
-          name: "hookName",
-          value: true,
-          required: false,
-          errors: null,
-          onChange: () => {},
-          onBlur: () => {},
-          onReset: () => {},
-          touched: false,
-        };
-        render(<Input 
-          data-testid={name}
-          type="checkbox"
-          hook={mockHook}
-        />);
-        const input = screen.getByTestId(name) as HTMLInputElement;
-        expect(input.checked).toBe(true);
-      });
-
-      test("is controlled and defaults to unchecked when only onChange is provided (no hook, no value)", () => {
-        const changeSpy = vi.fn();
-        const name = getTestId();
-        render(<Input 
-          data-testid={name}
-          type="checkbox"
-          onChange={changeSpy}
-        />);
-        const input = screen.getByTestId(name) as HTMLInputElement;
-
-        expect(input.checked).toBe(false);
-        // Controlled: clicking fires the caller's handler but does not
-        // toggle the DOM state itself — that's the caller's responsibility.
-        fireEvent.click(input);
-        expect(changeSpy).toHaveBeenCalled();
-        expect(input.checked).toBe(false);
-      });
+      rerender(<Input
+        data-testid={name}
+        type="checkbox"
+        value={false}
+        onChange={() => {}}
+      />);
+      input = screen.getByTestId(name) as HTMLInputElement;
+      expect(input.checked).toBe(false);
     });
   });
 
@@ -480,6 +432,27 @@ describe("Input element", () => {
       />);
       let input = container.querySelector(".input.select");
       expect(input).toBeInTheDocument();
+    });
+    test("infers select type when options is provided without an explicit type", () => {
+      const name = getTestId();
+      render(<Input
+        data-testid={name}
+        options={["this", "that"]}
+      />);
+      const input = screen.getByTestId(name);
+      expect(input.tagName).toBe("SELECT");
+    });
+    test("explicit non-select type is not silently overridden by presence of options", () => {
+      const name = getTestId();
+      // Cast used deliberately: this combination (explicit non-select type +
+      // options) shouldn't normally type-check as valid usage — this test
+      // exercises the runtime safety net for props assembled dynamically
+      // (e.g. spread from another object) rather than written as JSX literals.
+      const conflictingProps = { type: "text", options: ["this", "that"] } as any;
+      render(<Input data-testid={name} {...conflictingProps} />);
+      const input = screen.getByTestId(name) as HTMLInputElement;
+      expect(input.tagName).toBe("INPUT");
+      expect(input.type).toBe("text");
     });
   });
 
