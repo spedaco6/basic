@@ -36,17 +36,7 @@ export default defineConfig(({ command }) => {
           'next',
           /^next\/.*/,
           'lucide-react'
-        ],
-        output: {
-          globals: {
-            react: 'React',
-            'react-dom': 'ReactDOM',
-            'react/jsx-runtime': 'JSX',
-            'lucide-react': 'LucideReact',
-            'next': "Next",
-            'next/navigation': "NextNavigation"
-          }
-        }
+        ]
       }
     };
   }
