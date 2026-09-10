@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { PER_PAGE } from "../lib/client/const";
+import { useEffect, useState, type ChangeEvent } from "react"
+import { PER_PAGE, MAX_PER_PAGE } from "../lib/client/const";
 
 export type Pagination = {
   page: number;
@@ -28,28 +28,31 @@ export type UsePaginationResult = {
   onPrevPage: () => void;
   onLastPage: () => void;
   onChangePage: (val: number) => void;
-  onChangeLimit: (val: number) => void;
+  onChangeLimit: (val: number | ChangeEvent<HTMLSelectElement>) => void;
   onChangeSort: (val: string) => void;
   onChangeOrder: (val: "asc" | "desc") => void;
   onChangeSearch: (val: string) => void;
 }
 
 export function usePagination(total: number = 0): UsePaginationResult {
-  const [limit, setLimit] = useState(() => {
-    if (typeof window !== "undefined") {
-      let savedLimit = Number(window.sessionStorage.getItem("perPage"));
-      if (!savedLimit) {
-        savedLimit = PER_PAGE;
-        window.sessionStorage.setItem("perPage", String(savedLimit));
-      }
-      return savedLimit;
-    }
-    return PER_PAGE;
-  });    
+  const [limit, setLimit] = useState(PER_PAGE);
   const [page, setPage] = useState(1);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [sort, setSort] = useState("id");
   const [search, setSearch] = useState("");
+
+  // Runs once, client-side only (effects never run during SSR), so the
+  // server-rendered HTML and the client's first render always agree on
+  // PER_PAGE — avoiding a hydration mismatch — then upgrades to the saved
+  // value immediately after mount, if one exists and is still valid.
+  useEffect(() => {
+    const savedLimit = Number(window.sessionStorage.getItem("perPage"));
+    if (savedLimit > 0 && savedLimit <= MAX_PER_PAGE) {
+      setLimit(savedLimit);
+    } else {
+      window.sessionStorage.setItem("perPage", String(PER_PAGE));
+    }
+  }, []);
 
   const totalPages = Math.ceil(total/limit);
   const hasNextPage = page < totalPages;
@@ -58,6 +61,18 @@ export function usePagination(total: number = 0): UsePaginationResult {
   const lastRecordDisplaying = hasNextPage
     ? page * limit
     : total; 
+
+  // keep page inside [1, totalPages] whenever total/limit changes for any
+  // reason (e.g. an external filter shrinks the result set) — mirrors the
+  // same "clamp to last valid page, or 1 if there are no pages" logic used
+  // by onLastPage, but runs automatically instead of requiring a handler call
+  useEffect(() => {
+    if (totalPages > 0 && page > totalPages) {
+      setPage(totalPages);
+    } else if (totalPages === 0 && page !== 1) {
+      setPage(1);
+    }
+  }, [totalPages, page]);
 
   // cast all pagination values to string
   const urlSearchParams = new URLSearchParams({
@@ -86,18 +101,24 @@ export function usePagination(total: number = 0): UsePaginationResult {
     if (hasPrevPage) setPage(prev => prev - 1);
   }
   const onLastPage = () => {
-    setPage(totalPages);
+    const lastPage = totalPages > 0 ? totalPages : 1;
+    setPage(lastPage);
   }
 
-  const onChangeLimit = (newLimit: number) => {
+  const onChangeLimit = (newLimitData: number | React.ChangeEvent<HTMLSelectElement>) => {
+    let newLimit: number;
+    if (typeof newLimitData === "number") {
+      newLimit = newLimitData;
+    } else if ("target" in newLimitData) {
+      newLimit = Number(newLimitData.target.value);
+    } else {
+      return; // malformed input — leave existing state untouched
+    }
+
+    if (Number.isNaN(newLimit) || newLimit <= 0 || newLimit > MAX_PER_PAGE) return;
+    window.sessionStorage.setItem("perPage", String(newLimit));
+    setLimit(newLimit);
     setPage(1);
-    setLimit(prev => {
-      if (newLimit > 0 && newLimit <= 100) {
-        window.sessionStorage.setItem("perPage", String(newLimit)); 
-        return newLimit;
-      } 
-      return prev;
-    });
   };
 
   const onChangeOrder = (newOrder: "asc" | "desc") => {

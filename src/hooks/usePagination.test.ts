@@ -202,5 +202,87 @@ describe("usePagination", () => {
     act(() => result.current.onChangePage(-2));
     expect(result.current.page).toBe(3);
   });
+
+  test("onLastPage sets page to 1 when there are no records", () => {
+    const { result } = renderHook(() => usePagination(0));
+    act(() => result.current.onLastPage());
+    expect(result.current.page).toBe(1);
+  });
+
+  test("clamps page back into range when total shrinks between renders", () => {
+    const { result, rerender } = renderHook(
+      ({ total }) => usePagination(total),
+      { initialProps: { total: 23 } }
+    );
+    act(() => result.current.onLastPage());
+    expect(result.current.page).toBe(3);
+
+    rerender({ total: 5 });
+    expect(result.current.page).toBe(1);
+    expect(result.current.firstRecordDisplaying).toBe(1);
+    expect(result.current.lastRecordDisplaying).toBe(5);
+  });
+
+  test("clamps page down (not to 1) when total shrinks but multiple pages still remain", () => {
+    const { result, rerender } = renderHook(
+      ({ total }) => usePagination(total),
+      { initialProps: { total: 50 } }
+    );
+    act(() => result.current.onChangePage(4));
+    expect(result.current.page).toBe(4);
+
+    rerender({ total: 25 });
+    expect(result.current.page).toBe(3);
+  });
+
+  test("onChangeLimit does not reset page when the new limit is invalid", () => {
+    const { result } = renderHook(() => usePagination(23));
+    act(() => result.current.onChangePage(2));
+    expect(result.current.page).toBe(2);
+
+    act(() => result.current.onChangeLimit(0));
+    expect(result.current.page).toBe(2);
+    expect(result.current.limit).toBe(10);
+
+    act(() => result.current.onChangeLimit(150));
+    expect(result.current.page).toBe(2);
+    expect(result.current.limit).toBe(10);
+  });
+
+  test("onChangeLimit accepts a select change event and extracts its value", () => {
+    const { result } = renderHook(() => usePagination(23));
+    const fakeEvent = {
+      target: { value: "50" },
+    } as React.ChangeEvent<HTMLSelectElement>;
+
+    act(() => result.current.onChangeLimit(fakeEvent));
+    expect(result.current.limit).toBe(50);
+  });
+
+  test("onChangeLimit rejects a change event carrying a non-numeric value (regression: previously produced NaN)", () => {
+    const { result } = renderHook(() => usePagination(23));
+    act(() => result.current.onChangePage(2));
+
+    const badEvent = {
+      target: { value: "not-a-number" },
+    } as React.ChangeEvent<HTMLSelectElement>;
+
+    act(() => result.current.onChangeLimit(badEvent));
+    expect(result.current.limit).toBe(10);
+    expect(result.current.page).toBe(2);
+    expect(Number.isNaN(result.current.limit)).toBe(false);
+  });
+
+  test("onChangeLimit is a no-op when given an object with no target property", () => {
+    const { result } = renderHook(() => usePagination(23));
+    act(() => result.current.onChangePage(2));
+    expect(result.current.page).toBe(2);
+    expect(result.current.limit).toBe(10);
+
+    const malformed = {} as React.ChangeEvent<HTMLSelectElement>;
+    act(() => result.current.onChangeLimit(malformed));
+    expect(result.current.limit).toBe(10);
+    expect(result.current.page).toBe(2);
+  });
  
 });
