@@ -11,7 +11,7 @@ const App = () => {
 
   return <form className="flex flex-col gap-4 p-8 w-90">
     <p>{pagination.limit}</p>
-    <Input options={[1, 5, 10, 20]} label="Limit" onChange={pagination.onChangeLimit} />
+    <Input options={{one: 1, five: 5, ten: 10, twenty: 20}} label="Limit" onChange={pagination.onChangeLimit} value={pagination.limit} />
     <Input label="Password" type="password" hook={password} allowShow />
     <Input label="Confirm Password" type="email" hook={password2} />
     <Input name="one" label="Sample input" type="password" allowShow />

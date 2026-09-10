@@ -426,6 +426,44 @@ describe("Input element", () => {
       let options = container.querySelectorAll("option");
       expect(options).toHaveLength(2);
     });
+    test("accepts an object of title/value pairs and uses the value as the option's value", () => {
+      const { container } = render(<Input
+        type="select"
+        options={{ Apple: "apple_id", Banana: "banana_id" }}
+      />);
+      const options = container.querySelectorAll("option");
+      expect(options).toHaveLength(2);
+      expect(options[0].textContent).toBe("Apple");
+      expect(options[0].getAttribute("value")).toBe("apple_id");
+      expect(options[1].textContent).toBe("Banana");
+      expect(options[1].getAttribute("value")).toBe("banana_id");
+    });
+    test("filters a blank-value object option by default, keeps it with allowEmpty", () => {
+      const objOptions = { "Select an option": "", Apple: "apple_id" };
+      const { container, rerender } = render(<Input
+        type="select"
+        options={objOptions}
+      />);
+      let options = container.querySelectorAll("option");
+      expect(options).toHaveLength(1);
+      expect(options[0].textContent).toBe("Apple");
+
+      rerender(<Input
+        type="select"
+        allowEmpty
+        options={objOptions}
+      />);
+      options = container.querySelectorAll("option");
+      expect(options).toHaveLength(2);
+      expect(options[0].textContent).toBe("Select an option");
+      expect(options[0].getAttribute("value")).toBe("");
+    });
+    test("does not crash when options is null (guards against typeof null === 'object')", () => {
+      const nullOptions = null as any;
+      expect(() => {
+        render(<Input type="select" options={nullOptions} />);
+      }).not.toThrow();
+    });
     test("has select class", () => {
       const { container } = render(<Input 
         type="select"

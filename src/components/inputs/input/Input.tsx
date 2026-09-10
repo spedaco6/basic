@@ -34,7 +34,7 @@ export type InputProps =
   }
   | React.ComponentPropsWithRef<"select"> & BaseInputProps & { 
     type?: "select";
-    options: (string | number)[];
+    options: (string | number)[] | Record<string, (number | string)>;
     allowEmpty?: boolean;
     hook?: UseInputResult<HTMLSelectElement>;
   };
@@ -146,7 +146,7 @@ export function Input({
 
   // select inputs
   let selectAllowEmpty = false;
-  let selectOptions: (string | number)[] = [];
+  let selectOptions: [title: string | number, value: string | number][] = [];
   if (isSelect) {
     if ("allowEmpty" in cleanProps) {
       const { allowEmpty, ...sProps } = cleanProps;
@@ -155,13 +155,19 @@ export function Input({
     }
     if ("options" in cleanProps) {
       const { options, ...sProps } = cleanProps;
-      selectOptions = options ?? [];
+
+      if (Array.isArray(options)) {
+        selectOptions = options.map(opt => [opt, opt]);
+      } else if (options && typeof options === "object") {
+        selectOptions = Object.entries(options);
+      }
+
       if (!selectAllowEmpty || isRequired) {
-        const updated = selectOptions.filter(opt => opt !== "");
+        const updated: [string | number, string | number][] = selectOptions.filter(opt => opt[1] !== "");
         selectOptions = updated;
       }
-      if (!isRequired && selectAllowEmpty && selectOptions.every(opt => opt !== "")) {
-        const updated = ["", ...selectOptions];
+      if (!isRequired && selectAllowEmpty && selectOptions.every(opt => opt[1] !== "")) {
+        const updated: [string | number, string | number][] = [["", ""], ...selectOptions];
         selectOptions = updated;
       }
       cleanProps = sProps; 
@@ -214,7 +220,7 @@ export function Input({
     }
     if (inputType === "select") {
       return <select {...sharedProps} {...(cleanProps as React.ComponentPropsWithoutRef<"select">)}>
-        { selectOptions.map(opt => <option key={opt}>{ opt }</option>) }
+        { selectOptions.map(([title, val]) => <option key={val} value={val}>{ title }</option>) }
       </select>
     }
     if (isCheckbox) return <input {...sharedProps} type="checkbox" checked={inputChecked} {...(cleanProps as React.ComponentPropsWithoutRef<"input">)} />
