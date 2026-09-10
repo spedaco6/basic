@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ValidationErrors } from "../lib/client/errors";
 import type { Pagination } from "./usePagination";
 
@@ -16,15 +16,15 @@ export type RefetchFunction = {
   (): Promise<void>;
   (searchParams: string): Promise<void>;
   
-  // GET or POST signature
+  // POST signature (body only — always POST unless arg2 overrides the method)
   (body: Record<string, unknown>): Promise<void>;
   
   // PUT or PATCH signature
   (body: Record<string, unknown>, method: MethodTypes): Promise<void>;
 }
 
-export type UseFetchResult = {
-  data: FetchResponseData | null;
+export type UseFetchResult<T extends Record<string, any> = Record<string, any>> = {
+  data: FetchResponseData<T> | null;
   loading: boolean;
   error: string | null;
   refetch: RefetchFunction;
@@ -52,11 +52,26 @@ export function useFetch<
   url: string,
   callImmediately: boolean | "loadingOnly" = false,
   initHeaders?: HeadersInit
-): UseFetchResult {
+): UseFetchResult<T> {
   const [ data, setData ] = useState<FetchResponseData<T> | null>(null);
   const [ loading, setLoading ] = useState(!!callImmediately);
   const [ error, setError ] = useState<string | null>(null);
   const abortCtrl = useRef<AbortController | null>(null);
+
+  // Stable base headers, re-derived only when the caller-provided headers'
+  // actual content changes — not their reference. This is what lets refetch
+  // below stay referentially stable across renders even when a consumer
+  // passes initHeaders as a fresh inline object/array literal every render.
+  // (Headers instances are normalized to an array before stringifying, since
+  // JSON.stringify can't see a Headers instance's contents directly.)
+  const headerKey = initHeaders instanceof Headers
+    ? JSON.stringify(Array.from(initHeaders.entries()))
+    : JSON.stringify(initHeaders);
+  const baseHeaders = useMemo(
+    () => new Headers(initHeaders),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [headerKey]
+  );
 
   const refetch: RefetchFunction = useCallback(async (
     arg1?: FetchBody, 
@@ -64,6 +79,7 @@ export function useFetch<
   ): Promise<void> => {
     setLoading(true);
     setError(null);
+    setData(null);
     
     // abort previous call if necessary
     if (abortCtrl.current) abortCtrl.current.abort();
@@ -76,7 +92,7 @@ export function useFetch<
     if (typeof arg1 === "string" && arg1.toLowerCase() === "delete") {
       method = "DELETE";
 
-    // Determine body for POST, PUT, PATCH requests
+    // Body-only calls are always POST unless arg2 overrides the method
     } else if (typeof arg1 === "object") {
       method = "POST";
       body = arg1;
@@ -85,11 +101,13 @@ export function useFetch<
       }
     }
   
-    // Set headers
-    const headers: HeadersInit = {
-      ...initHeaders,
-      ...(body ? { "Content-Type": "application/json" } : {})
-    };
+    // Clone the stable base headers per call rather than mutating the shared
+    // memoized instance directly — Headers.set() mutates in place, and since
+    // baseHeaders persists across calls until initHeaders' content changes,
+    // mutating it directly would leak Content-Type from one call (e.g. a
+    // POST) into a later call that shouldn't have it (e.g. a GET).
+    const headers = new Headers(baseHeaders);
+    if (body) headers.set("Content-Type", "application/json");
 
     let activeAbortSignal;
     try {
@@ -120,7 +138,7 @@ export function useFetch<
         setLoading(false);
       }
     }
-  }, [url, initHeaders]);
+  }, [url, baseHeaders]);
 
   const reset = () => {
     if (abortCtrl.current) abortCtrl.current.abort();
