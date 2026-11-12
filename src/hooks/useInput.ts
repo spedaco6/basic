@@ -3,7 +3,8 @@
 import { checkRequirement } from "../lib/client/utils";
 import { Validator } from "../lib/client/validation";
 import type { ValidatorFn } from "../lib/client/validation";
-import { useCallback, useEffect, useId, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { useId } from "./useId";
 
 export type InputTypes = 
   | HTMLInputElement
@@ -76,7 +77,8 @@ export const useInput = <
     () => isRequired ? [...validation, Validator.REQUIRE] : validation,
     [isRequired, JSON.stringify(deps)]
   );
-  const id = inputName + "_" + useId();
+  
+  const id = useId("", inputName);
 
   useEffect(() => {
     if (blurred && touched) validate(value);

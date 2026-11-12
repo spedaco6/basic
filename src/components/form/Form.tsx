@@ -1,4 +1,5 @@
 import { FormContextProvider, useFormCtx } from "../../context/FormContext"
+import { useId } from "../../hooks/useId";
 import { Button } from "../inputs/button/Button";
 import type { ButtonProps } from "../inputs/button/Button";
 import { Input } from "../inputs/input/Input";
@@ -18,7 +19,7 @@ const Form = ({ children, ...props }: FormProps) => {
 const FormInput = ({ disabled, ...props }: InputProps) => {
   const ctx = useFormCtx();
   const inputDisabled = disabled || ctx.disabled || ctx.loading;
-  
+
   return <Input
     form={ctx.id}
     disabled={inputDisabled}
@@ -26,12 +27,14 @@ const FormInput = ({ disabled, ...props }: InputProps) => {
   />
 }
 
-const FormButton = ({ children, disabled, loading, ...props }: ButtonProps) => {
+const FormButton = ({ children, disabled, loading, id, ...props }: ButtonProps) => {
+  const buttonId = useId(id, "button");
   const ctx = useFormCtx();
   const buttonLoading = loading || ctx.loading;
   const buttonDisabled = disabled || ctx.disabled;
 
-  return <Button 
+  return <Button
+    id={buttonId} 
     form={ctx.id}
     disabled={buttonDisabled}
     loading={buttonLoading}

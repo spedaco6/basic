@@ -1,5 +1,6 @@
-import { createContext, useContext, useId } from "react";
+import { createContext, useContext } from "react";
 import type { FormProps } from "../components/form/Form";
+import { useId } from "../hooks/useId";
 
 type FormContextResult = {
   id: string;
@@ -27,8 +28,7 @@ export const FormContextProvider = ({
   disabled=false, 
   ...props 
 }: FormProps) => {
-  let formId = "form_" + useId();
-  if (id) formId = id;
+  const formId = useId(id, "form");
 
   const value = {
     id: formId,

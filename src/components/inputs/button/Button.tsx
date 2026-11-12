@@ -1,5 +1,5 @@
 import { LoaderCircle } from "lucide-react";
-import { useId } from "react";
+import { useId } from "../../../hooks/useId";
 
 export type ButtonVariant = "primary" | "secondary" | "success" | "danger" | "none";
 
@@ -25,8 +25,7 @@ export function Button({
   className="",
   ...props
 }: ButtonProps): React.ReactNode {
-  let buttonId = id;
-  if (!buttonId) buttonId = "button_" + useId();
+  const buttonId = useId(id, "button");
   const displayLoadingSpinner = showLoading && loading;
   const buttonDisabled = disabled || loading;
   

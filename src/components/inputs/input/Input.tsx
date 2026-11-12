@@ -1,8 +1,9 @@
-import React, { useId, useState } from "react";
+import React, { useState } from "react";
 import type { UseInputResult } from "../../../hooks/useInput";
 import { checkRequirement } from "../../../lib/client/utils";
 import { Button } from "../button/Button";
 import { Eye, EyeClosed } from "lucide-react";
+import { useId } from "../../../hooks/useId";
 
 type BaseInputProps = {
   errors?: string | string[] | null;
@@ -83,7 +84,7 @@ export function Input({
     requiredByName = isRequiredByName;
   }
 
-  let inputId = baseName ? baseName + "_" + useId() : useId();
+  let inputId = useId("", baseName);
 
   // Set hook values
   if (hook) {
