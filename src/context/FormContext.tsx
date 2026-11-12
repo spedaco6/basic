@@ -20,14 +20,20 @@ export const useFormCtx = () => {
   return ctx;
 }
 
-export const FormContextProvider = ({ children, id, ...props }: FormProps) => {
+export const FormContextProvider = ({ 
+  children, 
+  id, 
+  loading=false, 
+  disabled=false, 
+  ...props 
+}: FormProps) => {
   let formId = "form_" + useId();
   if (id) formId = id;
 
   const value = {
     id: formId,
-    disabled: false,
-    loading: false,
+    disabled,
+    loading,
     submitting: false,
     valid: false,
     complete: false,
